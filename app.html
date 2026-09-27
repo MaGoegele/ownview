@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="">
 <title>OwnView app</title>
 <meta name="robots" content="noindex,nofollow">
-<meta name="description" content="OwnView app: the personal wealth cockpit behind the sign-in. Net worth, allocation, valuations, Swiss tax pack, all with method, source and date.">
+<meta name="description" content="OwnView app: the personal wealth cockpit behind the sign-in. Net worth, allocation, valuations across currencies, a Swiss tax pack, all with method, source and date.">
 <style>
   :root{
     --pine:#1F5E4C; --pine-soft:#E7F0EA; --paper:#F6F4EE; --card:#FFFFFF;
@@ -623,17 +623,6 @@
         <div id="docRecentList"></div>
         <p class="note" id="docRecentEmpty" data-i18n="docs.recent_empty">Nothing read yet. Choose a file above; it is classified and read here without leaving your browser.</p>
         <p class="note" data-i18n="docs.recent_ocr">A PDF or a scanned image is recognized and named, but reading it needs an OCR/document-AI provider, which is not enabled here, so nothing is applied.</p>
-      </section>
-      <section class="card" id="docExport">
-        <h3 data-i18n="export.head" style="margin:0 0 4px;">Export the portfolio</h3>
-        <p class="note" data-i18n="export.sub">Download the same figures the dashboard shows as a workbook, a report or a deck. Every figure keeps its source and date.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-          <button type="button" class="btn" id="expXlsx" data-i18n="export.xlsx">Excel (.xlsx)</button>
-          <button type="button" class="btn" id="expDocx" data-i18n="export.docx">Word (.docx)</button>
-          <button type="button" class="btn" id="expPptx" data-i18n="export.pptx">PowerPoint (.pptx)</button>
-        </div>
-        <p class="note" id="expNote" hidden></p>
-        <p class="note" data-i18n="export.import_hint">To bring holdings back in, drop an Excel or CSV statement above.</p>
       </section>
     </section>
 
@@ -1687,40 +1676,6 @@
       parseUpload(f);
     });
   }
-  // Download the portfolio as a file. The endpoint returns the file bytes and a
-  // Content-Disposition; we read the filename from it and hand the blob to a
-  // temporary link, so the browser saves it like any download. A non-file
-  // response (an error object) is read as JSON and shown as a reason.
-  function exportPortfolio(fmt){
-    var note=document.getElementById("expNote");
-    if(note){note.hidden=false;note.textContent=T("export.working");}
-    fetch("api/export?format="+encodeURIComponent(fmt),{cache:"no-store"})
-      .then(function(r){
-        var disp=r.headers.get("Content-Disposition")||"";
-        var m=/filename="([^"]+)"/.exec(disp);
-        var name=m?m[1]:("ownview-portfolio."+fmt);
-        return r.blob().then(function(blob){return {ok:r.ok,blob:blob,name:name,type:r.headers.get("Content-Type")||""};});
-      })
-      .then(function(res){
-        if(!res.ok||(res.type&&res.type.indexOf("json")>=0)){
-          return res.blob().text().then(function(txt){
-            var msg=T("export.fail");
-            try{var j=JSON.parse(txt);if(j&&j.reason){msg=j.reason;}}catch(e){}
-            if(note){note.textContent=msg;}
-          });
-        }
-        var url=URL.createObjectURL(res.blob);
-        var a=document.createElement("a");
-        a.href=url;a.download=res.name;document.body.appendChild(a);a.click();
-        document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},4000);
-        if(note){note.textContent=T("export.done",{name:res.name});}
-      })
-      .catch(function(){if(note){note.textContent=T("export.fail");}});
-  }
-  [["expXlsx","xlsx"],["expDocx","docx"],["expPptx","pptx"]].forEach(function(pair){
-    var b=document.getElementById(pair[0]);
-    if(b){b.addEventListener("click",function(){exportPortfolio(pair[1]);});}
-  });
   // One row per candidate. A low-confidence line still flags REVIEW before you
   // confirm it; nothing is hidden. Until you press Confirm the row is a
   // proposal and the ledger is untouched.
