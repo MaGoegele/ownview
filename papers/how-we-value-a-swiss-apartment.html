@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How we value a Swiss apartment</title>
+<link rel="stylesheet" href="../legal/legal.css">
+<style>
+  article{max-width:720px;}
+  h1{font-size:1.9rem;letter-spacing:-.01em;margin:6px 0 0;}
+  .kicker{font-family:ui-monospace,monospace;font-size:.68rem;letter-spacing:.14em;
+    text-transform:uppercase;color:#B98A2E;font-weight:700;}
+  h2{font-size:1.15rem;margin:28px 0 6px;}
+  p{color:#3A453E;line-height:1.65;}
+  .meta{margin-top:26px;}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" id="brandLink" href="../app.html"></a>
+  <button class="langbtn" id="langBtn" type="button" title="Language"><span id="langLabel">DE</span></button>
+</header>
+<main>
+  <article>
+    <div class="kicker" data-i18n="paper.kicker"></div>
+    <h1 data-i18n="paper.title"></h1>
+    <p data-i18n="paper.lead"></p>
+
+    <h2 data-i18n="paper.s1_h"></h2><p data-i18n="paper.s1_p"></p>
+    <h2 data-i18n="paper.s2_h"></h2><p data-i18n="paper.s2_p"></p>
+    <h2 data-i18n="paper.s3_h"></h2><p data-i18n="paper.s3_p"></p>
+    <h2 data-i18n="paper.s4_h"></h2><p data-i18n="paper.s4_p"></p>
+    <h2 data-i18n="paper.s5_h"></h2><p data-i18n="paper.s5_p"></p>
+
+    <div class="disc"><span class="lbl" data-i18n="paper.kicker"></span><span data-i18n="paper.disclaimer"></span></div>
+
+    <p class="meta"><span data-i18n="legal.updated"></span>: 2026-09-24</p>
+    <a class="back" href="../app.html" data-i18n="paper.back"></a>
+  </article>
+</main>
+<script>window.OWNVIEW_BASE = "../";</script>
+<script src="../i18n/runtime.js"></script>
+<script>
+(function(){
+  var T = function(k){ return window.OwnViewI18n.T(k); };
+  function repaint(){
+    window.OwnViewI18n.applyI18n();
+    document.title = T("paper.title") + " - " + window.OwnViewI18n.brand();
+    document.getElementById("brandLink").textContent = window.OwnViewI18n.brand();
+  }
+  window.OwnViewI18n.init(repaint);
+  document.getElementById("langBtn").addEventListener("click", function(){
+    window.OwnViewI18n.toggle(repaint);
+  });
+})();
+</script>
+</body>
+</html>

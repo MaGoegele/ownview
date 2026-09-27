@@ -1,1 +1,579 @@
-<!doctype html><title>OwnView probe</title><h1>hi</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231F5E4C'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#1F5E4C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="">
+<title>OwnView: net worth in one place, Swiss tax ready</title>
+<meta name="description" content="OwnView shows every asset you own in one view: listed, property, private markets, crypto, metals, collectibles and cash. Each figure keeps its method, source and as-of date, ready for the Swiss tax pack. Portfolio information, not advice.">
+<meta name="robots" content="index,follow">
+<meta name="author" content="OwnView">
+<link rel="canonical" href="https://magoegele.github.io/ownview/">
+
+<!-- Open Graph / social preview -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OwnView">
+<meta property="og:title" content="OwnView: net worth in one place">
+<meta property="og:description" content="Every asset in one view, each figure with its method, source and date. Swiss-tax-ready. Portfolio information, not advice.">
+<meta property="og:locale" content="en_CH">
+<meta property="og:locale:alternate" content="de_CH">
+<meta property="og:url" content="https://magoegele.github.io/ownview/">
+<meta property="og:image" content="https://magoegele.github.io/ownview/portfolio.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OwnView: net worth in one place">
+<meta name="twitter:description" content="Every asset in one view, each figure with its method, source and date. Swiss-tax-ready.">
+<meta name="twitter:image" content="https://magoegele.github.io/ownview/portfolio.png">
+<link rel="alternate" hreflang="en" href="https://magoegele.github.io/ownview/">
+<link rel="alternate" hreflang="de" href="https://magoegele.github.io/ownview/">
+
+<!-- JSON-LD: the product, described to crawlers. No price until the model is
+     public (landing.price.note), so offers carry no amount. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "OwnView",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "description": "Personal wealth cockpit: every asset in one view, each figure with its method, source and date, Swiss-tax-ready.",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CHF"},
+  "inLanguage": ["en", "de"],
+  "isAccessibleForFree": true
+}
+</script>
+<style>
+  :root{
+    --pine:#1F5E4C; --pine-soft:#E7F0EA; --paper:#F6F4EE; --card:#FFFFFF;
+    --ink:#17201C; --muted:#5C6A62; --line:#E4E0D4;
+    --est:#B98A2E; --est-soft:#F5EDD8; --pos:#2E6B3E; --neg:#B23A2E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;}
+  .num{font-variant-numeric:tabular-nums;}
+  a{color:var(--pine);}
+  header{border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:20;}
+  .bar{max-width:1080px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:18px;}
+  .brand{font-weight:700;letter-spacing:-.01em;font-size:1.05rem;text-decoration:none;color:var(--ink);}
+  .bnav{display:flex;gap:18px;margin-left:auto;align-items:center;}
+  .bnav a{font-size:.83rem;color:var(--muted);text-decoration:none;font-weight:500;}
+  .bnav a:hover{color:var(--ink);}
+  .btn{display:inline-block;padding:9px 16px;border-radius:9px;font-size:.85rem;font-weight:600;
+    text-decoration:none;cursor:pointer;border:1px solid transparent;}
+  .btn.p{background:var(--pine);color:#fff;}
+  .btn.gh{background:transparent;border-color:var(--line);color:var(--ink);}
+  .btn.sm{padding:7px 13px;font-size:.8rem;}
+  .langbtn{background:none;border:1px solid var(--line);border-radius:8px;padding:5px 11px;
+    font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;}
+  @media(max-width:820px){.bnav .hide{display:none;}}
+  @media(max-width:420px){
+    .bar{padding:11px 16px;gap:10px;}
+    .bnav{gap:10px;}
+    .bnav .signin{display:none;}
+    .btn.sm{padding:7px 11px;font-size:.75rem;}
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+  .hero{padding:64px 0 44px;}
+  .eyebrow{font-family:ui-monospace,monospace;font-size:.68rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--est);font-weight:700;}
+  h1{font-size:2.5rem;line-height:1.12;letter-spacing:-.02em;margin:14px 0 0;max-width:20ch;}
+  .lead{font-size:1.05rem;color:var(--muted);max-width:62ch;margin:18px 0 0;}
+  .cta{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap;}
+  .note{font-size:.76rem;color:var(--muted);margin-top:16px;font-family:ui-monospace,monospace;}
+  .proof{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:40px 0 0;}
+  @media(max-width:640px){.proof{grid-template-columns:1fr;}}
+  .proof .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;}
+  .proof .v{font-size:1.9rem;font-weight:700;letter-spacing:-.02em;}
+  .proof .v b{color:var(--pine);}
+  .proof .l{font-size:.8rem;color:var(--muted);margin-top:4px;}
+  section.band{border-top:1px solid var(--line);padding:56px 0;}
+  h2{font-size:1.5rem;letter-spacing:-.01em;margin:0;}
+  .sub{color:var(--muted);margin:10px 0 0;max-width:64ch;}
+  .caps{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px;}
+  @media(max-width:820px){.caps{grid-template-columns:1fr;}}
+  .cap{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;}
+  .cap h3{margin:0 0 6px;font-size:1rem;}
+  .cap p{margin:0;color:var(--muted);font-size:.88rem;}
+  .shot{border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:14px;margin-top:12px;}
+  .row{display:flex;justify-content:space-between;gap:12px;font-size:.82rem;padding:6px 0;border-bottom:1px dashed var(--line);}
+  .row:last-child{border-bottom:0;}
+  .row .k{color:var(--muted);}
+  .row .v{font-weight:600;}
+  .est{color:var(--est);}
+  .src{display:block;font-size:.68rem;color:var(--muted);font-family:ui-monospace,monospace;margin-top:2px;}
+  .tick{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    padding:8px 0;border-bottom:1px solid var(--line);font-size:.83rem;}
+  .tick:last-child{border-bottom:0;}
+  .tick .nm{font-weight:600;}
+  .tick .vl{font-variant-numeric:tabular-nums;font-weight:600;}
+  .tick .chg{font-size:.76rem;font-weight:700;}
+  .up{color:var(--pos);} .down{color:var(--neg);}
+  .tick .dt{color:var(--muted);font-size:.68rem;font-family:ui-monospace,monospace;display:block;text-align:right;}
+  .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px;}
+  @media(max-width:820px){.cols{grid-template-columns:1fr;}}
+  .tourgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px;}
+  @media(max-width:820px){.tourgrid{grid-template-columns:1fr;}}
+  .tstep{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden;
+    cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit;display:flex;flex-direction:column;}
+  .tstep:hover{border-color:var(--pine);}
+  .tstep .im{aspect-ratio:4/5;background:var(--pine-soft);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .tstep .im img{width:100%;height:100%;object-fit:cover;object-position:top;}
+  .tstep .tx{padding:12px 14px;}
+  .tstep .tx .tag{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--pine);}
+  .tstep .tx h3{margin:5px 0 4px;font-size:.98rem;}
+  .tstep .tx p{margin:0;font-size:.84rem;color:var(--muted);line-height:1.55;}
+  .item{padding:12px 0;border-bottom:1px solid var(--line);}
+  .item:last-child{border-bottom:0;}
+  .item .t{font-weight:600;font-size:.9rem;}
+  .item .d{color:var(--muted);font-size:.82rem;margin-top:3px;}
+  .chip{display:inline-block;font-size:.64rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--est);background:var(--est-soft);padding:2px 8px;border-radius:999px;margin-left:6px;}
+  .pricegrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px;max-width:760px;}
+  @media(max-width:640px){.pricegrid{grid-template-columns:1fr;}}
+  .tier{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;}
+  .tier.hot{border-color:var(--pine);}
+  .tier h3{margin:0;font-size:1.05rem;}
+  .tier ul{margin:14px 0 0;padding-left:18px;color:var(--muted);font-size:.86rem;}
+  .tier li{margin:6px 0;}
+  .status{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--est);background:var(--est-soft);padding:3px 9px;border-radius:999px;margin-bottom:12px;}
+  footer{border-top:1px solid var(--line);background:var(--card);padding:34px 0 46px;margin-top:8px;}
+  .fgrid{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;
+    gap:20px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);}
+  .fgrid a{color:var(--muted);text-decoration:none;margin-right:16px;}
+  .fgrid a:hover{color:var(--ink);}
+  .disc{margin-top:18px;font-size:.76rem;color:var(--muted);max-width:70ch;}
+</style>
+</head>
+<body>
+<script src="api-base.js"></script>
+<script>window.OWNVIEW_BASE = "";</script>
+<script src="i18n/runtime.js"></script>
+
+<header>
+  <div class="bar">
+    <a class="brand" id="brandLink" href="index.html"></a>
+    <nav class="bnav">
+      <a class="hide" href="#product" data-i18n="landing.nav.product"></a>
+      <a class="hide" href="#market" data-i18n="landing.nav.market"></a>
+      <a class="hide" href="#papers" data-i18n="landing.nav.papers"></a>
+      <a class="hide" href="#pricing" data-i18n="landing.nav.price"></a>
+      <a class="signin" href="app.html" data-i18n="landing.nav.signin"></a>
+      <a class="btn p sm" href="app.html#demo" data-i18n="landing.nav.demo"></a>
+      <button class="langbtn" id="langBtn"><span id="langLabel"></span></button>
+    </nav>
+  </div>
+</header>
+
+<div class="hero wrap">
+  <div class="eyebrow" data-i18n="landing.hero.eyebrow"></div>
+  <h1 data-i18n="landing.title"></h1>
+  <p class="lead" data-i18n="landing.hero.lead"></p>
+  <div class="cta">
+    <a class="btn p" href="app.html#demo" data-i18n="landing.nav.demo"></a>
+    <a class="btn gh" href="app.html" data-i18n="landing.nav.signin"></a>
+  </div>
+  <div class="note" data-i18n="landing.hero.note"></div>
+
+  <div class="proof">
+    <div class="card"><div class="v"><b data-i18n="landing.proof.1.v"></b></div><div class="l" data-i18n="landing.proof.1.l"></div></div>
+    <div class="card"><div class="v"><b data-i18n="landing.proof.2.v"></b></div><div class="l" data-i18n="landing.proof.2.l"></div></div>
+    <div class="card"><div class="v"><b data-i18n="landing.proof.3.v"></b></div><div class="l" data-i18n="landing.proof.3.l"></div></div>
+  </div>
+</div>
+
+<section class="band" id="product">
+  <div class="wrap">
+    <h2 data-i18n="landing.cap.title"></h2>
+    <p class="sub" data-i18n="landing.cap.lead"></p>
+    <div class="caps">
+
+      <div class="cap">
+        <h3 data-i18n="landing.cap.portfolio.t"></h3>
+        <p data-i18n="landing.cap.portfolio.d"></p>
+        <div class="shot" id="wPortfolio"></div>
+      </div>
+
+      <div class="cap">
+        <h3 data-i18n="landing.cap.valuation.t"></h3>
+        <p data-i18n="landing.cap.valuation.d"></p>
+        <div class="shot" id="wValuation"></div>
+      </div>
+
+      <div class="cap">
+        <h3 data-i18n="landing.cap.style.t"></h3>
+        <p data-i18n="landing.cap.style.d"></p>
+        <div class="shot" id="wStyle"></div>
+      </div>
+
+      <div class="cap">
+        <h3 data-i18n="landing.cap.flags.t"></h3>
+        <p data-i18n="landing.cap.flags.d"></p>
+        <div class="shot" id="wFlags"></div>
+      </div>
+
+      <div class="cap">
+        <h3 data-i18n="landing.cap.tax.t"></h3>
+        <p data-i18n="landing.cap.tax.d"></p>
+        <div class="shot" id="wTax"></div>
+      </div>
+
+      <div class="cap">
+        <h3 data-i18n="landing.cap.docs.t"></h3>
+        <p data-i18n="landing.cap.docs.d"></p>
+      </div>
+
+      <div class="cap">
+        <h3 data-i18n="landing.cap.share.t"></h3>
+        <p data-i18n="landing.cap.share.d"></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="band" id="tour">
+  <div class="wrap">
+    <h2 data-i18n="tour.section"></h2>
+    <p class="sub" id="tourLead"></p>
+    <div class="tourgrid" id="tourGrid"></div>
+    <div class="cta" style="margin-top:22px;">
+      <a class="btn p" href="app.html#tour" data-i18n="tour.open"></a>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="market">
+  <div class="wrap">
+    <h2 data-i18n="landing.market.title"></h2>
+    <p class="sub" data-i18n="landing.market.lead"></p>
+    <div class="cols">
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:.95rem;" data-i18n="landing.market.trends_h"></h3>
+        <div id="wTrends"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:.95rem;" data-i18n="landing.market.news_h"></h3>
+        <div id="wNews"></div>
+      </div>
+      <div class="card" id="papers">
+        <h3 style="margin:0 0 10px;font-size:.95rem;" data-i18n="landing.market.papers_h"></h3>
+        <div id="wPapers"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="pricing">
+  <div class="wrap">
+    <span class="status" data-i18n="landing.price.status"></span>
+    <h2 data-i18n="landing.price.title"></h2>
+    <div class="pricegrid">
+      <div class="tier hot">
+        <h3 data-i18n="landing.price.free.t"></h3>
+        <p class="sub" style="margin-top:4px;font-size:.85rem;" data-i18n="landing.price.free.d"></p>
+        <ul>
+          <li data-i18n="landing.price.free.1"></li>
+          <li data-i18n="landing.price.free.2"></li>
+          <li data-i18n="landing.price.free.3"></li>
+        </ul>
+      </div>
+      <div class="tier">
+        <h3 data-i18n="landing.price.paid.t"></h3>
+        <p class="sub" style="margin-top:4px;font-size:.85rem;" data-i18n="landing.price.paid.d"></p>
+        <ul>
+          <li data-i18n="landing.price.paid.1"></li>
+          <li data-i18n="landing.price.paid.2"></li>
+          <li data-i18n="landing.price.paid.3"></li>
+        </ul>
+      </div>
+    </div>
+    <p class="disc" data-i18n="landing.price.note"></p>
+  </div>
+</section>
+
+<section class="band" id="audience">
+  <div class="wrap">
+    <span class="status" data-i18n="landing.aud.status"></span>
+    <h2 data-i18n="landing.aud.title"></h2>
+    <p class="sub" data-i18n="landing.aud.lead" style="max-width:70ch;"></p>
+    <div class="pricegrid">
+      <div class="tier">
+        <span class="tag" style="display:inline-block;background:#E7E9F3;color:#3B4C7A;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;font-family:ui-monospace,monospace;letter-spacing:.06em;" data-i18n="landing.aud.b2c.tag"></span>
+        <h3 data-i18n="landing.aud.b2c.t"></h3>
+        <p class="sub" style="margin-top:4px;font-size:.85rem;" data-i18n="landing.aud.b2c.d"></p>
+        <ul>
+          <li data-i18n="landing.aud.b2c.1"></li>
+          <li data-i18n="landing.aud.b2c.2"></li>
+          <li data-i18n="landing.aud.b2c.3"></li>
+        </ul>
+        <div class="cta" style="margin-top:14px;">
+          <a class="btn p" href="app.html#demo" data-i18n="landing.aud.b2c.cta"></a>
+        </div>
+      </div>
+      <div class="tier">
+        <span class="tag" style="display:inline-block;background:#E7E9F3;color:#3B4C7A;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;font-family:ui-monospace,monospace;letter-spacing:.06em;" data-i18n="landing.aud.b2b.tag"></span>
+        <h3 data-i18n="landing.aud.b2b.t"></h3>
+        <p class="sub" style="margin-top:4px;font-size:.85rem;" data-i18n="landing.aud.b2b.d"></p>
+        <ul>
+          <li data-i18n="landing.aud.b2b.1"></li>
+          <li data-i18n="landing.aud.b2b.2"></li>
+          <li data-i18n="landing.aud.b2b.3"></li>
+        </ul>
+        <div class="cta" style="margin-top:14px;">
+          <a class="btn gh" href="altpilot/" data-i18n="landing.aud.b2b.cta"></a>
+        </div>
+      </div>
+    </div>
+    <p class="disc" data-i18n="landing.aud.note"></p>
+  </div>
+</section>
+
+<section class="band" id="cta">
+  <div class="wrap" style="text-align:center;">
+    <h2 data-i18n="landing.cta.title"></h2>
+    <p class="sub" style="margin:12px auto 0;" data-i18n="landing.cta.lead"></p>
+    <div class="cta" style="justify-content:center;">
+      <a class="btn p" href="app.html#demo" data-i18n="landing.nav.demo"></a>
+      <a class="btn gh" href="app.html#tour" data-i18n="tour.open"></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fgrid">
+    <div>
+      <span class="brand" id="footBrand"></span>
+      <div class="disc" style="margin-top:8px;" data-i18n="landing.footer.build"></div>
+    </div>
+    <div>
+      <div style="font-weight:600;color:var(--ink);margin-bottom:8px;" data-i18n="landing.footer.legal"></div>
+      <a href="legal/imprint.html" data-i18n="legal.imprint.title"></a>
+      <a href="legal/privacy.html" data-i18n="legal.privacy.title"></a>
+      <a href="legal/terms.html" data-i18n="legal.terms.title"></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var T = function(k){ return window.OwnViewI18n.T(k); };
+  var MKT = function(){ return window.OwnViewI18n.market(); };
+  var loc = function(f){ return window.OwnViewI18n.loc(f); };
+
+  // market content as data: market.config.json at the root, shared with the app
+  // strip, so one edit updates both. Each item keeps a named source and a date.
+  function renderTrends(){
+    var s=document.getElementById("wTrends"); if(!s) return; s.innerHTML="";
+    (MKT().levels||[]).forEach(function(t){
+      var chg=t.change||"";
+      var cls = chg.indexOf("-")===0 ? "down" : (chg.indexOf("+")===0 ? "up" : "");
+      var d=document.createElement("div"); d.className="tick";
+      d.innerHTML='<span class="nm">'+t.name+'</span>'+
+        '<span><span class="vl num">'+t.value+'</span> <span class="chg '+cls+'">'+chg+'</span>'+
+        '<span class="dt">'+t.source+' &middot; '+t.date+'</span></span>';
+      s.appendChild(d);
+    });
+  }
+  function renderNews(){
+    var s=document.getElementById("wNews"); if(!s) return; s.innerHTML="";
+    (MKT().news||[]).forEach(function(n){
+      var d=document.createElement("div"); d.className="item";
+      d.innerHTML='<div class="t">'+loc(n.title)+'</div><div class="d">'+loc(n.body)+'</div>'+
+        '<span class="src">'+n.source+', '+n.date+'</span>';
+      s.appendChild(d);
+    });
+  }
+  function renderPapers(){
+    var s=document.getElementById("wPapers"); if(!s) return; s.innerHTML="";
+    (MKT().papers||[]).forEach(function(p){
+      var d=document.createElement("div"); d.className="item";
+      var chip = p.status==="live" ? "" : '<span class="chip">'+T("landing.paper.soon")+'</span>';
+      var link = p.status==="live"
+        ? '<a class="src" style="margin-top:6px;" href="'+p.href+'">'+T("landing.paper.read")+'</a>' : "";
+      d.innerHTML='<div class="t">'+loc(p.title)+chip+'</div><div class="d">'+loc(p.blurb)+'</div>'+link;
+      s.appendChild(d);
+    });
+  }
+
+  // live mini-widgets from the synthetic demo household (no stock art)
+  var TOTAL = 2901661;
+  function chf(n){ return "CHF " + n.toLocaleString("de-CH"); }
+  function row(k,v,sub,cls){
+    return '<div class="row"><span class="k">'+k+(sub?'<span class="src">'+sub+'</span>':'')+
+      '</span><span class="v '+(cls||"")+'">'+v+'</span></div>';
+  }
+  function renderPortfolio(){
+    var el=document.getElementById("wPortfolio"); if(!el) return;
+    var rows=[
+      ["lw.apartment","1,480,000","lw.m.d_apartment","est"],
+      ["lw.equityetf","742,100","lw.m_market",""],
+      ["lw.pe","318,900","lw.m_nav","est"],
+      ["lw.privco","150,000","lw.m_privco","est"],
+      ["lw.cash","196,000","lw.m_stmt",""],
+      ["lw.bondfund","170,300","lw.m_market",""],
+      ["lw.gold","118,500","lw.m_lbma","est"],
+      ["lw.car","95,000","lw.m_dealer","est"],
+      ["lw.crypto","84,400","lw.m_cg",""],
+      ["lw.watch","62,000","lw.m_auction","est"],
+      ["lw.mortgage","-780,000","lw.m_stmt",""]
+    ];
+    var h='<div class="row" style="border-bottom:1px solid var(--line);"><span class="k">'+T("lw.networth")+'</span><span class="v num" style="font-size:1.05rem;">'+chf(TOTAL)+'</span></div>';
+    h+=rows.map(function(r){ return row(T(r[0]), r[1], T(r[2]), r[3]); }).join("");
+    h+='<span class="src" style="margin-top:6px;">'+T("lw.foot_portfolio")+'</span>';
+    el.innerHTML=h;
+  }
+  function renderValuation(){
+    var el=document.getElementById("wValuation"); if(!el) return;
+    el.innerHTML=
+      row(T("lw.val_apartment"),T("lw.val_range"),T("lw.val_ap"),"est")+
+      row(T("lw.equityetf"),"742,100",T("lw.val_market"),"")+
+      row(T("lw.gold"),"118,500",T("lw.val_spot"),"est")+
+      '<span class="src" style="margin-top:6px;">'+T("lw.foot_valuation")+'</span>';
+  }
+  function renderStyle(){
+    var el=document.getElementById("wStyle"); if(!el) return;
+    var rows=[["lw.realestate","48%","lw.t_realestate"],["lw.equity","30%","lw.t_equity"],
+      ["lw.private","13%","lw.t_private"],["lw.metals","5%","lw.t_metals"],["lw.crypto_c","3%","lw.t_crypto"]];
+    el.innerHTML=rows.map(function(r){ return row(T(r[0]), r[1], T("lw.ref")+" "+T(r[2])); }).join("")+
+      '<span class="src" style="margin-top:6px;">'+T("lw.foot_style")+'</span>';
+  }
+  function renderFlags(){
+    var el=document.getElementById("wFlags"); if(!el) return;
+    el.innerHTML=
+      '<div class="row"><span class="k">'+T("lw.conc")+'<span class="src">'+T("lw.fc")+'</span></span><span class="v" style="color:var(--neg);">'+T("lw.flag")+'</span></div>'+
+      '<div class="row"><span class="k">'+T("lw.liq")+'<span class="src">'+T("lw.fl")+'</span></span><span class="v" style="color:var(--neg);">'+T("lw.flag")+'</span></div>'+
+      '<div class="row"><span class="k">'+T("lw.vol")+'<span class="src">'+T("lw.fv")+'</span></span><span class="v">'+T("lw.note")+'</span></div>'+
+      '<div class="row"><span class="k">'+T("lw.stale")+'<span class="src">'+T("lw.fs")+'</span></span><span class="v">'+T("lw.note")+'</span></div>'+
+      '<span class="src" style="margin-top:6px;">'+T("lw.foot_flags")+'</span>';
+  }
+  function renderTax(){
+    var el=document.getElementById("wTax"); if(!el) return;
+    el.innerHTML=
+      '<div class="row"><span class="k">'+T("lw.tax_basis")+'<span class="src">'+T("lw.tax_basis_s")+'</span></span><span class="v num">3,417,200</span></div>'+
+      '<div class="row"><span class="k">'+T("lw.tax_debt")+'</span><span class="v num">780,000</span></div>'+
+      '<div class="row"><span class="k">'+T("lw.tax_net")+'</span><span class="v num">2,637,200</span></div>'+
+      '<div class="row"><span class="k">'+T("lw.tax_sec")+'<span class="src">'+T("lw.tax_sec_s")+'</span></span><span class="v">'+T("lw.tax_rows")+'</span></div>'+
+      '<span class="src" style="margin-top:6px;">'+T("lw.foot_tax")+'</span>';
+  }
+
+  // The demo tour, as data from tour.config.json (shared with the app lightbox):
+  // a grid of steps that open a lightbox with the full screenshot and caption.
+  var TOUR=null;
+  function loadTour(){
+    return fetch("tour.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){ TOUR=d||{steps:[]}; return TOUR; }).catch(function(){ TOUR={steps:[]}; return TOUR; });
+  }
+  function renderTour(){
+    var el=document.getElementById("tourGrid"); if(!el) return;
+    var steps=(TOUR&&TOUR.steps)||[];
+    var lead=document.getElementById("tourLead"); if(lead) lead.textContent=loc(TOUR.intro);
+    el.innerHTML=steps.map(function(s,i){
+      return '<button type="button" class="tstep" data-step="'+i+'">'+
+        '<span class="im"><img loading="lazy" src="'+s.shot+'" alt=""></span>'+
+        '<span class="tx"><span class="tag">'+loc(s.tag)+'</span>'+
+        '<h3>'+loc(s.title)+'</h3><p>'+loc(s.body)+'</p></span></button>';
+    }).join("");
+  }
+  var LB=null, lbIdx=0;
+  function lbEnsure(){
+    if(LB) return LB;
+    LB=document.createElement("div"); LB.className="lbox"; LB.id="lbox";
+    LB.innerHTML='<div class="panel"><div class="lhead"><span class="tag" id="lbTag"></span>'+
+      '<span class="ttl" id="lbTtl"></span><span class="cnt" id="lbCnt"></span>'+
+      '<button class="x" id="lbX" type="button" aria-label="Close">&#10005;</button></div>'+
+      '<div class="shotwrap"><img id="lbShot" alt="" src=""></div>'+
+      '<div class="dots" id="lbDots"></div><div class="cap"><p id="lbBody"></p></div>'+
+      '<div class="lfoot"><button class="btn gh" id="lbPrev" type="button"></button>'+
+      '<button class="spbtn" id="lbClose" type="button"></button>'+
+      '<button class="btn p" id="lbNext" type="button"></button></div></div>';
+    document.body.appendChild(LB);
+    document.getElementById("lbX").addEventListener("click",lbClose);
+    document.getElementById("lbClose").addEventListener("click",lbClose);
+    document.getElementById("lbPrev").addEventListener("click",function(){lbGo(-1);});
+    document.getElementById("lbNext").addEventListener("click",function(){lbGo(1);});
+    LB.addEventListener("click",function(e){ if(e.target===LB) lbClose(); });
+    document.addEventListener("keydown",function(e){
+      if(!LB.classList.contains("on")) return;
+      if(e.key==="Escape") lbClose();
+      else if(e.key==="ArrowRight") lbGo(1);
+      else if(e.key==="ArrowLeft") lbGo(-1);
+    });
+    var tx=null;
+    LB.addEventListener("touchstart",function(e){tx=e.touches[0].clientX;},{passive:true});
+    LB.addEventListener("touchend",function(e){
+      if(tx===null) return; var dx=e.changedTouches[0].clientX-tx; tx=null;
+      if(Math.abs(dx)>40) lbGo(dx<0?1:-1);
+    },{passive:true});
+    return LB;
+  }
+  function lbPaint(){
+    var steps=(TOUR&&TOUR.steps)||[]; if(!steps.length) return;
+    var s=steps[lbIdx];
+    document.getElementById("lbTag").textContent=loc(s.tag);
+    document.getElementById("lbTtl").textContent=loc(s.title);
+    document.getElementById("lbBody").textContent=loc(s.body);
+    document.getElementById("lbCnt").textContent=(lbIdx+1)+" / "+steps.length;
+    var img=document.getElementById("lbShot"); img.src=s.shot; img.alt=loc(s.title);
+    document.getElementById("lbPrev").textContent=T("tour.prev");
+    document.getElementById("lbNext").textContent=T("tour.next");
+    document.getElementById("lbClose").textContent=T("tour.close");
+    document.getElementById("lbPrev").style.visibility=lbIdx===0?"hidden":"visible";
+    document.getElementById("lbNext").style.visibility=lbIdx===steps.length-1?"hidden":"visible";
+    var dots=document.getElementById("lbDots"); dots.innerHTML="";
+    steps.forEach(function(_,i){
+      var d=document.createElement("i"); if(i===lbIdx) d.className="on";
+      d.addEventListener("click",function(){lbIdx=i;lbPaint();}); dots.appendChild(d);
+    });
+  }
+  function lbGo(d){
+    var steps=(TOUR&&TOUR.steps)||[];
+    lbIdx=Math.max(0,Math.min(steps.length-1,lbIdx+d)); lbPaint();
+  }
+  function lbOpen(i){
+    lbEnsure(); lbIdx=Math.max(0,i||0);
+    LB.classList.add("on"); document.body.style.overflow="hidden"; lbPaint();
+  }
+  function lbClose(){ if(!LB) return; LB.classList.remove("on"); document.body.style.overflow=""; }
+
+  // paint() waits on the market config first (init loads it), so the trends,
+  // news and paper lists share one source of truth with the app strip.
+  function paint(){
+    renderTrends(); renderNews(); renderPapers();
+    renderPortfolio(); renderValuation();
+    renderStyle(); renderFlags(); renderTax(); renderTour();
+  }
+
+  document.getElementById("tourGrid").addEventListener("click", function(e){
+    var b=e.target.closest("[data-step]"); if(!b) return;
+    lbOpen(parseInt(b.getAttribute("data-step"),10));
+  });
+
+  loadTour().then(function(){
+    window.OwnViewI18n.init(function(){
+      window.OwnViewI18n.applyI18n();
+      var b = window.OwnViewI18n.brand();
+      document.title = T("landing.title") + " - " + b;
+      document.getElementById("brandLink").textContent = b;
+      var fb = document.getElementById("footBrand"); if(fb) fb.textContent = b;
+      var am = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+      if(am) am.setAttribute("content", b);
+      paint();
+    });
+  });
+
+  document.getElementById("langBtn").addEventListener("click", function(){
+    window.OwnViewI18n.toggle(function(){
+      document.title = T("landing.title") + " - " + window.OwnViewI18n.brand();
+      paint();
+    });
+  });
+})();
+</script>
+</body>
+</html>

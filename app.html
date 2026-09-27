@@ -1,0 +1,3043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231F5E4C'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#1F5E4C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="">
+<title>OwnView app</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="OwnView app: the personal wealth cockpit behind the sign-in. Net worth, allocation, valuations, Swiss tax pack, all with method, source and date.">
+<style>
+  :root{
+    --pine:#1F5E4C; --pine-soft:#E7F0EA; --paper:#F6F4EE; --card:#FFFFFF;
+    --ink:#17201C; --muted:#5C6A62; --line:#E4E0D4;
+    --est:#B98A2E; --est-soft:#F5EDD8; --pos:#2E6B3E; --neg:#B23A2E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5;}
+  .num{font-variant-numeric:tabular-nums;}
+  header{border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:20;}
+  .bar{max-width:1160px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:16px;}
+  .brand{font-weight:700;letter-spacing:-.01em;font-size:1.05rem;}
+  .brand b{color:var(--pine);}
+  .who{margin-left:auto;font-size:.8rem;color:var(--muted);}
+  .demo{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--est);background:var(--est-soft);padding:3px 9px;border-radius:999px;
+    font-family:ui-monospace,monospace;}
+  .shell{max-width:1160px;margin:0 auto;padding:0 24px 60px;display:grid;
+    grid-template-columns:196px 1fr;gap:24px;align-items:start;}
+  .nav{position:sticky;top:64px;padding:20px 0;display:flex;flex-direction:column;gap:2px;}
+  .nav a{padding:9px 13px;border-radius:9px;color:var(--muted);text-decoration:none;
+    font-size:.87rem;font-weight:500;cursor:pointer;}
+  .nav a:hover{background:var(--card);color:var(--ink);}
+  .nav a.on{background:var(--pine);color:#fff;}
+  .nav .sec{font-family:ui-monospace,monospace;font-size:.62rem;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);padding:14px 13px 4px;font-weight:700;}
+  main{padding:26px 0 0;min-width:0;}
+  .view{display:none;} .view.on{display:block;}
+  .grid{display:grid;gap:18px;}
+  .hero{grid-template-columns:1.35fr 1fr;}
+  @media(max-width:820px){.hero{grid-template-columns:1fr;}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;}
+  .eyebrow{font-family:ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;
+    font-size:.66rem;color:var(--muted);font-weight:700;}
+  h1{font-size:2.5rem;font-weight:700;letter-spacing:-.02em;margin:.35rem 0 .2rem;font-variant-numeric:tabular-nums;}
+  h2{font-size:1.05rem;margin:0 0 14px;font-weight:600;}
+  h3{font-size:.9rem;margin:18px 0 8px;font-weight:700;}
+  .sub{color:var(--muted);font-size:.85rem;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .chg{font-weight:600;font-size:.85rem;}
+  .chg.up{color:var(--pos);} .chg.down{color:var(--neg);}
+  .src{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:2px 8px;}
+  .src .dot{width:6px;height:6px;border-radius:50%;background:var(--pine);}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);gap:12px;}
+  .row:last-child{border-bottom:0;}
+  .row .l{display:flex;flex-direction:column;min-width:0;}
+  .row .l small{color:var(--muted);font-size:.72rem;}
+  .row .r{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;}
+  .alloc{display:grid;gap:10px;margin-top:4px;}
+  .alloc .a{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:.86rem;}
+  .bar2{height:8px;border-radius:6px;background:var(--pine-soft);overflow:hidden;margin-top:4px;}
+  .bar2 i{display:block;height:100%;background:var(--pine);border-radius:6px;}
+  .est-badge{font-size:.66rem;font-weight:700;color:var(--est);background:var(--est-soft);
+    padding:2px 7px;border-radius:6px;font-family:ui-monospace,monospace;letter-spacing:.04em;}
+  .stale-badge{font-size:.66rem;font-weight:700;color:#8a3b12;background:#F6E2D2;
+    padding:2px 7px;border-radius:6px;font-family:ui-monospace,monospace;letter-spacing:.04em;}
+  .rm{font-size:.66rem;font-weight:700;color:var(--muted);background:transparent;
+    border:1px solid var(--line);border-radius:6px;padding:3px 8px;margin-left:8px;
+    cursor:pointer;letter-spacing:.04em;}
+  .rm:hover{color:var(--neg);border-color:var(--neg);}
+  .rm-toggle{font-size:.7rem;font-weight:700;color:var(--muted);background:transparent;
+    border:1px solid var(--line);border-radius:6px;padding:5px 10px;margin:10px 0 4px;
+    cursor:pointer;letter-spacing:.04em;text-transform:uppercase;}
+  .rm-toggle:hover{color:var(--pine);border-color:var(--pine);}
+  #rmList .row{opacity:.72;}
+  .restore{font-size:.66rem;font-weight:700;color:var(--pine);background:transparent;
+    border:1px solid var(--pine);border-radius:6px;padding:3px 8px;margin-left:8px;
+    cursor:pointer;letter-spacing:.04em;}
+  .restore:hover{background:var(--pine);color:#fff;}
+  .range{display:flex;align-items:center;gap:10px;margin-top:6px;}
+  .range .track{flex:1;height:10px;background:#EFEAD9;border-radius:6px;position:relative;}
+  .range .band{position:absolute;top:0;bottom:0;background:var(--est);opacity:.35;border-radius:6px;}
+  .range .pt{position:absolute;top:-4px;width:4px;height:18px;background:var(--est);border-radius:2px;}
+  .flag{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.85rem;}
+  .flag:last-child{border-bottom:0;}
+  .flag .k{font-family:ui-monospace,monospace;font-size:.68rem;font-weight:700;color:var(--pine);
+    background:var(--pine-soft);padding:2px 7px;border-radius:6px;height:fit-content;white-space:nowrap;}
+  .flag small{color:var(--muted);display:block;margin-top:2px;}
+  .note{margin-top:16px;font-size:.78rem;color:var(--muted);border-left:3px solid var(--line);padding-left:12px;}
+  .nocall{margin-top:22px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--pine);
+    border-radius:12px;padding:16px 20px;font-size:.82rem;color:var(--muted);}
+  .nocall b{color:var(--ink);}
+  .strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;}
+  .tick{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 15px;}
+  .tick .nm{font-size:.78rem;font-weight:600;}
+  .tick .vl{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;margin:3px 0 2px;}
+  .tick .mt{font-size:.68rem;color:var(--muted);display:flex;justify-content:space-between;gap:6px;}
+  .tick .mt .dt{font-family:ui-monospace,monospace;}
+  form .f{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:640px){form .f{grid-template-columns:1fr;}}
+  label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.07em;margin:12px 0 5px;}
+  input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;
+    font-size:.9rem;font-family:inherit;background:#fff;color:var(--ink);}
+  input:focus,select:focus{outline:2px solid var(--pine-soft);border-color:var(--pine);}
+  .btn{margin-top:16px;padding:11px 18px;border:0;border-radius:10px;background:var(--pine);
+    color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .btn:hover{background:#194b3d;}
+  .btn.ghost{background:#fff;color:var(--muted);border:1px solid var(--line);}
+  .tag{font-size:.68rem;font-family:ui-monospace,monospace;background:var(--pine-soft);
+    color:var(--pine);padding:2px 7px;border-radius:6px;}
+  .tag.tag-warn{background:#fdecc8;color:#8a5a00;}
+  .empty{color:var(--muted);font-size:.85rem;padding:10px 0;}
+
+  .q{margin-top:6px;}
+  .q .qi{padding:13px 0;border-bottom:1px solid var(--line);}
+  .q .qi:last-of-type{border-bottom:0;}
+  .q .qt{font-size:.87rem;font-weight:600;margin:0 0 9px;}
+  .q .qo{display:flex;gap:8px;flex-wrap:wrap;}
+  .q .qo label{display:inline-flex;align-items:center;gap:6px;margin:0;padding:7px 12px;
+    border:1px solid var(--line);border-radius:999px;font-size:.8rem;font-weight:500;
+    text-transform:none;letter-spacing:0;color:var(--muted);cursor:pointer;background:#fff;}
+  .q .qo input{width:auto;margin:0;padding:0;}
+  .q .qo label.sel{border-color:var(--pine);background:var(--pine-soft);color:var(--ink);font-weight:600;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+  .chip{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;
+    font-size:.83rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;}
+  .chip:hover{border-color:var(--pine);color:var(--pine);}
+  .chip.on{background:var(--pine);color:#fff;border-color:var(--pine);}
+  .gapbar{margin-top:6px;}
+  .gapbar .gl{display:grid;grid-template-columns:150px 1fr 200px;gap:12px;align-items:center;
+    padding:9px 0;border-bottom:1px solid var(--line);font-size:.83rem;}
+  .gapbar .gl:last-child{border-bottom:0;}
+  @media(max-width:820px){.gapbar .gl{grid-template-columns:1fr;gap:4px;}}
+  .gapbar .track{position:relative;height:22px;background:#EFEAD9;border-radius:6px;overflow:hidden;}
+  .gapbar .cur{position:absolute;top:0;bottom:0;background:rgba(31,94,76,.22);}
+  .gapbar .tgt{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--pine);border-radius:2px;}
+  .gapbar .delta{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;}
+  .gapbar .delta.over{color:var(--est);} .gapbar .delta.under{color:var(--neg);}
+  .gapbar .delta.matched{color:var(--pos);}
+  .rep{margin-top:8px;border:1px solid var(--line);border-radius:12px;padding:18px 20px;
+    background:#FCFBF7;font-size:.87rem;line-height:1.6;}
+  .rep h3{margin:14px 0 6px;font-size:.82rem;font-family:ui-monospace,monospace;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--pine);}
+  .rep h3:first-child{margin-top:0;}
+  .rep p{margin:0 0 6px;}
+  .rep .closing{color:var(--muted);font-size:.78rem;border-top:1px solid var(--line);
+    padding-top:10px;margin-top:12px;}
+  footer{max-width:1160px;margin:0 auto;padding:0 24px 40px;color:var(--muted);font-size:.74rem;}
+
+  .gate{position:fixed;inset:0;background:var(--paper);display:flex;align-items:center;
+    justify-content:center;padding:24px;z-index:50;}
+  .gate.hidden{display:none;}
+  .gate .box{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:34px 30px;max-width:400px;width:100%;}
+  .gate h1{font-size:1.7rem;margin:.2rem 0 .4rem;letter-spacing:-.02em;}
+  .gate p{color:var(--muted);font-size:.86rem;margin:.2rem 0 18px;}
+  .gate .go{margin-top:20px;width:100%;padding:12px;border:0;border-radius:10px;
+    background:var(--pine);color:#fff;font-size:.92rem;font-weight:600;cursor:pointer;font-family:inherit;}
+  .gate .go:hover{background:#194b3d;}
+  .gate .hint{margin-top:16px;font-size:.76rem;color:var(--muted);
+    background:var(--est-soft);border-radius:10px;padding:11px 13px;}
+  .gate .hint code{font-family:ui-monospace,monospace;background:#fff;padding:1px 5px;border-radius:4px;}
+  .gate .ops{display:flex;gap:8px;margin-top:14px;}
+  .gate .ops button{flex:1;padding:9px;border:1px solid var(--line);border-radius:9px;
+    background:#fff;cursor:pointer;font-family:inherit;font-size:.8rem;color:var(--muted);}
+  .gate .ops button:hover{border-color:var(--pine);color:var(--pine);}
+  .gate .passkey{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.78rem;color:var(--muted);}
+  .gate .gatefoot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px;
+    padding-top:12px;border-top:1px solid var(--line);font-size:.74rem;}
+  .gate .gatefoot a{color:var(--muted);text-decoration:none;}
+  .gate .gatefoot a:hover{color:var(--pine);}
+  .gate .drafttag{margin-left:auto;background:#fdf6e6;border:1px solid #e8d5a8;color:#8a5a12;
+    border-radius:5px;padding:1px 7px;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;}
+
+  /* responsive: desktop, iPad, mobile */
+  .navbtn{display:none;margin-left:auto;background:var(--card);border:1px solid var(--line);
+    border-radius:9px;padding:7px 12px;font:inherit;font-size:.82rem;font-weight:600;
+    color:var(--ink);cursor:pointer;}
+  .navbtn:hover{border-color:var(--pine);color:var(--pine);}
+  .navbtn .chev{color:var(--muted);font-size:.7rem;}
+  .langbtn{margin-left:auto;background:var(--card);border:1px solid var(--line);
+    border-radius:9px;padding:7px 11px;font:inherit;font-size:.8rem;font-weight:700;
+    letter-spacing:.04em;color:var(--ink);cursor:pointer;}
+  .langbtn:hover{border-color:var(--pine);color:var(--pine);}
+  .navbtn{margin-left:0;}
+  @media(max-width:1024px){
+    .bar{flex-wrap:wrap;row-gap:8px;}
+    .who{order:3;flex-basis:100%;margin-left:0;}
+  }
+  @media(max-width:860px){
+    .shell{grid-template-columns:1fr;gap:0;padding:0 18px 48px;}
+    .navbtn{display:inline-flex;align-items:center;gap:6px;}
+    /* collapsed by default on small screens, opens as a panel under the header */
+    .nav{position:static;top:auto;padding:0;gap:4px;border:1px solid var(--line);
+      border-radius:12px;background:var(--card);overflow:hidden;
+      max-height:0;opacity:0;margin:0;visibility:hidden;
+      transition:max-height .18s ease,opacity .18s ease,visibility .18s;}
+    .nav.open{max-height:520px;opacity:1;visibility:visible;margin:14px 0 6px;padding:8px;}
+    .nav a{padding:12px 13px;font-size:.95rem;}
+    .nav .sec{padding:10px 13px 3px;}
+    main{padding:18px 0 0;}
+    h1{font-size:2rem;}
+    .card{padding:18px;}
+  }
+  @media(max-width:640px){
+    .bar{padding:12px 16px;gap:10px;}
+    .brand{font-size:1rem;}
+    .demo{font-size:.6rem;padding:2px 7px;}
+    .who{font-size:.74rem;}
+    h1{font-size:1.7rem;}
+    .card{padding:16px;}
+    .chips{gap:7px;}
+    .chip{padding:7px 11px;font-size:.82rem;}
+    .gapbar .gl{grid-template-columns:1fr;gap:6px;}
+    /* A portfolio row carries a value, badges and up to three controls in .r;
+       with white-space:nowrap it cannot fit a narrow screen and pushes the
+       page wide. Let the right side wrap and the row top-align. */
+    .row{align-items:flex-start;}
+    .row .l{flex:1 1 auto;}
+    .row .r{white-space:normal;display:flex;flex-wrap:wrap;justify-content:flex-end;
+      align-items:baseline;gap:4px 8px;}
+  }
+  @media(max-width:420px){
+    .who{display:none;}
+    .demo:not(.aidraft){display:none;}
+  }
+  /* Statement upload: a drop zone doubling as the file picker. */
+  .drop{display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+    border:1.5px dashed var(--line);border-radius:14px;padding:20px;cursor:pointer;
+    background:var(--paper);transition:border-color .12s,background .12s;}
+  .drop:hover,.drop.over{border-color:var(--pine);background:var(--card);}
+  .drop strong{font-size:.95rem;}
+  .drop span{color:var(--muted);font-size:.85rem;max-width:70ch;}
+  .drop input[type=file]{font:inherit;font-size:.82rem;margin-top:2px;}
+  /* Preview chip: what a confirm would do, before it is pressed. */
+  .pv{display:inline-block;font-size:.72rem;font-family:ui-monospace,monospace;
+    padding:3px 9px;border-radius:999px;margin:6px 0 0;border:1px solid var(--line);
+    color:var(--muted);background:var(--paper);}
+  .pv-create_asset,.pv-stack,.pv-flow{color:var(--pine);border-color:var(--pine-soft);}
+  .pv-flow_dup{color:var(--muted);}
+  .pv-supersede{color:#8a6d3b;border-color:#e6d9bf;background:#fbf6ec;}
+  .pv-refuse{color:#a33;border-color:#e6c3c3;background:#fbf0f0;font-weight:600;}
+  /* Tour lightbox: a stacked screenshot with a caption, deep-linkable. */
+  .tourbtn{background:var(--card);border:1px solid var(--line);border-radius:9px;
+    padding:7px 12px;font:inherit;font-size:.8rem;font-weight:600;color:var(--ink);cursor:pointer;}
+  .tourbtn:hover{border-color:var(--pine);color:var(--pine);}
+  .lbox{position:fixed;inset:0;z-index:60;background:rgba(23,32,28,.72);
+    display:none;align-items:center;justify-content:center;padding:22px;}
+  .lbox.on{display:flex;}
+  .lbox .panel{background:var(--card);border-radius:16px;max-width:900px;width:100%;
+    max-height:92vh;overflow:auto;display:flex;flex-direction:column;}
+  .lbox .lhead{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);}
+  .lbox .lhead .tag{flex:none;}
+  .lbox .lhead .ttl{font-weight:700;font-size:1rem;}
+  .lbox .lhead .cnt{margin-left:auto;font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .lbox .x{background:none;border:1px solid var(--line);border-radius:8px;width:34px;height:34px;
+    font-size:1.05rem;line-height:1;color:var(--ink);cursor:pointer;flex:none;}
+  .lbox .shotwrap{background:var(--pine-soft);padding:10px;display:flex;justify-content:center;}
+  .lbox .shotwrap img{max-width:100%;max-height:60vh;border-radius:8px;border:1px solid var(--line);
+    height:auto;object-fit:contain;}
+  .lbox .cap{padding:14px 18px;}
+  .lbox .cap p{margin:.4rem 0 0;color:var(--muted);font-size:.9rem;line-height:1.6;}
+  .lbox .dots{display:flex;gap:7px;justify-content:center;padding:0 0 10px;}
+  .lbox .dots i{width:9px;height:9px;border-radius:50%;background:var(--line);cursor:pointer;display:block;}
+  .lbox .dots i.on{background:var(--pine);}
+  .lbox .lfoot{display:flex;gap:10px;justify-content:space-between;align-items:center;
+    padding:12px 16px;border-top:1px solid var(--line);}
+  .lbox .lfoot .btn{min-height:44px;min-width:44px;}
+  .lbox .lfoot .spbtn{background:none;border:1px solid var(--line);border-radius:9px;
+    padding:9px 14px;font:inherit;font-size:.84rem;font-weight:600;color:var(--ink);cursor:pointer;}
+  /* History panel: a table of recorded valuations, current vs replaced. */
+  .lbox .hp{max-width:640px;}
+  .histwrap{padding:2px 18px 18px;}
+  #histRows .hrow{display:flex;align-items:baseline;gap:10px;padding:10px 0;border-top:1px solid var(--line);}
+  #histRows .hrow:first-child{border-top:none;}
+  #histRows .hrow .amt{font-weight:700;font-variant-numeric:tabular-nums;}
+  #histRows .hrow .meta{color:var(--muted);font-size:.78rem;line-height:1.5;}
+  #histRows .hrow .flag{margin-left:auto;flex:none;font-size:.66rem;font-weight:700;letter-spacing:.04em;
+    border:1px solid var(--line);border-radius:999px;padding:2px 8px;text-transform:uppercase;}
+  #histRows .hrow.cur .flag{color:var(--pine);border-color:var(--pine);}
+  #histRows .hrow.rep{opacity:.68;}
+  #histRows .hrow.rep .flag{color:var(--muted);}
+  #histRows .hrow .hfix{margin-left:8px;flex:none;font-size:.68rem;font-weight:700;color:var(--muted);
+    background:transparent;border:1px solid var(--line);border-radius:7px;padding:4px 9px;cursor:pointer;font-family:inherit;}
+  #histRows .hrow .hfix:hover{color:var(--pine);border-color:var(--pine);}
+  .histchg{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;}
+  .histchg .hd{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--muted);margin-bottom:8px;}
+  .histchg .crow{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--line);}
+  .histchg .crow:first-child{border-top:none;}
+  .histchg .crow .act{font-size:.72rem;font-weight:700;color:var(--pine);flex:none;min-width:88px;}
+  .histchg .crow .when{color:var(--muted);font-size:.72rem;margin-left:auto;flex:none;font-variant-numeric:tabular-nums;}
+  .histchg .crow .what{font-size:.8rem;line-height:1.5;}
+  .histchg .none{color:var(--muted);font-size:.8rem;}
+  @media(max-width:640px){
+    .lbox{padding:0;}
+    .lbox .panel{max-width:none;width:100%;max-height:100vh;height:100vh;border-radius:0;}
+    .lbox .shotwrap img{max-height:46vh;}
+    /* 44px tap targets on a phone */
+    .navbtn,.langbtn,.tourbtn,.btn{min-height:44px;}
+    .lbox .cap{padding:12px 16px;}
+  }
+</style>
+</head>
+<body>
+<script src="api-base.js"></script>
+
+<div class="gate" id="gate">
+  <div class="box">
+    <span class="eyebrow" data-i18n="gate.eyebrow">{brand} &middot; sign in</span>
+    <h1 data-i18n="gate.title">Welcome back</h1>
+    <p data-i18n="gate.sub">Slice preview. Synthetic data only, no real accounts.</p>
+    <label for="em" data-i18n="gate.email">Email</label>
+    <input id="em" type="email" value="lena.muster@example.ch" autocomplete="username">
+    <label for="pw" data-i18n="gate.password">Password</label>
+    <input id="pw" type="password" value="demo-ownview" autocomplete="current-password">
+    <button class="go" id="signin" data-i18n="gate.signin">Sign in</button>
+    <div class="passkey"><span class="src"><span class="dot"></span></span> <span data-i18n="gate.passkey">or use a passkey (Phase 0 target)</span></div>
+    <div class="ops">
+      <button id="newacc" data-i18n="gate.create">Create account</button>
+      <button id="delacc" data-i18n="gate.delete">Delete account</button>
+    </div>
+    <div class="hint"><span data-i18n="gate.hint">Demo login prefilled. Anything works, this is the slice shell.</span>
+    <span data-i18n="gate.hint_identity">Dummy identity:</span> <code>lena.muster@example.ch</code> / <code>demo-ownview</code>.</div>
+    <div class="gatefoot">
+      <a href="legal/imprint.html" data-i18n="legal.imprint.title">Imprint</a>
+      <a href="legal/privacy.html" data-i18n="legal.privacy.title">Privacy</a>
+      <a href="legal/terms.html" data-i18n="legal.terms.title">Terms</a>
+      <span class="drafttag" data-i18n="legal.draft_banner_label">Draft</span>
+    </div>
+  </div>
+</div>
+
+<header id="app">
+  <div class="bar">
+    <span class="brand" data-i18n="brand.name">{brand}</span>
+    <span class="demo" data-i18n="brand.demo">synthetic demo</span>
+    <span class="demo aidraft" style="color:var(--pine);background:var(--pine-soft);" data-i18n="brand.aidraft">AI draft, model generated</span>
+    <button class="langbtn" id="langBtn" type="button" title="Language"><span id="langLabel">DE</span></button>
+    <button class="tourbtn" id="tourBtn" type="button" data-i18n="tour.open">Tour</button>
+    <button class="navbtn" id="navBtn" type="button" aria-expanded="false" aria-controls="mainNav">
+      <span id="navLabel" data-i18n="nav.menu">Menu</span> <span class="chev">&#9662;</span>
+    </button>
+    <span class="who"><span id="emailOut">Lena Muster</span> &middot; <span data-i18n="who.base">base</span> CHF &middot; <span data-i18n="who.asof">as of</span> 24 Sep 2026</span>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="nav" id="mainNav">
+    <a data-v="portfolio" class="on" data-i18n="nav.portfolio">Portfolio</a>
+    <a data-v="market" data-i18n="nav.market">Market today</a>
+    <a data-v="style" data-i18n="nav.style">Investment style</a>
+    <a data-v="insights" data-i18n="nav.insights">Insights</a>
+    <a data-v="scenario" data-i18n="nav.scenario">Scenarios</a>
+    <a data-v="governance" data-i18n="nav.governance">Governed AI</a>
+    <a data-v="estate" data-i18n="nav.estate">Estate</a>
+    <a data-v="compliance" data-i18n="nav.compliance">Compliance</a>
+    <a data-v="documents" data-i18n="nav.documents">Documents</a>
+    <a data-v="add" data-i18n="nav.add">Add position</a>
+    <div class="sec" data-i18n="nav.section">Coming later</div>
+    <a data-v="tax" data-i18n="nav.tax">Tax (CH)</a>
+    <a data-v="sharing" data-i18n="nav.sharing">Sharing</a>
+  </nav>
+
+  <main>
+    <!-- PORTFOLIO -->
+    <section class="view on" id="v-portfolio">
+      <div class="grid hero">
+        <section class="card">
+          <span class="eyebrow" data-i18n="portfolio.eyebrow">Total net worth</span>
+          <h1 id="nw">2,847,300 <span style="font-size:1.1rem;color:var(--muted);font-weight:500;">CHF</span></h1>
+          <div class="sub">
+            <span class="chg up" data-i18n="portfolio.monthly">+1.8% this month</span>
+            <span class="src"><span class="dot"></span><span data-i18n="portfolio.sourced">every figure dated and sourced</span></span>
+          </div>
+          <p class="note" data-i18n="portfolio.note">Three of six positions are estimates. They carry a range, a method and a
+          named index source, and are drawn differently from market prices. Add a position from the
+          left and the totals update.</p>
+        </section>
+        <section class="card">
+          <span class="eyebrow" data-i18n="portfolio.allocation">Allocation</span>
+          <div style="display:flex;justify-content:flex-end;gap:4px;margin:2px 0 -2px;">
+            <button class="rm-toggle" id="allocModeBars" type="button"
+                    data-i18n="portfolio.alloc.bars" aria-pressed="true">Bars</button>
+            <button class="rm-toggle" id="allocModeDonut" type="button"
+                    data-i18n="portfolio.alloc.donut" aria-pressed="false">Donut</button>
+          </div>
+          <div class="alloc" id="alloc"></div>
+          <div id="allocDonutWrap" hidden style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:6px;">
+            <svg id="allocDonut" viewBox="0 0 180 180" style="width:180px;height:180px;flex:0 0 auto;"
+                 role="img" data-i18n-aria="portfolio.alloc.donut.aria"
+                 aria-label="Allocation by asset class"></svg>
+            <div id="allocDonutLegend" class="alloc" style="flex:1 1 200px;"></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top:18px;" id="wealthCard" hidden>
+        <h2><span data-i18n="wealth.title">Net worth over time</span>
+          <span style="font-weight:400;color:var(--muted);font-size:.82rem;" id="wealthMeta"></span></h2>
+        <svg id="wealthChart" viewBox="0 0 720 170" preserveAspectRatio="none"
+             style="width:100%;height:170px;display:block;" role="img"
+             aria-label="Net worth over time"></svg>
+        <p class="note" id="wealthNote"></p>
+        <p class="note" id="wealthSplit" hidden></p>
+        <p class="note" id="wealthConverted" hidden></p>
+        <p class="note" id="wealthSkipped" hidden style="color:var(--est);"></p>
+        <p class="note" id="wealthBreak" hidden style="color:var(--est);"></p>
+        <div id="wealthStackWrap" hidden style="margin-top:10px;">
+          <div style="font-weight:600;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;"
+               data-i18n="wealth.stack.title">Assets by class</div>
+          <svg id="wealthStack" viewBox="0 0 720 150" preserveAspectRatio="none"
+               style="width:100%;height:150px;display:block;" role="img"
+               aria-label="Assets by class over time"></svg>
+          <div id="wealthLegend" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:.72rem;color:var(--muted);"></div>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <h2><span data-i18n="portfolio.positions">Positions</span> <span style="font-weight:400;color:var(--muted);font-size:.82rem;" id="posMeta"></span>
+          <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="srcTag" data-i18n="portfolio.srctag.snapshot">bundled snapshot</span></h2>
+        <div id="posList"></div>
+        <p class="note" id="posNote" style="display:none;"></p>
+        <div id="removedWrap" style="display:none;">
+          <button class="rm-toggle" type="button" id="rmToggle" aria-expanded="false"></button>
+          <div id="rmList"></div>
+        </div>
+        <div class="row" style="border-top:2px solid var(--line);margin-top:6px;">
+          <div class="l"><span style="font-weight:700;" data-i18n="portfolio.networth">Net worth</span><small data-i18n="portfolio.networth_sub">assets minus liabilities</small></div>
+          <div class="r" id="nw2">2,847,300 CHF</div>
+        </div>
+      </section>
+
+      <section class="card" id="privateCard" style="margin-top:18px;display:none;">
+        <h2><span data-i18n="portfolio.private.title">Private markets</span>
+          <span style="font-weight:400;color:var(--muted);font-size:.82rem;" id="privateMeta"></span></h2>
+        <div id="privateList"></div>
+        <p class="note" id="privateNote"></p>
+      </section>
+
+      <div class="nocall">
+        <b data-i18n="portfolio.nocall.title">Information, not advice.</b> <span data-i18n="portfolio.nocall.body">{brand} computes, visualizes and explains facts about your
+        own data. It never tells you to buy, sell, hold or switch a specific asset, and it does not
+        compute personal tax strategies. Every market number carries a named source and a date. If a
+        source is unavailable you see "unavailable" and the last known value with its date, never a
+        guessed number.</span>
+      </div>
+    </section>
+
+    <!-- MARKET -->
+    <section class="view" id="v-market">
+      <span class="eyebrow">The world today</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;">Market strip</h2>
+      <p class="sub" style="margin-bottom:16px;">Each tile shows value, source, and the date the
+      source published. Nothing on this page is a forecast or a recommendation.</p>
+      <div class="strip" id="strip"></div>
+
+      <section class="card" style="margin-top:20px;">
+        <h2>Themes <span style="font-weight:400;color:var(--muted);font-size:.82rem;">&middot; draft, pending admin review before publish</span></h2>
+        <div class="row">
+          <div class="l"><span>Policy rates easing into 2027</span>
+            <small>Indicators: SNB, ECB, Fed policy rates &middot; last updated 24 Sep 2026</small></div>
+          <div class="r"><span class="tag">DRAFT</span></div>
+        </div>
+        <div class="row">
+          <div class="l"><span>Swiss residential price momentum cooling</span>
+            <small>Indicators: W&uuml;est Partner index, SARON &middot; last updated 24 Sep 2026</small></div>
+          <div class="r"><span class="tag">DRAFT</span></div>
+        </div>
+        <p class="note">Phase 1 rule: an LLM may only summarize fetched sources and must cite source
+        IDs. Items that cannot cite a source are rejected automatically. No theme reaches the public
+        page without a human reviewer approving it in the admin queue.</p>
+      </section>
+    </section>
+
+    <!-- INVESTMENT STYLE -->
+    <section class="view" id="v-style">
+      <span class="eyebrow">Investment style</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;">Target allocation and the gap to today</h2>
+      <p class="sub" style="margin-bottom:16px;">Pick a style yourself, or answer two questions and
+      we suggest a fit. The target is an illustrative reference profile, not advice. The gap is
+      arithmetic on your own holdings.</p>
+
+      <div class="grid" style="grid-template-columns:1.15fr 1fr;">
+        <section class="card">
+          <h2>1. Choose a style</h2>
+          <div class="chips" id="styleChips"></div>
+          <div class="sub" id="styleQn" style="margin-top:12px;display:none;"></div>
+          <div class="sub" id="styleSrc" style="margin-top:10px;"></div>
+          <div id="styleMeta" class="note" style="margin-top:14px;"></div>
+        </section>
+        <section class="card">
+          <h2>2. Questionnaire</h2>
+          <p class="sub" style="margin:-6px 0 4px;">Two questions. The fit is a rule on your answers,
+          shown openly. Clear the answers to choose a style by hand.</p>
+          <div class="q" id="quiz"></div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top:18px;">
+        <h2>3. Gap to the target <span style="font-weight:400;color:var(--muted);font-size:.82rem;">&middot; thin bar is your share today, solid bar is the target share</span></h2>
+        <div class="gapbar" id="gapBars"></div>
+        <p class="note">A matched class sits within 5 points of the target. Over and under are stated
+        as facts about the two shares, same as any figure on this page.</p>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <h2>4. What the gap flags, and which decisions sit behind it</h2>
+        <div id="styleFlags"></div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <h2>AI drafted report <span style="font-weight:400;color:var(--muted);font-size:.82rem;">&middot; asset classes, themes, regions</span></h2>
+        <p class="sub" style="margin:-6px 0 4px;">Generated for the selected style from your own
+        allocation. The model sees only the figures on this page and is instructed to describe, never
+        to advise.</p>
+        <div class="sub" id="repMeta" style="margin:6px 0 10px;"></div>
+        <div class="rep" id="report"></div>
+      </section>
+
+      <div class="nocall">
+        <b>Information, not advice.</b> A target allocation is an illustration of how a stated style
+        might be built, not a recommendation for you. The questionnaire is a transparent scoring rule,
+        not a suitability assessment, and it does not replace a licensed adviser. Nothing here tells
+        you to buy, sell, hold or switch a specific asset. Every figure below is arithmetic on the
+        holdings shown on the Portfolio view.
+      </div>
+    </section>
+
+    <!-- INSIGHTS -->
+    <section class="view" id="v-insights">
+      <span class="eyebrow">Insights</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;">Flags</h2>
+      <p class="sub" style="margin-bottom:16px;">Facts computed from your own data. Transparent
+      rules, no recommendation, no black box.</p>
+      <section class="card">
+        <div id="flagList"></div>
+      </section>
+      <section class="card" style="margin-top:18px;">
+        <h2 data-i18n="insights.scenario.title">Scenarios</h2>
+        <p class="sub" data-i18n="insights.scenario.sub">What-if shocks re-run the same valuation
+        functions on your live positions, each with a named, dated assumption. If this happened,
+        not a forecast.</p>
+        <p style="margin:10px 0 0;"><a href="#scenario" id="toScenario" data-i18n="insights.scenario.open">Open the scenario engine</a></p>
+      </section>
+    </section>
+
+    <!-- SCENARIOS -->
+    <section class="view" id="v-scenario">
+      <span class="eyebrow" data-i18n="scenario.eyebrow">What-if</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;"><span data-i18n="scenario.title">Scenario engine</span>
+        <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="scenarioTag" data-i18n="scenario.tag.loading">loading</span></h2>
+      <p class="sub" data-i18n="scenario.sub">Re-runs the same valuation functions on your live positions
+      under a stated shock and shows the difference. If this happened, not a forecast: every figure names
+      its assumption and the function it re-ran.</p>
+      <div class="row" id="scenarioBase"></div>
+      <div id="scenarioBody"></div>
+      <div class="nocall" id="scenarioNotes"></div>
+    </section>
+
+    <!-- GOVERNED AI -->
+    <section class="view" id="v-governance">
+      <span class="eyebrow" data-i18n="governance.title">Governed AI</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;"><span data-i18n="governance.title">Governed AI</span>
+        <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="govTag" data-i18n="governance.tag.loading">loading</span></h2>
+      <p class="sub" data-i18n="governance.sub">Every explanation must cite the ledger rows it used,
+      and an advice guardrail blocks anything that reads as advice. The red-team suite below runs live.</p>
+      <section class="card">
+        <div class="row"><div class="l"><span data-i18n="governance.attacks">adversarial prompts blocked</span></div>
+          <div class="r"><b id="govAttacks">–</b></div></div>
+        <div class="row"><div class="l"><span data-i18n="governance.controls">information controls passed</span></div>
+          <div class="r"><b id="govControls">–</b></div></div>
+        <div class="row"><div class="l"><span data-i18n="governance.cites">required citation fields</span></div>
+          <div class="r" id="govCites"></div></div>
+      </section>
+      <div class="nocall" id="govNotes"></div>
+    </section>
+
+    <!-- DOCUMENTS -->
+    <section class="view" id="v-documents">
+      <span class="eyebrow">Documents</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;">Statement extraction</h2>
+      <p class="sub" style="margin-bottom:16px;">Upload a statement or forward it by email. The
+      pipeline classifies, extracts to a typed schema, and shows you a side-by-side review. It never
+      overwrites a value silently.</p>
+      <section class="card" id="docLive" hidden>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h3 style="margin:0;" id="docStmt"></h3>
+          <button type="button" class="btn" id="docConfirmAll" data-i18n="docs.confirm_all"
+            style="margin-left:auto;">Confirm all</button>
+        </div>
+        <p class="note" id="docBatch" hidden></p>
+        <div id="docCands"></div>
+        <div id="docFlows"></div>
+        <div id="docRefused"></div>
+        <p class="note" id="docNote"></p>
+      </section>
+      <section class="card" id="docUploadCard">
+        <label class="drop" id="docDrop" for="docFile">
+          <strong data-i18n="docs.up_title">Read a statement</strong>
+          <span data-i18n="docs.up_hint">Drop a statement here, or choose a file. The pipeline classifies the format, reads it to the typed schema and shows you the review; nothing is written until you confirm a line. A PDF or a scan is recognized and named, but needs an OCR provider to read.</span>
+          <input type="file" id="docFile" accept=".json,.csv,application/json,text/csv,.pdf,application/pdf,image/*">
+        </label>
+        <div class="row" id="docDetect" hidden>
+          <div class="l"><span id="docDetectKind"></span><small id="docDetectSrc"></small></div>
+          <div class="r"><span class="tag" id="docDetectTag"></span></div>
+        </div>
+        <p class="note" id="docUpload" hidden></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="btn" id="docDemoCsv" data-i18n="docs.demo_csv">Try a CSV statement</button>
+          <button type="button" class="btn" id="docDemoPdf" data-i18n="docs.demo_pdf">Try a PDF (OCR gate)</button>
+        </div>
+      </section>
+      <section class="card" id="docRecent">
+        <h3 data-i18n="docs.recent_head" style="margin:0 0 8px;">Statements read this session</h3>
+        <div id="docRecentList"></div>
+        <p class="note" id="docRecentEmpty" data-i18n="docs.recent_empty">Nothing read yet. Choose a file above; it is classified and read here without leaving your browser.</p>
+        <p class="note" data-i18n="docs.recent_ocr">A PDF or a scanned image is recognized and named, but reading it needs an OCR/document-AI provider, which is not enabled here, so nothing is applied.</p>
+      </section>
+      <section class="card" id="docExport">
+        <h3 data-i18n="export.head" style="margin:0 0 4px;">Export the portfolio</h3>
+        <p class="note" data-i18n="export.sub">Download the same figures the dashboard shows as a workbook, a report or a deck. Every figure keeps its source and date.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="btn" id="expXlsx" data-i18n="export.xlsx">Excel (.xlsx)</button>
+          <button type="button" class="btn" id="expDocx" data-i18n="export.docx">Word (.docx)</button>
+          <button type="button" class="btn" id="expPptx" data-i18n="export.pptx">PowerPoint (.pptx)</button>
+        </div>
+        <p class="note" id="expNote" hidden></p>
+        <p class="note" data-i18n="export.import_hint">To bring holdings back in, drop an Excel or CSV statement above.</p>
+      </section>
+    </section>
+
+    <!-- ADD -->
+    <section class="view" id="v-add">
+      <span class="eyebrow">Manual entry</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;">Add a position</h2>
+      <p class="sub" style="margin-bottom:16px;">Synthetic entry. In the full app this writes to the
+      event-sourced ledger and never mutates history in place.</p>
+      <section class="card">
+        <form id="addForm">
+          <div class="f">
+            <div><label for="aName">Name</label><input id="aName" value="Sample position" required></div>
+            <div><label for="aClass">Asset class</label>
+              <select id="aClass">
+                <option value="cash">Cash</option>
+                <option value="equity">Equity</option>
+                <option value="bonds">Bonds</option>
+                <option value="realestate">Real estate (estimate)</option>
+                <option value="private">Private markets (estimate)</option>
+                <option value="crypto">Crypto</option>
+                <option value="metals">Metals</option>
+                <option value="collectibles">Collectibles (estimate)</option>
+                <option value="vehicles">Vehicles (estimate)</option>
+                <option value="liability">Liability</option>
+              </select></div>
+            <div><label for="aVal">Value (CHF)</label><input id="aVal" type="number" value="50000" min="0" required></div>
+            <div><label for="aCur">Currency</label>
+              <select id="aCur"><option>CHF</option><option>EUR</option><option>USD</option></select></div>
+          </div>
+          <label for="aMethod">Valuation method</label>
+          <select id="aMethod">
+            <option value="market">Last close x units x FX (equity, bonds)</option>
+            <option value="market">Spot x weight x FX (metals)</option>
+            <option value="market">Last close x units x FX (crypto)</option>
+            <option value="indexed_purchase">Method D, indexed purchase price (real estate)</option>
+            <option value="appraisal">Method C, owner estimate / appraisal (real estate)</option>
+            <option value="roll_forward">Roll-forward from statement (private)</option>
+            <option value="private_company">Method 8.4, multiple / last round (private company)</option>
+            <option value="comparable">Comparable sales (collectibles, vehicles)</option>
+            <option value="balance">Account balance (cash)</option>
+            <option value="amortized">Amortized balance (liability)</option>
+          </select>
+          <button class="btn" type="submit">Add to portfolio</button>
+          <button class="btn ghost" type="button" id="reset">Reset demo</button>
+        </form>
+        <p class="note" id="addMsg">Manual entries are marked EST. and carry the method you chose. A saved entry writes one holding and one valuation to the ledger under the source "Manual entry (synthetic)".</p>
+      </section>
+      <section class="card">
+        <form id="flowForm">
+          <div class="f">
+            <div><label for="fKind" data-i18n="flow.kind">Cash flow kind</label>
+              <select id="fKind">
+                <option value="contribution" data-i18n="flow.kind.contribution">Contribution (money in)</option>
+                <option value="distribution" data-i18n="flow.kind.distribution">Withdrawal (money out)</option>
+                <option value="capital_call" data-i18n="flow.kind.capital_call">Capital call (money out)</option>
+              </select></div>
+            <div><label for="fAmount" data-i18n="flow.amount">Amount (CHF)</label><input id="fAmount" type="number" value="10000" min="0" required></div>
+            <div><label for="fCur" data-i18n="flow.currency">Currency</label>
+              <select id="fCur"><option>CHF</option><option>EUR</option><option>USD</option></select></div>
+            <div><label for="fAsOf" data-i18n="flow.asof">Date</label><input id="fAsOf" type="date" required></div>
+          </div>
+          <button class="btn" type="submit" data-i18n="flow.submit">Record cash flow</button>
+        </form>
+        <p class="note" id="flowMsg" data-i18n="flow.note">A cash flow is money in or out, recorded from the date you choose. It carries the source "Manual entry (synthetic)" and does not change net worth on its own; it shows on the flow side of the wealth series.</p>
+      </section>
+      <section class="card" id="flowListCard" style="display:none;">
+        <h3 style="font-size:1.05rem;margin:0 0 4px;" data-i18n="flow.list_head">Recorded cash flows</h3>
+        <p class="note" data-i18n="flow.list_intro">Every cash flow on this household, newest first. Removing one deletes that record and updates the flow side of the wealth series; it is audited.</p>
+        <div id="flowList"></div>
+        <p class="note" id="flowListMsg" style="display:none;"></p>
+      </section>
+    </section>
+
+    <section class="view" id="v-tax">
+      <span class="eyebrow" data-i18n="tax.eyebrow">Swiss tax</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;"><span data-i18n="tax.title">Tax pack (Switzerland)</span>
+        <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="taxTag" data-i18n="tax.tag.loading">loading</span></h2>
+      <p class="sub" data-i18n="tax.sub">Organizes the facts a Swiss return needs, from your own ledger: year-end values
+      by asset, capital-gains events as information, and withholding-tax reclaim items. It does not
+      compute a personal tax bill and gives no tax advice.</p>
+      <div class="row" id="taxWealth"></div>
+      <div id="taxBody"></div>
+      <section class="card" id="harvestCard" style="margin-top:18px;">
+        <h2 style="font-size:.95rem;margin:0 0 6px;"><span data-i18n="harvest.title">Cost basis and loss lots</span>
+          <span style="font-weight:600;color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;" id="harvestTag"></span></h2>
+        <p class="sub" data-i18n="harvest.sub">Every listed holding, its acquisition lots, and the lots
+        sitting below their cost. If this happened, not a forecast, and not a recommendation to act.</p>
+        <div id="harvestBody"></div>
+      </section>
+      <div class="nocall" id="taxNotes"></div>
+    </section>
+
+    <!-- ESTATE / TRANSFER -->
+    <section class="view" id="v-estate">
+      <span class="eyebrow" data-i18n="estate.eyebrow">Transfer</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;"><span data-i18n="estate.title">Ownership &amp; beneficiaries</span>
+        <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="estateTag" data-i18n="estate.tag.loading">loading</span></h2>
+      <p class="sub" data-i18n="estate.sub">Who owns each holding, how entities are held, and the split of
+      the estate a transfer would pass today. If this happened, not a forecast; not tax or legal advice.</p>
+      <div class="row" id="estateTotal"></div>
+      <div id="estateBody"></div>
+      <div class="nocall" id="estateNotes"></div>
+    </section>
+
+    <section class="view" id="v-sharing">
+      <span class="eyebrow">Sharing</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;">Advisor and family access</h2>
+      <p class="sub">Scoped, time-boxed, logged and revocable. Nothing is shared by default.</p>
+      <div class="nocall">Phase 6 target. Every share grant is written to the per-tenant audit log
+      with actor, scope and expiry.</div>
+    </section>
+
+    <section class="view" id="v-compliance">
+      <span class="eyebrow" data-i18n="evidence.eyebrow">Compliance</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;"><span data-i18n="evidence.title">Evidence pack</span>
+        <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="evidenceTag" data-i18n="evidence.tag.loading">loading</span></h2>
+      <p class="sub" data-i18n="evidence.sub">Read-only: the control matrix, the records of processing, a
+      live evidence item and an extract of the tenant's immutable audit log, sealed with a content digest.
+      Evidence of readiness, not a certification.</p>
+      <div class="row" id="evidenceSeal"></div>
+      <div id="evidenceBody"></div>
+      <div class="nocall" id="evidenceNotes"></div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  Synthetic demo data. No real person, no real client. Slice preview deployed from
+  projects/wealthview. Working title <span id="footBrand">{brand}</span>, see DOMAIN_BRAND_REPORT.md.
+</footer>
+
+<!-- Demo tour: a screenshot walk-through, data-driven from tour.config.json. -->
+<div class="lbox" id="lbox" role="dialog" aria-modal="true" aria-label="Demo tour">
+  <div class="panel">
+    <div class="lhead">
+      <span class="tag" id="tourTag"></span>
+      <span class="ttl" id="tourTtl"></span>
+      <span class="cnt" id="tourCnt"></span>
+      <button class="x" id="tourX" type="button" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="shotwrap"><img id="tourShot" alt="" src=""></div>
+    <div class="dots" id="tourDots"></div>
+    <div class="cap"><p id="tourBody"></p></div>
+    <div class="lfoot">
+      <button class="btn gh" id="tourPrev" type="button" data-i18n="tour.prev">Back</button>
+      <button class="spbtn" id="tourSkip" type="button" data-i18n="tour.close">Close</button>
+      <button class="btn p" id="tourNext" type="button" data-i18n="tour.next">Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- A holding's value history: read-only. Shows the recorded valuations newest
+     first, marking each as current or replaced by a later correction, so the old
+     number a correction superseded is visible rather than a claim. -->
+<div class="lbox" id="hist" role="dialog" aria-modal="true" aria-label="Value history">
+  <div class="panel hp">
+    <div class="lhead">
+      <span class="tag" data-i18n="hist.tag">History</span>
+      <span class="ttl" id="histTtl"></span>
+      <button class="x" id="histX" type="button" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="cap"><p id="histSub"></p></div>
+    <div class="histwrap"><div id="histRows"></div></div>
+    <div class="histchg">
+      <div class="hd"><span data-i18n="hist.changes">Changes</span></div>
+      <div id="histChg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- API base: same-origin by default. A static host (GitHub Pages, Netlify)
+     sets window.OWNVIEW_API_BASE to the Railway backend so only the JSON API is
+     remote and the app shell (html/js/css/assets) is served locally. -->
+<script>window.OWNVIEW_API_BASE = window.OWNVIEW_API_BASE || "";</script>
+<script>
+(function(){
+  var B = (window.OWNVIEW_API_BASE || "").replace(/\/$/, "");
+  if (!B) return;
+  var of = window.fetch;
+  window.fetch = function(input, init){
+    try {
+      if (typeof input === "string" && input.indexOf("api/") === 0) {
+        input = B + "/" + input;
+      }
+    } catch (e) {}
+    return of.call(this, input, init);
+  };
+})();
+</script>
+<script>
+(function(){
+  var FX = {CHF:1, EUR:0.95, USD:1.12};
+  var state = {
+    positions: [
+      {n:"Apartment, Zurich Seefeld", c:"realestate", v:1480000, cur:"CHF", est:true,
+       sub:"Direct real estate, 3.5 rooms, 96 m2",
+       note:"Method D, indexed purchase price. Source: Wuest Partner house-price index, Zurich, Q3 2026, published 12 Sep 2026. Confidence: medium. Not a market price.",
+       lo:1330000, hi:1580000, pt:1480000},
+      {n:"Global equity ETF", c:"equity", v:742100, cur:"CHF", est:false,
+       sub:"Equity, 8,400 units",
+       note:"Method: last close x units x FX. Source: SIX Swiss Exchange close 23 Sep 2026; ECB reference rate 23 Sep 2026."},
+      {n:"Swiss bond fund", c:"bonds", v:170300, cur:"CHF", est:false,
+       sub:"Bonds, accumulated"},
+      {n:"Gold, vaulted bars", c:"metals", v:118500, cur:"CHF", est:false,
+       sub:"Metals, 1.4 kg fine gold, 99.99%",
+       note:"Method: spot x weight x FX. Source: LBMA Gold Price PM 23 Sep 2026; ECB reference rate 23 Sep 2026."},
+      {n:"Bitcoin + Ethereum", c:"crypto", v:84400, cur:"CHF", est:false,
+       sub:"Crypto, self-custodied",
+       note:"Method: last close x units x FX. Source: CoinGecko 24 Sep 2026. High volatility, shown as a class of its own."},
+      {n:"Vintage watch collection", c:"collectibles", v:62000, cur:"CHF", est:true,
+       sub:"Collectibles, 3 pieces",
+       note:"Method: auction comparables. Source: hammer prices, Geneva, H1 2026. Confidence: low. Not a market price.",
+       lo:48000, hi:74000, pt:62000},
+      {n:"Car, Porsche 911 (2021)", c:"vehicles", v:95000, cur:"CHF", est:true,
+       sub:"Vehicle, second car, no loan",
+       note:"Method: indexed purchase price less depreciation curve. Source: Swiss used-car index, Q3 2026. Confidence: low. Not a market price.",
+       lo:82000, hi:104000, pt:95000},
+      {n:"Private equity fund II", c:"private", v:318900, cur:"CHF", est:true,
+       sub:"Private, commitment 250k, called 198k",
+       note:"Method: roll-forward from last capital account statement. Source: capital account statement as of 30 Jun 2026. Confidence: medium. Metrics are computed from the ledger when the endpoint is live."},
+      {n:"Cash, CHF + EUR accounts", c:"cash", v:196000, cur:"CHF", est:false,
+       sub:"Liquid, 2 accounts"},
+      {n:"Mortgage, Zurich apartment", c:"liability", v:780000, cur:"CHF", est:false,
+       sub:"Liability, SARON-linked",
+       note:"Method: amortized balance. Source: lender statement 30 Jun 2026."}
+    ]
+  };
+  // Holistic asset-class taxonomy. Equity and bonds are split out of the old
+  // catch-all "listed" bucket, and cars, crypto, metals and collectibles get
+  // their own vertical, so the allocation chart and every gap reads like a real
+  // balance sheet rather than four broad buckets. `liability` is not an asset
+  // class and is excluded from every share computation.
+  var CLASSES = {
+    equity:{k:"class.equity", color:"#2E6B3E"},
+    bonds:{k:"class.bonds", color:"#5C8A6A"},
+    realestate:{k:"class.realestate", color:"#1F5E4C"},
+    private:{k:"class.private", color:"#B98A2E"},
+    crypto:{k:"class.crypto", color:"#8A6FB0"},
+    metals:{k:"class.metals", color:"#A78B4B"},
+    collectibles:{k:"class.collectibles", color:"#9A6B4F"},
+    vehicles:{k:"class.vehicles", color:"#4E6E8E"},
+    cash:{k:"class.cash", color:"#6C8F86"},
+    liability:{k:"class.liability", color:"#B23A2E"}
+  };
+  // Min/max share of total assets used to sanity-check a new position, not a rule.
+  var LIMITS = {equity:100, bonds:100, realestate:90, private:180, crypto:25, metals:40,
+    collectibles:40, vehicles:20, cash:1};
+  var TODAY = new Date(2026,8,24);
+
+  // i18n runtime
+  // Catalogues are plain JSON under i18n/, so adding FR/IT is a new file, not
+  // a code change. EN is the default. The choice persists in localStorage.
+  var I18N = {};                       // {lang: {key: string}}
+  var LANG = (function(){
+    try { return localStorage.getItem("ownview.lang") || "en"; } catch(e){ return "en"; }
+  })();
+  function T(key, params){
+    var cat = I18N[LANG] || I18N.en || {};
+    var s = cat[key] != null ? cat[key] : ((I18N.en||{})[key] != null ? I18N.en[key] : key);
+    if(params){ Object.keys(params).forEach(function(k){ s = s.split("{"+k+"}").join(params[k]); }); }
+    if(BRAND && s.indexOf("{brand}")>=0) s = s.split("{brand}").join(BRAND);
+    return s;
+  }
+  // Pick the active language's text from a {en, de} field, falling back to en.
+  // Used by the tour steps, whose copy lives in tour.config.json.
+  function loc(field){
+    if(field==null) return "";
+    if(typeof field==="string") return field;
+    return field[LANG]!=null ? field[LANG] : (field.en||"");
+  }
+  function applyI18n(root){
+    (root||document).querySelectorAll("[data-i18n]").forEach(function(el){
+      el.textContent = T(el.getAttribute("data-i18n"));
+    });
+    document.documentElement.lang = LANG;
+    var ll=document.getElementById("langLabel"); if(ll) ll.textContent = T("lang.other");
+    var lab=document.getElementById("navLabel");
+    var cur=document.querySelector('.nav a.on');
+    if(lab && cur) lab.textContent = cur.textContent.trim();
+  }
+  function setLang(l){
+    (I18N[l] ? Promise.resolve() : loadCatalogue(l)).then(function(){
+      LANG = l;
+      try { localStorage.setItem("ownview.lang", l); } catch(e){}
+      applyI18n();
+      // Re-render the data-driven views so their strings follow the language.
+      try { render(); } catch(e){}
+      try { if(document.getElementById("taxBody")) loadTax(); } catch(e){}
+      try { if(document.getElementById("scenarioBody")) loadScenario(); } catch(e){}
+      try { if(document.getElementById("govAttacks")) loadGovernance(); } catch(e){}
+      try { if(document.getElementById("estateTotal")) loadEstate(); } catch(e){}
+      try { if(document.getElementById("evidenceSeal")) loadEvidence(); } catch(e){}
+      try { if(document.getElementById("strip")) renderStrip(); } catch(e){}
+      try { if(document.getElementById("styleChips")) renderStyles(); } catch(e){}
+      try { if(document.getElementById("quizList")) renderQuiz(); } catch(e){}
+    });
+  }
+  function loadCatalogue(l){
+    return fetch("i18n/"+l+".json",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){ I18N[l]=d; }).catch(function(){ I18N[l]={}; });
+  }
+  // b2c brand from brand.config.json, applied over {brand} in catalogue strings.
+  var BRAND="";
+  function loadBrand(){
+    return fetch("brand.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        BRAND=(d && d.b2c && d.b2c.brand) || "";
+        if(d && d.b2c && d.b2c.accent){ document.documentElement.style.setProperty("--pine", d.b2c.accent); }
+        return BRAND;
+      }).catch(function(){ BRAND=""; return BRAND; });
+  }
+
+  function chf(x){return (x==null||isNaN(x))?"?":Math.round(x).toLocaleString("de-CH");}
+  function assets(){return state.positions.filter(function(p){return p.c!=="liability";});}
+  function totalAssets(){return assets().reduce(function(s,p){return s+p.v;},0);}
+  function totalLiab(){return state.positions.filter(function(p){return p.c==="liability";})
+      .reduce(function(s,p){return s+p.v;},0);}
+  function netWorth(){return totalAssets()-totalLiab();}
+
+  // Allocation view: bars (ranking) or donut (shape of the mix). One preference
+  // for the lifetime of the page; no server round trip and no stored profile.
+  var ALLOC_MODE = "bars";
+
+  function applyAllocMode(){
+    var bars=document.getElementById("alloc"), dn=document.getElementById("allocDonutWrap");
+    var bb=document.getElementById("allocModeBars"), bd=document.getElementById("allocModeDonut");
+    if(!bars||!dn||!bb||!bd){return;}
+    var donut = ALLOC_MODE==="donut";
+    bars.hidden = donut; dn.hidden = !donut;
+    bb.setAttribute("aria-pressed", donut?"false":"true");
+    bd.setAttribute("aria-pressed", donut?"true":"false");
+  }
+
+  // A donut of the allocation. Every slice is a class already in byClass, drawn
+  // with the same CLASSES colour the bar uses, so the two views agree by
+  // construction. Built with stroke-dasharray arcs on one circle (no path math
+  // to get wrong) — a class at zero simply draws nothing.
+  function renderAllocDonut(order, byClass, ta){
+    var svg=document.getElementById("allocDonut");
+    var legend=document.getElementById("allocDonutLegend");
+    if(!svg||!legend){return;}
+    var NS="http://www.w3.org/2000/svg";
+    while(svg.firstChild){svg.removeChild(svg.firstChild);}
+    legend.innerHTML="";
+    if(!ta||!order.length){return;}
+    var cx=90, cy=90, r=70, sw=26, C=2*Math.PI*r, off=0;
+    var bg=document.createElementNS(NS,"circle");
+    bg.setAttribute("cx",cx); bg.setAttribute("cy",cy); bg.setAttribute("r",r);
+    bg.setAttribute("fill","none"); bg.setAttribute("stroke","var(--pine-soft)");
+    bg.setAttribute("stroke-width",sw);
+    svg.appendChild(bg);
+    order.forEach(function(k){
+      var frac=byClass[k]/ta, len=frac*C;
+      var c=document.createElementNS(NS,"circle");
+      c.setAttribute("cx",cx); c.setAttribute("cy",cy); c.setAttribute("r",r);
+      c.setAttribute("fill","none"); c.setAttribute("stroke",CLASSES[k].color);
+      c.setAttribute("stroke-width",sw);
+      c.setAttribute("stroke-dasharray",len.toFixed(2)+" "+(C-len).toFixed(2));
+      c.setAttribute("stroke-dashoffset",(-off).toFixed(2));
+      c.setAttribute("transform","rotate(-90 "+cx+" "+cy+")");
+      var t=document.createElementNS(NS,"title");
+      t.textContent=T(CLASSES[k].k)+": "+(frac*100).toFixed(1)+"%";
+      c.appendChild(t);
+      svg.appendChild(c);
+      off+=len;
+      // Legend row mirrors the bar view: name, percent in the ring.
+      var row=document.createElement("div");
+      row.className="a";
+      row.innerHTML='<span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;'+
+        'margin-right:6px;background:'+CLASSES[k].color+'"></i>'+T(CLASSES[k].k)+'</span>'+
+        '<span class="num">'+(frac*100).toFixed(1)+'%</span>';
+      legend.appendChild(row);
+    });
+  }
+
+  function render(){
+    var nw = netWorth();
+    document.getElementById("nw").innerHTML = chf(nw)+' <span style="font-size:1.1rem;color:var(--muted);font-weight:500;">CHF</span>';
+    document.getElementById("nw2").textContent = chf(nw)+" CHF";
+    var a = assets();
+    document.getElementById("posMeta").textContent = T("portfolio.meta",
+      {assets:a.length, liab:state.positions.length-a.length, currencies:3, props:1, funds:2});
+
+    // allocation
+    var byClass={};
+    a.forEach(function(p){byClass[p.c]=(byClass[p.c]||0)+p.v;});
+    var ta=totalAssets();
+    var order=Object.keys(byClass).sort(function(x,y){return byClass[y]-byClass[x];});
+    var alloc=document.getElementById("alloc");
+    alloc.innerHTML="";
+    order.forEach(function(k){
+      var pct=byClass[k]/ta*100;
+      var d=document.createElement("div");
+      d.innerHTML='<div class="a"><span>'+T(CLASSES[k].k)+'</span><span class="num">'+chf(byClass[k])+'</span></div>'+
+        '<div class="bar2"><i style="width:'+pct.toFixed(1)+'%;background:'+CLASSES[k].color+'"></i></div>';
+      alloc.appendChild(d);
+    });
+    // The donut is the same figures the bars show, drawn for the shape of the
+    // mix rather than the ranking. Both are produced from one byClass pass, so
+    // the two views can never disagree: switching is a view toggle, not a second
+    // calculation. Bars and donut are separate containers; only one is visible.
+    renderAllocDonut(order, byClass, ta);
+    applyAllocMode();
+
+    // positions
+    var list=document.getElementById("posList");
+    list.innerHTML="";
+    state.positions.forEach(function(p){
+      var row=document.createElement("div");
+      row.className="row"+(p.est?"":"");
+      var est = p.est?' <span class="est-badge">EST.</span>':"";
+      // A mark older than the freshness threshold is flagged, never silently
+      // carried forward as if it were today's price.
+      var stale = p.stale?' <span class="stale-badge">'+T("portfolio.stale")+'</span>':"";
+      var val = p.c==="liability" ? "-"+chf(p.v)+" CHF" : chf(p.v)+" CHF";
+      // A holding from the ledger carries its id, so it can be removed. Removal
+      // is a soft archive: the row leaves the portfolio, its valuation history
+      // stays in the ledger. A holding only in the page's memory has no id and
+      // gets no control.
+      var rm = p.id?' <button class="rm" type="button" data-archive="'+p.id+'" title="'+T("portfolio.remove")+'">'+T("portfolio.remove")+'</button>':"";
+      // A correction control: an edit writes a fresh valuation that supersedes
+      // the mistaken one on the same as_of, so a typo is fixed without re-typing
+      // the holding and the old value stays in the ledger history. Only a ledger
+      // holding (an id) can be corrected.
+      var ed = p.id?' <button class="rm" type="button" data-edit="'+p.id+'" data-cur="'+p.v+'" title="'+T("portfolio.edit")+'">'+T("portfolio.edit")+'</button>':"";
+      // A history control: opens the recorded valuations read-only, so a
+      // correction's superseded value is visible rather than taken on faith.
+      var hi = p.id?' <button class="rm" type="button" data-history="'+p.id+'" title="'+T("portfolio.history")+'">'+T("portfolio.history")+'</button>':"";
+      row.innerHTML='<div class="l"><span>'+p.n+'</span><small>'+p.sub+'</small></div>'+
+        '<div class="r" style="'+(p.c==="liability"?"color:var(--neg);":"")+'">'+val+stale+est+hi+ed+rm+'</div>';
+      list.appendChild(row);
+      if(p.est && p.lo){
+        var r=document.createElement("div");
+        r.className="range";
+        var span=p.hi-p.lo, pmax=p.hi+(span*0.25), pmin=Math.max(0,p.lo-(span*0.25));
+        var lft=(p.lo-pmin)/(pmax-pmin)*100, wid=(p.hi-p.lo)/(pmax-pmin)*100;
+        var pt=(p.pt-pmin)/(pmax-pmin)*100;
+        r.innerHTML='<span style="font-size:.72rem;color:var(--muted);">'+(p.lo/1e6).toFixed(2)+'M</span>'+
+          '<span class="track"><span class="band" style="left:'+lft.toFixed(0)+'%;width:'+wid.toFixed(0)+'%"></span>'+
+          '<span class="pt" style="left:'+pt.toFixed(0)+'%"></span></span>'+
+          '<span style="font-size:.72rem;color:var(--muted);">'+(p.hi/1e6).toFixed(2)+'M</span>';
+        list.appendChild(r);
+      }
+      if(p.note){
+        var nt=document.createElement("p"); nt.className="note"; nt.textContent=p.note; list.appendChild(nt);
+      }
+    });
+
+    renderFlags(byClass, ta);
+    renderStyleGap();
+  }
+
+  function renderFlags(byClass, ta){
+    var flags=[];
+    // Largest single class across every asset class except cash.
+    var biggest=null, bigPct=0;
+    Object.keys(byClass).forEach(function(k){
+      if(k==="cash"||k==="liability") return;
+      var p=byClass[k]/ta*100;
+      if(p>bigPct){bigPct=p;biggest=k;}
+    });
+    if(biggest && bigPct>45) flags.push(["CONC.",T(CLASSES[biggest].k)+" is "+bigPct.toFixed(1)+"% of net worth. Rule: any single class above 45%.",
+      "Reads your position sizes only. It does not say to buy or sell."]);
+    flags.push(["STALE","The apartment valuation rests on an index published 12 days ago.",
+      "Threshold for direct real estate: 90 days. Next refresh scheduled 1 Oct 2026."]);
+    var illClasses=["realestate","private","collectibles","vehicles"];
+    var ill=illClasses.reduce(function(s,k){return s+(byClass[k]||0);},0)/ta*100;
+    if(ill>50) flags.push(["LIQ.","Illiquid assets (property, private markets, collectibles, vehicles) are "+ill.toFixed(1)+"% of net worth. Liquid runway at current spend: 4.2 years.",
+      "Liquidity ladder uses asset class and lock-up terms on file."]);
+    var cry=(byClass.crypto||0)/ta*100;
+    if(cry>0) flags.push(["VOL.","Crypto is "+cry.toFixed(1)+"% of net worth and can move several percent in a day.",
+      "Shown as its own class, with no reference weight, so the size is visible rather than buried in listed securities."]);
+    var cash=(byClass.cash||0);
+    var spend=Math.max(1, netWorth()*0.012);
+    flags.push(["RUNWAY","Cash covers "+ (cash/spend).toFixed(1) +" years of the modelled spend.",
+      "Modelled spend is 1.2% of net worth. Change the rule in settings, not the data."]);
+    var el=document.getElementById("flagList"); el.innerHTML="";
+    flags.forEach(function(f){
+      var d=document.createElement("div"); d.className="flag";
+      d.innerHTML='<span class="k">'+f[0]+'</span><div>'+f[1]+'<small>'+f[2]+'</small></div>';
+      el.appendChild(d);
+    });
+    // Private-markets flags (#143): rule-based, from the fund config and metrics.
+    // Each names the fund, the rule, the threshold and the numbers behind it, and
+    // ends with the expert tail. Descriptive, never prescriptive.
+    (window.__fundFlags||[]).forEach(function(f){
+      var d=document.createElement("div"); d.className="flag";
+      var n=f.numbers||{};
+      // The statement is composed here from the numbers, so it is translated
+      // with the rest of the page rather than shipping English from the API.
+      var stmt, thr;
+      if(f.code==="stale_nav"){
+        stmt=T("flag.fund.stale_nav.stmt",{fund:n.fund,age:n.age_days});
+        thr=T("flag.fund.threshold.days",{n:(n.threshold_days!=null?n.threshold_days:f.threshold)});
+      }else if(f.code==="past_term"){
+        stmt=T("flag.fund.past_term.stmt",{fund:n.fund,
+          ratio:(n.age_vs_term!=null?n.age_vs_term.toFixed(2):"n/a"),term:n.term_years});
+        thr=T("flag.fund.threshold.ratio",{n:"1.00"});
+      }else if(f.code==="vintage_concentration"){
+        stmt=T("flag.fund.vintage_concentration.stmt",{n:n.funds,total:n.dated_funds,
+          year:n.year,share:Math.round((n.share||0)*100)});
+        thr=T("flag.fund.threshold.share",{n:"50"});
+      }else if(f.code==="pacing_vs_target"){
+        stmt=T("flag.fund.pacing_vs_target.stmt",{side:T("flag.fund.pacing_vs_target."+(n.calls>n.target?"above":"below")),
+          horizon:n.horizon,calls:chf(n.calls),target:chf(n.target)});
+        thr=chf(n.target);
+      }else{
+        stmt=f.statement||"";
+        thr=(f.threshold!=null?String(f.threshold):"");
+      }
+      d.innerHTML='<span class="k">'+T("flag.fund."+f.code)+'</span><div>'+stmt+
+        '<small>'+T("flag.fund."+f.code+".rule",{threshold:thr})+' '+
+        T("flag.expert")+'</small></div>';
+      el.appendChild(d);
+    });
+  }
+
+  // investment style: target profiles, gap, questionnaire, drafted report
+  var STYLES = [
+    {n:"Capital preservation", t:{cash:30,bonds:42,equity:8,metals:5,realestate:10,private:5},
+     d:"Illustrative reference profile for a capital-first style.",
+     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+    {n:"Income", t:{cash:10,bonds:45,equity:20,metals:5,realestate:15,private:5},
+     d:"Illustrative reference profile for an income-first style.",
+     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+    {n:"Balanced", t:{cash:12,bonds:28,equity:28,metals:5,realestate:15,private:12},
+     d:"Illustrative reference profile for a middle-of-the-road style.",
+     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+    {n:"Growth", t:{cash:5,bonds:12,equity:47,metals:6,realestate:16,private:14},
+     d:"Illustrative reference profile for a growth-first style.",
+     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+    {n:"Aggressive", t:{cash:3,bonds:5,equity:55,metals:7,realestate:6,private:24},
+     d:"Illustrative reference profile for a highest-risk style.",
+     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."}
+  ];
+  // Order used by the gap view. Crypto, collectibles and vehicles carry no
+  // target weight: they are satellite holdings, shown in the allocation but
+  // reported as "no target" rather than nudged toward a number.
+  var GAPCLASSES = ["cash","bonds","equity","realestate","metals","private"];
+  var REPORTS = {"Capital preservation": "Asset classes\nA capital preservation illustrative profile normally gives its largest weights to cash and bonds, with smaller equity, metals, real estate and private markets. Here, cash at 5.7 percent and bonds at 5.0 percent sit well below those reference weights, while equity at 21.7 percent and real estate at 43.3 percent sit above. Metals at 3.5 percent are modestly below, and private markets at 13.7 percent are above. Crypto, collectibles and vehicles carry no reference weight and appear as satellites at 2.5, 1.8 and 2.8 percent. The CHF 780,000 mortgage is a liability outside these weights; net worth is CHF 2,637,200.\n\nThemes\nThe illustrative profile typically emphasises liquidity, capital stability, high quality credit and broad defensive diversification. The current mix instead carries themes of direct property concentration, global equity growth, private market exposure, and alternative stores of value such as vaulted gold, self custodied crypto, a vintage watch collection and a Porsche 911. These are descriptive differences only.\n\nRegions\nA capital preservation profile often has broad developed market cash and bond exposure, frequently with a Swiss base. The current portfolio is Swiss concentrated through a Zurich apartment, CHF and EUR cash and a Swiss bond fund, while the global equity ETF and private holdings add non Swiss exposure. Region data may be incomplete for private assets.\n\nThis is an illustrative draft, not advice.", "Income": "Asset classes\nAn illustrative Income profile typically emphasizes bonds and real estate, with cash, equity, metals and private markets as smaller components. Reference weights are cash 10 percent, bonds 45 percent, equity 20 percent, metals 5 percent, real estate 15 percent and private 5 percent. Current allocation is cash 5.7, bonds 5.0, equity 21.7, real estate 43.3, metals 3.5, private markets 13.7, crypto 2.5, collectibles 1.8 and vehicles 2.8 percent. Bonds are therefore far below reference, while real estate and private markets are above. Equity is slightly above, cash and metals below. Crypto, collectibles and vehicles have no reference weight in any style and sit as satellites. A CHF 780,000 mortgage is a liability outside these weights. Total assets are CHF 3,417,200 and net worth CHF 2,637,200 after that liability.\n\nThemes\nThe reference style generally holds income-producing bonds, listed real estate or direct property, dividend equity and some gold for diversification. Current portfolio themes include direct Zurich residential property, global equity, Swiss bonds, vaulted gold, private equity, a synthetic private-company stake, self-custodied Bitcoin and Ethereum, vintage watches and a Porsche 911.\n\nRegions\nThe reference does not set regional weights, but a Swiss income orientation often has domestic bond and property exposure plus global equity. Current holdings appear concentrated in Swiss real estate and Swiss bonds, with global equity and international crypto, while private markets include a synthetic stake. Cash is held in CHF and EUR.\n\nThis is an illustrative draft, not advice.", "Balanced": "Asset classes\nA Balanced reference profile typically holds cash 12%, bonds 28%, equity 28%, metals 5%, real estate 15% and private markets 12%. Your current allocation shows cash at 5.7% and bonds at 5.0%, below those illustrative weights. Equity at 21.7% is below the reference, while real estate at 43.3% is well above it, reflecting the Zurich apartment. Metals at 3.5% sit under the reference. Private markets at 13.7% are above. Crypto at 2.5%, collectibles at 1.8% and vehicles at 2.8% are satellites with no reference weight. Total assets are CHF 3,417,200; the CHF 780,000 mortgage is a liability outside these weights, leaving net worth of CHF 2,637,200.\n\nThemes\nThe mix combines a global equity ETF, a Swiss bond fund, vaulted gold bars, a private equity fund, a synthetic private company stake and self custodied Bitcoin and Ethereum. The apartment, watch collection and Porsche add direct and tangible exposures. This creates a growth and real asset tilt, with less in income oriented cash and bonds than the illustrative profile.\n\nRegions\nThe holdings are not evenly spread. Real estate is concentrated in Zurich, the bond fund is Swiss, and cash is held in CHF and EUR. The equity ETF is global, while the private equity fund and synthetic stake may carry wider or sector specific exposure. The result is a home market bias through real estate and Swiss bonds, offset by global equity and digital assets.\n\nThis is an illustrative draft, not advice.", "Growth": "Asset classes\nAn illustrative Growth profile typically holds equity as its largest asset class at 47 percent, with real estate at 16 percent, private markets at 14 percent, bonds at 12 percent, metals at 6 percent and cash at 5 percent. The current portfolio holds equity at 21.7 percent, below that reference, while real estate is 43.3 percent, well above it. Bonds are 5.0 percent, below the 12 percent reference. Cash is 5.7 percent, close to reference. Metals are 3.5 percent, slightly below. Private markets are 13.7 percent, close to reference. Crypto, collectibles and vehicles appear as satellites with no reference weight in any style.\n\nThemes\nThe Growth style is generally built around long term capital growth through listed equities and private markets, balanced by property, bonds, metals and cash. Current exposure leans more heavily toward direct property and includes satellite holdings such as Bitcoin, Ethereum, a watch collection and a car. These satellites are outside the reference framework and add different risk and liquidity characteristics. The mortgage is a liability outside the allocation weights. Net worth is CHF 2,637,200 against total assets of CHF 3,417,200.\n\nRegions\nThe reference profile does not specify regional weights. Current holdings suggest exposure through a global equity ETF, a Swiss bond fund, a Zurich apartment and CHF/EUR cash, with private markets and digital assets adding further spread. This is an illustrative draft, not advice.", "Aggressive": "Asset classes\nAn illustrative Aggressive profile typically holds equity and private markets as its largest blocks, with smaller cash, bonds, metals and real estate. Reference weights are cash 3, bonds 5, equity 55, metals 7, real estate 6 and private markets 24 percent. Your current allocation is above reference in cash at 5.7, real estate at 43.3, and satellites crypto, collectibles and vehicles, which have no reference weight. It is close to reference in bonds at 5.0, and below in equity at 21.7, metals at 3.5, and private markets at 13.7. The CHF 780,000 mortgage is a liability outside these weights, so net worth is CHF 2,637,200 against total assets of CHF 3,417,200.\n\nThemes\nThe portfolio is shaped by a direct Zurich apartment, a global equity ETF, a Swiss bond fund, vaulted gold, a private equity fund, a synthetic private company stake, self custodied Bitcoin and Ethereum, a vintage watch collection, a Porsche 911, and CHF and EUR cash. Direct property and selected private and satellite holdings create concentration relative to the illustrative style. The synthetic stake represents 3.0 percent ownership.\n\nRegions\nRegion exposure appears strongly Swiss through the apartment and Swiss bond fund. The global equity ETF adds broad international listed exposure. Cash is held in CHF and EUR. Private markets and crypto may add global or unlisted exposure, though their regional split is not shown here.\n\nThis is an illustrative draft for information only, not advice."};
+  var REPORT_PROMPT = "You are the report engine inside {brand}, a Swiss portfolio information tool. It is NOT an advisor and must never give personalised advice. You receive the client's current allocation by asset class and an illustrative reference profile for their chosen style. Write a drafted report of 180 to 240 words with three headed sections: Asset classes, Themes, Regions. Describe what an illustrative profile of this kind typically holds and where the current portfolio sits above or below it. Descriptive and educational only. End with one line that this is an illustrative draft, not advice. Never tell the client to buy or sell. English, plain text, no asterisks.";
+  var REPORT_META = "Report model: DeepSeek V4.1 Flash (Fireworks) via the {brand} gateway. Generated 24 Sep 2026 from the allocation shown. Prompt is fixed; it receives the figures only. Draft, pending human review before it reaches a client.";
+  var style = {selected:"Balanced", via:"self"};
+
+  function targets(st){return st.t;}
+  function styleByName(n){for(var i=0;i<STYLES.length;i++){if(STYLES[i].n===n)return STYLES[i];}return STYLES[2];}
+  function currentShares(byClass,ta){
+    var out={};
+    GAPCLASSES.forEach(function(k){
+      out[k]=((byClass[k]||0)/ta*100);
+    });
+    return out;
+  }
+
+  function renderStyles(){
+    var chips=document.getElementById("styleChips");
+    if(!chips) return;
+    chips.innerHTML="";
+    STYLES.forEach(function(st){
+      var b=document.createElement("button");
+      b.type="button"; b.className="chip"+(style.selected===st.n?" on":"");
+      b.textContent=st.n;
+      b.addEventListener("click",function(){style.selected=st.n;style.via="self";quizAns.horizon=null;quizAns.drop=null;syncQuiz();renderStyles();renderStyleGap();});
+      chips.appendChild(b);
+    });
+    var st=styleByName(style.selected);
+    document.getElementById("styleQn").innerHTML="<span>Selected: <b>"+st.n+"</b></span>"+
+      "<span>Source: "+(style.via==="quiz"?"matched from your questionnaire answers":"chosen by you")+"</span>";
+    document.getElementById("styleSrc").innerHTML='<span class="src"><span class="dot"></span>'+T(st.src)+'</span>';
+    document.getElementById("styleMeta").innerHTML="<b>Illustrative profile.</b> "+st.d+
+      " These weights are a reference designed by us, in the open, so you can see what the gap is measured against. They are not a recommended allocation and not a product.";
+  }
+
+  var QUESTIONS=[
+    {id:"horizon", q:"How long before you would need a large part of this money?", opts:[
+      {v:0,label:"Under 3 years"},{v:1,label:"3 to 7 years"},{v:2,label:"8 to 15 years"},{v:3,label:"Over 15 years"}]},
+    {id:"drop", q:"If your portfolio fell 25% in a year, what would you do?", opts:[
+      {v:0,label:"Sell to stop further falls"},{v:1,label:"Sell some"},{v:2,label:"Hold"},{v:3,label:"Add to it"}]}
+  ];
+  var quizAns={horizon:null, drop:null};
+  function renderQuiz(){
+    var el=document.getElementById("quiz"); if(!el) return;
+    el.innerHTML="";
+    QUESTIONS.forEach(function(Q){
+      var d=document.createElement("div"); d.className="qi";
+      var h='<p class="qt">'+Q.q+'</p><div class="qo">';
+      Q.opts.forEach(function(o){
+        var on=quizAns[Q.id]===o.v;
+        h+='<label class="'+(on?"sel":"")+'" data-q="'+Q.id+'" data-v="'+o.v+'"><input type="radio" name="'+Q.id+'" '+(on?"checked":"")+'>'+o.label+'</label>';
+      });
+      h+='</div>'; d.innerHTML=h; el.appendChild(d);
+    });
+    el.querySelectorAll("label[data-q]").forEach(function(l){
+      l.addEventListener("click",function(){
+        quizAns[l.dataset.q]=parseInt(l.dataset.v,10);
+        guessStyle(); renderQuiz(); renderStyles(); renderStyleGap();
+      });
+    });
+    var c=document.createElement("p"); c.className="note";
+    c.textContent="Rule: score 0 to 6 across the two answers maps to Capital preservation, Income, Balanced, Growth, Aggressive at 0-1, 2, 3, 4, 5-6. An open rule, not a black box.";
+    el.appendChild(c);
+  }
+  function guessStyle(){
+    if(quizAns.horizon===null||quizAns.drop===null) return;
+    var s=quizAns.horizon+quizAns.drop;
+    var pick=[0,0,1,2,3,4,4][s];
+    style.selected=STYLES[pick].n; style.via="quiz";
+  }
+  function syncQuiz(){renderQuiz();}
+
+  function renderStyleGap(){
+    var byClass={}, a=assets();
+    a.forEach(function(p){byClass[p.c]=(byClass[p.c]||0)+p.v;});
+    var ta=totalAssets();
+    var cur=currentShares(byClass,ta);
+    var tgt=targets(styleByName(style.selected));
+    var box=document.getElementById("gapBars"); if(!box) return;
+    box.innerHTML="";
+    var max=10;
+    GAPCLASSES.forEach(function(k){max=Math.max(max,cur[k],tgt[k]);});
+    max=Math.ceil((max+5)/10)*10;
+    var flags=[];
+    GAPCLASSES.forEach(function(k){
+      var d=cur[k]-tgt[k];
+      var cls = Math.abs(d)<=5 ? "matched" : (d>0?"over":"under");
+      var word = Math.abs(d)<=5 ? "matched" : (d>0?"over the target":"under the target");
+      var row=document.createElement("div"); row.className="gl";
+      row.innerHTML='<span>'+T(CLASSES[k].k)+'</span>'+
+        '<span class="track"><span class="cur" style="left:0;width:'+(cur[k]/max*100).toFixed(1)+'%"></span>'+
+        '<span class="tgt" style="left:'+(tgt[k]/max*100).toFixed(1)+'%"></span></span>'+
+        '<span class="delta '+cls+'">'+cur[k].toFixed(1)+'% of assets &middot; target '+tgt[k]+'% &middot; '+
+        (d>=0?"+":"")+d.toFixed(1)+'pt '+word+'</span>';
+      box.appendChild(row);
+      if(cls!=="matched"){
+        var txt = k==="realestate"?"Direct property is the class that is hardest to change in small steps, since a property cannot be sold in slices.":
+          k==="equity"?"Listed equity is the class a portfolio can move in whole percentage points and in small amounts, so a gap of this size can be closed gradually.":
+          k==="bonds"?"Bonds and bond funds trade in whole units, so this gap can be closed in a few orders without touching the rest of the mix.":
+          k==="metals"?"Metals are the smallest liquid sleeve here. A gap of a few points is one purchase or one sale of bars or an ETF.":
+          k==="private"?"Private markets sit in a fund with a fixed commitment and a lock-up, so any change here waits for a capital call or a distribution, not for a decision today.":
+          "Cash is the class you can change in a single transfer. A larger cash share trades potential return for a longer runway.";
+        flags.push(["GAP", T(CLASSES[k].k)+" is "+Math.abs(d).toFixed(1)+" points "+word.replace(" the target","")+".", txt]);
+      }
+    });
+    // Satellite classes: held, shown, and explicitly given no target weight.
+    var sats=assets().map(function(p){return p.c;}).filter(function(c,idx,arr){
+      return arr.indexOf(c)===idx && GAPCLASSES.indexOf(c)<0;});
+    var satShare=sats.reduce(function(s,k){return s+(cur[k]||((byClass[k]||0)/ta*100));},0);
+    sats.forEach(function(k){
+      var sh=((byClass[k]||0)/ta*100);
+      var row=document.createElement("div"); row.className="gl";
+      row.innerHTML='<span>'+T(CLASSES[k].k)+'</span>'+
+        '<span class="track"><span class="cur" style="left:0;width:'+(sh/max*100).toFixed(1)+'%"></span></span>'+
+        '<span class="delta notgt">'+sh.toFixed(1)+'% of assets &middot; no target weight</span>';
+      box.appendChild(row);
+    });
+    if(satShare>25){
+      flags.push(["GAP","Satellite holdings with no target weight add up to "+satShare.toFixed(1)+" percent of assets.",
+        "Crypto, collectibles and vehicles are shown in full but carry no reference weight in any style."]);
+    }
+    var el=document.getElementById("styleFlags"); el.innerHTML="";
+    flags.forEach(function(f){
+      var d=document.createElement("div"); d.className="flag";
+      d.innerHTML='<span class="k">'+f[0]+'</span><div>'+f[1]+'<small>'+f[2]+'</small></div>';
+      el.appendChild(d);
+    });
+
+    // drafted report for the selected style
+    var rep=document.getElementById("report");
+    rep.innerHTML="";
+    var text=REPORTS[style.selected]||"";
+    var blocks=text.split(/\n{2,}/);
+    blocks.forEach(function(b){
+      b=b.trim(); if(!b) return;
+      var lines=b.split("\n");
+      var head=lines[0].replace(/^\s*\d+\.\s*/,"").trim();
+      if(lines.length>1 && lines[0].trim().length<=48){
+        var h=document.createElement("h3"); h.textContent=head; rep.appendChild(h);
+        var p=document.createElement("p"); p.textContent=lines.slice(1).join(" "); rep.appendChild(p);
+      } else {
+        var p2=document.createElement("p"); p2.className="closing"; p2.textContent=lines.join(" "); rep.appendChild(p2);
+      }
+    });
+    document.getElementById("repMeta").innerHTML='<span class="src"><span class="dot"></span>'+T(REPORT_META)+'</span>'+
+      '<span class="src">style: '+style.selected+'</span>';
+  }
+
+  // market strip: levels from market.config.json (the same file the landing
+  // page reads), so one edit updates both and neither can drift. Each tile
+  // keeps its source and publish date.
+  var MARKET={};
+  function loadMarket(){
+    return fetch("market.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){ MARKET=d||{}; return MARKET; }).catch(function(){ MARKET={}; return MARKET; });
+  }
+  function renderStrip(){
+    var s=document.getElementById("strip"); if(!s) return; s.innerHTML="";
+    (MARKET.levels||[]).forEach(function(t){
+      var chg=t.change||"";
+      var d=document.createElement("div"); d.className="tick";
+      var cls = chg.indexOf("-")===0 ? "down" : (chg.indexOf("+")===0 ? "up" : "");
+      d.innerHTML='<div class="nm">'+t.name+'</div><div class="vl num">'+t.value+'</div>'+
+        '<div class="mt"><span class="chg '+cls+'" style="font-size:.72rem;">'+chg+'</span><span class="dt">'+t.date+'</span></div>'+
+        '<div class="mt"><span>'+t.source+'</span></div>';
+      s.appendChild(d);
+    });
+  }
+
+  // mobile menu: collapsed nav that slides open under the header
+  var navEl=document.getElementById("mainNav"), navBtn=document.getElementById("navBtn"),
+      navLabel=document.getElementById("navLabel");
+  function closeNav(){if(!navEl)return;navEl.classList.remove("open");
+    if(navBtn)navBtn.setAttribute("aria-expanded","false");}
+  if(navBtn){
+    navBtn.addEventListener("click",function(){
+      var open=navEl.classList.toggle("open");
+      navBtn.setAttribute("aria-expanded",open?"true":"false");
+    });
+  }
+  window.addEventListener("resize",function(){if(window.innerWidth>860)closeNav();});
+
+  // Demo tour. A sequence of steps, each a screenshot of a real view with a
+  // caption in EN+DE, loaded from tour.config.json so a caption or the order
+  // is a data edit. Deep-linkable: #tour opens it, #tour=3 opens at a step.
+  // Keyboard: left/right, Escape. Touch: swipe. Captions describe, never advise.
+  var TOUR=null, tourIdx=0;
+  function loadTour(){
+    return fetch("tour.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){ TOUR=d||{}; return TOUR; }).catch(function(){ TOUR={steps:[]}; return TOUR; });
+  }
+  function tourSteps(){ return (TOUR && TOUR.steps) || []; }
+  function openTour(i){
+    var steps=tourSteps(); if(!steps.length) return;
+    tourIdx = Math.max(0, Math.min(steps.length-1, i||0));
+    var lb=document.getElementById("lbox"); if(!lb) return;
+    lb.classList.add("on");
+    document.body.style.overflow="hidden";
+    paintTour();
+  }
+  function closeTour(){
+    var lb=document.getElementById("lbox"); if(!lb) return;
+    lb.classList.remove("on");
+    document.body.style.overflow="";
+    if(location.hash.indexOf("#tour")===0){
+      try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+    }
+  }
+  function paintTour(){
+    var steps=tourSteps(); if(!steps.length) return;
+    var s=steps[tourIdx];
+    document.getElementById("tourTag").textContent = loc(s.tag);
+    document.getElementById("tourTtl").textContent = loc(s.title);
+    document.getElementById("tourBody").textContent = loc(s.body);
+    document.getElementById("tourCnt").textContent = (tourIdx+1)+" / "+steps.length;
+    var img=document.getElementById("tourShot");
+    img.src=s.shot; img.alt=loc(s.title);
+    img.onerror=function(){ img.alt=T("tour.shot_missing"); };
+    document.getElementById("tourPrev").style.visibility = tourIdx===0?"hidden":"visible";
+    document.getElementById("tourNext").style.visibility = tourIdx===steps.length-1?"hidden":"visible";
+    var dots=document.getElementById("tourDots"); dots.innerHTML="";
+    steps.forEach(function(_,i){
+      var d=document.createElement("i");
+      if(i===tourIdx) d.className="on";
+      d.addEventListener("click",function(){tourIdx=i;paintTour();});
+      dots.appendChild(d);
+    });
+  }
+  function tourGo(d){
+    var steps=tourSteps(); if(!steps.length) return;
+    tourIdx=Math.max(0,Math.min(steps.length-1,tourIdx+d));
+    paintTour();
+  }
+  if(document.getElementById("allocModeBars")){
+    document.getElementById("allocModeBars").addEventListener("click",function(){
+      ALLOC_MODE="bars"; applyAllocMode();
+    });
+    document.getElementById("allocModeDonut").addEventListener("click",function(){
+      ALLOC_MODE="donut"; applyAllocMode();
+    });
+  }
+  if(document.getElementById("tourBtn")){
+    document.getElementById("tourBtn").addEventListener("click",function(){ openTour(0); });
+    document.getElementById("tourX").addEventListener("click",closeTour);
+    document.getElementById("tourSkip").addEventListener("click",closeTour);
+    document.getElementById("tourPrev").addEventListener("click",function(){tourGo(-1);});
+    document.getElementById("tourNext").addEventListener("click",function(){tourGo(1);});
+    document.getElementById("lbox").addEventListener("click",function(e){
+      if(e.target===document.getElementById("lbox")) closeTour();
+    });
+    document.addEventListener("keydown",function(e){
+      var on=document.getElementById("lbox").classList.contains("on");
+      if(!on) return;
+      if(e.key==="Escape") closeTour();
+      else if(e.key==="ArrowRight") tourGo(1);
+      else if(e.key==="ArrowLeft") tourGo(-1);
+    });
+    // Swipe on a phone.
+    var tx=null;
+    var panel=document.getElementById("lbox");
+    panel.addEventListener("touchstart",function(e){tx=e.touches[0].clientX;},{passive:true});
+    panel.addEventListener("touchend",function(e){
+      if(tx===null) return;
+      var dx=e.changedTouches[0].clientX-tx; tx=null;
+      if(Math.abs(dx)>40){ tourGo(dx<0?1:-1); }
+    },{passive:true});
+  }
+
+  function route(v){
+    document.querySelectorAll(".nav a").forEach(function(a){a.classList.toggle("on",a.dataset.v===v);});
+    document.querySelectorAll(".view").forEach(function(s){s.classList.toggle("on",s.id==="v-"+v);});
+    if(v==="documents") loadDocuments();
+    if(v==="scenario") loadScenario();
+    if(v==="governance") loadGovernance();
+    if(v==="estate") loadEstate();
+    if(v==="compliance") loadEvidence();
+    var cur=document.querySelector('.nav a[data-v="'+v+'"]');
+    if(navLabel&&cur)navLabel.textContent=cur.textContent.trim();
+    closeNav();
+    window.scrollTo(0,0);
+  }
+  // Statement ingest. Reads the demo fixture, shows the candidate lines with
+  // their provenance. Read-only: nothing here writes to the ledger. A low
+  // confidence line is flagged for review; a line with no source is refused.
+  var docState={cands:{},flows:{},preview:{}};
+  // What was actually read this session, newest first. Real state, not a mock:
+  // each entry names the file, its detected format, whether the seam could read
+  // it, and how many candidate lines came out. Nothing is persisted server-side,
+  // so a reload clears it, which is honest about a session-scoped demo.
+  var docRecent=[];
+  function pushRecent(entry){docRecent.unshift(entry);if(docRecent.length>6){docRecent.pop();}renderRecent();}
+  function renderRecent(){
+    var list=document.getElementById("docRecentList");
+    var empty=document.getElementById("docRecentEmpty");
+    if(!list){return;}
+    if(!docRecent.length){list.innerHTML="";if(empty){empty.hidden=false;}return;}
+    if(empty){empty.hidden=true;}
+    list.innerHTML=docRecent.map(function(e){
+      var tag=e.ok?T("docs.recent_tag_ok"):T("docs.recent_tag_ocr");
+      var meta=e.ok?T("docs.recent_lines",{n:String(e.lines)}):T("docs.recent_refused",{reason:e.reason||""});
+      return '<div class="row"><div class="l"><span>'+esc(e.name)+'</span><small>'+
+        esc((e.kind||e.format||"")+" · ")+meta+'</small></div>'+
+        '<div class="r"><span class="tag'+(e.ok?"":" tag-warn")+'">'+tag+'</span></div></div>';
+    }).join("");
+  }
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  // One review renderer for both the fixture (GET) and an uploaded document
+  // (POST {document}). Nothing here writes; it only paints the candidate, flow
+  // and refused lines so the Confirm controls can act on either source.
+  function renderStatement(d){
+    var live=document.getElementById("docLive");
+    if(!live){return false;}
+    var st=d.statement||{};
+    var meta=document.getElementById("docStmt");
+    if(meta){meta.textContent=T("docs.stmt",{institution:st.institution||"",as_of:st.as_of||""});}
+    docState.cands={};
+    (d.candidates||[]).forEach(function(c){docState.cands[c.line]=c;});
+    docState.flows={};
+    (d.flows||[]).forEach(function(f){docState.flows[f.line]=f;});
+    docState.preview={};
+    (d.preview||[]).forEach(function(p){docState.preview[p.line]=p;});
+    renderCandidates();
+    renderFlows();
+    var ref=document.getElementById("docRefused");
+    if(ref){
+      ref.innerHTML=(d.refused&&d.refused.length)?
+        '<div class="row" style="border-top:2px solid var(--line);margin-top:6px;">'+
+        '<div class="l"><span>'+T("docs.refused")+'</span><small>'+
+        d.refused.map(function(r){return r.name+" ("+r.reason+")";}).join("; ")+'</small></div>'+
+        '<div class="r"><span class="tag">'+T("docs.refused_tag")+'</span></div></div>':"";
+    }
+    var note=document.getElementById("docNote");
+    if(note){note.textContent=T("docs.note",{source:st.source||""});}
+    live.hidden=false;
+    var batch=document.getElementById("docBatch"); if(batch){batch.hidden=true;}
+    return true;
+  }
+  // A read-only what-would-change for each line: does a Confirm create a new
+  // holding, stack onto one, or supersede a value already on that date? Fetched
+  // separately so the review still loads if the ledger is unreachable, and it
+  // never writes: the endpoint only reads.
+  function fetchPreview(){
+    return fetch("api/ingest?preview=1",{cache:"no-store"})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok||!d.preview_ready){return;}
+        docState.preview={};
+        (d.preview||[]).forEach(function(p){docState.preview[p.line]=p;});
+        renderCandidates();
+        renderFlows();
+      }).catch(function(){});
+  }
+  // The preview chip for one line, or "" when there is no preview. A supersede
+  // shows the exact from -> to; a create names the new holding; a refuse names
+  // why. Actions that would land are muted, a refuse is loud.
+  function previewChip(line){
+    var p=docState.preview&&docState.preview[line];
+    if(!p||!p.action){return "";}
+    var cls="pv pv-"+p.action, label;
+    if(p.action==="create_asset"){label=T("docs.pv_create");}
+    else if(p.action==="stack"){label=T("docs.pv_stack",{amount:chf(p.from_amount)});}
+    else if(p.action==="supersede"){label=T("docs.pv_supersede",{from:chf(p.from_amount),to:chf(p.to_amount)});}
+    else if(p.action==="flow"){label=T("docs.pv_flow");}
+    else if(p.action==="flow_dup"){label=T("docs.pv_flow_dup");}
+    else{label=T("docs.pv_refuse",{reason:p.reason||""});}
+    return '<span class="'+cls+'">'+label+'</span>';
+  }
+  function loadDocuments(){
+    var live=document.getElementById("docLive");
+    if(!live||live.dataset.loaded){return;}
+    return fetch("api/ingest",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok||!d.candidates||!d.candidates.length){return false;}
+        live.dataset.loaded="1";
+        renderStatement(d);
+        fetchPreview();
+        return true;
+      }).catch(function(){return false;});
+  }
+  // Parse a chosen statement file. Reads the file as bytes, base64s it, and
+  // POSTs it to the extractor seam ({upload_base64}). The pipeline classifies the
+  // format and reads it to the typed schema, then the review paints through the
+  // same renderStatement the fixture uses. The bytes never leave the browser
+  // except as the parse request; nothing is written until a Confirm. A PDF or an
+  // image is recognized and reported as needing OCR, not misread.
+  var DOC_MAX=512*1024;
+  function showDetection(det){
+    var row=document.getElementById("docDetect");
+    if(!row||!det){return;}
+    var kind=document.getElementById("docDetectKind");
+    var src=document.getElementById("docDetectSrc");
+    var tag=document.getElementById("docDetectTag");
+    if(kind){kind.textContent=T("docs.det_format",{kind:det.kind||det.format||""});}
+    if(src){src.textContent=det.note||det.source||"";}
+    if(tag){
+      tag.textContent=det.supported?T("docs.det_ok"):T("docs.det_ocr");
+      tag.className="tag"+(det.supported?"":" tag-warn");
+    }
+    row.hidden=false;
+  }
+  function clearDetection(){
+    var row=document.getElementById("docDetect"); if(row){row.hidden=true;}
+  }
+  function parseUpload(file){
+    var out=document.getElementById("docUpload");
+    if(!file){return;}
+    function fail(key,extra){
+      if(!out){return;}
+      out.hidden=false;
+      out.textContent=T(key,extra||{});
+    }
+    if(file.size>DOC_MAX){
+      fail("docs.up_too_big",{kb:String(Math.round(DOC_MAX/1024))});
+      return;
+    }
+    var fr=new FileReader();
+    fr.onerror=function(){fail("docs.up_read_fail");};
+    fr.onload=function(){
+      var b64;
+      try{
+        var bytes=new Uint8Array(fr.result);
+        var bin="";for(var i=0;i<bytes.length;i++){bin+=String.fromCharCode(bytes[i]);}
+        b64=btoa(bin);
+      }catch(e){fail("docs.up_read_fail");return;}
+      fetch("api/ingest",{method:"POST",cache:"no-store",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({upload_base64:b64,filename:file.name||""})})
+        .then(function(r){return r.json();})
+        .then(function(d){
+          if(d&&d.detection){showDetection(d.detection);}
+          var det=(d&&d.detection)||{};
+          if(!d||!d.ok){
+            pushRecent({name:file.name||"",format:det.format,kind:det.kind,ok:false,
+              reason:(d&&(d.reason||(d.needs_ocr?"needs OCR":"")))||"error"});
+            if(d&&d.needs_ocr){fail("docs.up_needs_ocr",{reason:(d.reason||"")});}
+            else{fail("docs.up_refused",{reason:(d&&d.reason)||"error"});}
+            return;
+          }
+          if(!d.candidates||(!d.candidates.length&&!(d.flows||[]).length)){
+            pushRecent({name:file.name||"",format:det.format,kind:det.kind,ok:true,lines:0});
+            fail("docs.up_empty");return;}
+          if(out){out.hidden=true;}
+          pushRecent({name:file.name||"",format:det.format,kind:det.kind,ok:true,
+            lines:(d.candidates||[]).length+(d.flows||[]).length});
+          renderStatement(d);
+          fetchPreview();
+          var live=document.getElementById("docLive");
+          if(live){live.dataset.loaded="1";}
+        }).catch(function(){fail("docs.up_refused",{reason:"network"});});
+    };
+    fr.readAsArrayBuffer(file);
+  }
+  // A one-click demo of the seam: a synthetic CSV statement reads straight
+  // through, and a minimal PDF shows the OCR gate naming why nothing was read.
+  var DEMO_CSV="line,name,class,currency,amount,as_of,source,confidence\n"+
+    "1,Global equity ETF,equity,CHF,748500,2026-09-30,\"Demo CSV, line 1\",high\n"+
+    "2,Swiss bond fund,bonds,CHF,171200,2026-09-30,\"Demo CSV, line 2\",high\n"+
+    "3,\"Cash, CHF account\",cash,CHF,51200,2026-09-30,\"Demo CSV, line 3\",high\n"+
+    "4,Unlabeled scan,equity,CHF,9999,2026-09-30,,\n";
+  function demoBytesToB64(str){
+    var bytes=new TextEncoder().encode(str),bin="";
+    for(var i=0;i<bytes.length;i++){bin+=String.fromCharCode(bytes[i]);}
+    return btoa(bin);
+  }
+  function postUpload(b64,filename,readFail){
+    var out=document.getElementById("docUpload");
+    fetch("api/ingest",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({upload_base64:b64,filename:filename})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d&&d.detection){showDetection(d.detection);}
+        var det=(d&&d.detection)||{};
+        if(!d||!d.ok){
+          pushRecent({name:filename||"",format:det.format,kind:det.kind,ok:false,
+            reason:(d&&(d.reason||(d.needs_ocr?"needs OCR":"")))||"error"});
+          if(out){out.hidden=false;out.textContent=(d&&d.needs_ocr)?
+            T("docs.up_needs_ocr",{reason:(d.reason||"")}):
+            T("docs.up_refused",{reason:(d&&d.reason)||"error"});}
+          return;
+        }
+        if(out){out.hidden=true;}
+        pushRecent({name:filename||"",format:det.format,kind:det.kind,ok:true,
+          lines:(d.candidates||[]).length+(d.flows||[]).length});
+        renderStatement(d);fetchPreview();
+        var live=document.getElementById("docLive");if(live){live.dataset.loaded="1";}
+      }).catch(function(){if(out){out.hidden=false;out.textContent=T("docs.up_refused",{reason:"network"});}});
+  }
+  var demoCsvBtn=document.getElementById("docDemoCsv");
+  if(demoCsvBtn){demoCsvBtn.addEventListener("click",function(){clearDetection();postUpload(demoBytesToB64(DEMO_CSV),"demo_statement.csv");});}
+  var demoPdfBtn=document.getElementById("docDemoPdf");
+  if(demoPdfBtn){demoPdfBtn.addEventListener("click",function(){clearDetection();
+    postUpload(demoBytesToB64("%PDF-1.4\n% demo scan placeholder\n"),"statement_scan.pdf");});}
+  var docFile=document.getElementById("docFile");
+  if(docFile){
+    docFile.addEventListener("change",function(e){
+      var f=e.target.files&&e.target.files[0];
+      parseUpload(f);
+    });
+  }
+  var docDrop=document.getElementById("docDrop");
+  if(docDrop){
+    ["dragenter","dragover"].forEach(function(ev){
+      docDrop.addEventListener(ev,function(e){e.preventDefault();docDrop.classList.add("over");});
+    });
+    ["dragleave","drop"].forEach(function(ev){
+      docDrop.addEventListener(ev,function(e){e.preventDefault();docDrop.classList.remove("over");});
+    });
+    docDrop.addEventListener("drop",function(e){
+      var f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+      parseUpload(f);
+    });
+  }
+  // Download the portfolio as a file. The endpoint returns the file bytes and a
+  // Content-Disposition; we read the filename from it and hand the blob to a
+  // temporary link, so the browser saves it like any download. A non-file
+  // response (an error object) is read as JSON and shown as a reason.
+  function exportPortfolio(fmt){
+    var note=document.getElementById("expNote");
+    if(note){note.hidden=false;note.textContent=T("export.working");}
+    fetch("api/export?format="+encodeURIComponent(fmt),{cache:"no-store"})
+      .then(function(r){
+        var disp=r.headers.get("Content-Disposition")||"";
+        var m=/filename="([^"]+)"/.exec(disp);
+        var name=m?m[1]:("ownview-portfolio."+fmt);
+        return r.blob().then(function(blob){return {ok:r.ok,blob:blob,name:name,type:r.headers.get("Content-Type")||""};});
+      })
+      .then(function(res){
+        if(!res.ok||(res.type&&res.type.indexOf("json")>=0)){
+          return res.blob().text().then(function(txt){
+            var msg=T("export.fail");
+            try{var j=JSON.parse(txt);if(j&&j.reason){msg=j.reason;}}catch(e){}
+            if(note){note.textContent=msg;}
+          });
+        }
+        var url=URL.createObjectURL(res.blob);
+        var a=document.createElement("a");
+        a.href=url;a.download=res.name;document.body.appendChild(a);a.click();
+        document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},4000);
+        if(note){note.textContent=T("export.done",{name:res.name});}
+      })
+      .catch(function(){if(note){note.textContent=T("export.fail");}});
+  }
+  [["expXlsx","xlsx"],["expDocx","docx"],["expPptx","pptx"]].forEach(function(pair){
+    var b=document.getElementById(pair[0]);
+    if(b){b.addEventListener("click",function(){exportPortfolio(pair[1]);});}
+  });
+  // One row per candidate. A low-confidence line still flags REVIEW before you
+  // confirm it; nothing is hidden. Until you press Confirm the row is a
+  // proposal and the ledger is untouched.
+  function renderCandidates(){
+    var list=document.getElementById("docCands");
+    if(!list){return;}
+    var lines=Object.keys(docState.cands).map(Number).sort(function(a,b){return a-b;});
+    list.innerHTML=lines.map(function(ln){
+      var c=docState.cands[ln];
+      var tag=c.review?'<span class="tag">'+T("docs.review")+'</span>':'<span class="tag">'+T("docs.ready")+'</span>';
+      var action='<button type="button" class="btn ghost" data-confirm="'+c.line+'" '+
+        'style="margin-top:0;padding:6px 12px;font-size:.78rem;">'+T("docs.confirm")+'</button>';
+      return '<div class="row" data-line="'+c.line+'"><div class="l"><span>'+c.name+'</span>'+
+        '<small>'+T("docs.line",{line:c.line,cls:c.class,conf:c.confidence})+'</small></div>'+
+        '<div class="r">'+chf(c.amount)+' '+c.currency+' '+tag+action+'</div></div>'+
+        previewChip(c.line)+
+        '<p class="note">'+c.source+' &middot; '+c.as_of+'</p>';
+    }).join("");
+  }
+  // A flow line is money in or out, not a holding: it never becomes a position
+  // and never changes the net on its own, it is the flow side of the series.
+  function renderFlows(){
+    var list=document.getElementById("docFlows");
+    if(!list){return;}
+    var lines=Object.keys(docState.flows).map(Number).sort(function(a,b){return a-b;});
+    if(!lines.length){list.innerHTML="";return;}
+    var head='<p class="note" style="border-top:2px solid var(--line);margin-top:10px;padding-top:8px;">'+
+      T("docs.flows_head")+'</p>';
+    list.innerHTML=head+lines.map(function(ln){
+      var f=docState.flows[ln];
+      var action='<button type="button" class="btn ghost" data-confirm-flow="'+f.line+'" '+
+        'style="margin-top:0;padding:6px 12px;font-size:.78rem;">'+T("docs.confirm")+'</button>';
+      return '<div class="row" data-flow-line="'+f.line+'"><div class="l"><span>'+f.name+'</span>'+
+        '<small>'+T("docs.flow_line",{line:f.line,flow:f.flow})+'</small></div>'+
+        '<div class="r">'+chf(f.amount)+' '+f.currency+
+        ' <span class="tag">'+T("docs.flow_tag")+'</span>'+action+'</div></div>'+
+        previewChip(f.line)+
+        '<p class="note">'+f.source+' &middot; '+f.as_of+'</p>';
+    }).join("");
+  }
+  // Confirm one flow. The POST writes through accept_flow(); the row flips to
+  // ACCEPTED and the series picks the amount up on the flow side.
+  function confirmFlow(line,btn){
+    if(btn){btn.disabled=true;btn.textContent=T("docs.confirming");}
+    return fetch("api/ingest",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({line:line})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var row=document.querySelector('#docFlows .row[data-flow-line="'+line+'"]');
+        if(!d||!d.ok){
+          if(btn){btn.disabled=false;btn.textContent=T("docs.confirm");}
+          if(row&&!row.querySelector(".refused-note")){
+            var p=document.createElement("p");
+            p.className="note refused-note";
+            p.textContent=T("docs.refused_confirm",{reason:(d&&d.reason)||"error"});
+            row.parentNode.insertBefore(p,row.nextSibling);
+          }
+          return false;
+        }
+        if(row){
+          var r=row.querySelector(".r");
+          if(r){
+            var b=r.querySelector("[data-confirm-flow]");if(b){b.remove();}
+            var acc=document.createElement("span");acc.className="tag";
+            acc.textContent=T("docs.accepted");r.appendChild(acc);
+          }
+        }
+        var rowNote=document.createElement("p");
+        rowNote.className="note";
+        rowNote.textContent=T("docs.accepted_flow",{flow:String(d.cash_flow_id||"").slice(0,8),
+          mode:(d.created?T("docs.flow_new"):T("docs.flow_dup"))});
+        if(row){row.parentNode.insertBefore(rowNote,row.nextSibling);}
+        refresh();
+        return true;
+      }).catch(function(){
+        if(btn){btn.disabled=false;btn.textContent=T("docs.confirm");}
+        return false;
+      });
+  }
+  // Confirm one candidate. The POST writes through the ledger's accept() and
+  // returns exactly what landed; the row flips to ACCEPTED with the ids, so the
+  // effect is auditable on screen. Net worth is refreshed so the change shows.
+  function confirmCandidate(line,btn){
+    if(btn){btn.disabled=true;btn.textContent=T("docs.confirming");}
+    return fetch("api/ingest",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({line:line})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var row=document.querySelector('#docCands .row[data-line="'+line+'"]');
+        if(!d||!d.ok){
+          if(btn){btn.disabled=false;btn.textContent=T("docs.confirm");}
+          if(row&&!row.querySelector(".refused-note")){
+            var p=document.createElement("p");
+            p.className="note refused-note";
+            p.textContent=T("docs.refused_confirm",{reason:(d&&d.reason)||"error"});
+            row.parentNode.insertBefore(p,row.nextSibling);
+          }
+          return false;
+        }
+        if(row){
+          var r=row.querySelector(".r");
+          if(r){
+            var nw=r.querySelector("[data-confirm]");if(nw){nw.remove();}
+            var acc=document.createElement("span");acc.className="tag";
+            acc.textContent=T("docs.accepted");r.appendChild(acc);
+          }
+        }
+        var rowNote=document.createElement("p");
+        rowNote.className="note";rowNote.setAttribute("data-line-note",line);
+        rowNote.textContent=T("docs.accepted_ids",{asset:String(d.asset_id||"").slice(0,8),
+          val:String(d.valuation_id||"").slice(0,8),
+          mode:(d.superseded?T("docs.superseded"):T("docs.stacked"))});
+        if(row){row.parentNode.insertBefore(rowNote,row.nextSibling);}
+        // Refresh the total and the series together, so the confirmed point
+        // shows on the wealth chart without a reload.
+        refresh();
+        return true;
+      }).catch(function(){
+        if(btn){btn.disabled=false;btn.textContent=T("docs.confirm");}
+        return false;
+      });
+  }
+  var docListEl=document.getElementById("docCands");
+  if(docListEl){
+    docListEl.addEventListener("click",function(e){
+      var b=e.target.closest("[data-confirm]");
+      if(b){confirmCandidate(parseInt(b.getAttribute("data-confirm"),10),b);}
+      var fb=e.target.closest("[data-confirm-flow]");
+      if(fb){confirmFlow(parseInt(fb.getAttribute("data-confirm-flow"),10),fb);}
+    });
+  }
+  // Confirm the whole parsed statement in one call. The POST writes through
+  // accept_all(); every accepted row flips to ACCEPTED with its ids, a refused
+  // line is reported in place, and the total and series refresh once at the end
+  // rather than per line.
+  function confirmAll(btn){
+    if(btn){btn.disabled=true;btn.textContent=T("docs.confirming_all");}
+    var batch=document.getElementById("docBatch");
+    return fetch("api/ingest",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({all:true})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok||!d.results){
+          if(btn){btn.disabled=false;btn.textContent=T("docs.confirm_all");}
+          if(batch){batch.hidden=false;batch.textContent=T("docs.batch_fail",
+            {reason:(d&&d.reason)||"error"});}
+          return false;
+        }
+        batchDrop();
+        d.results.forEach(function(res){applyBatchResult(res);});
+        if(batch){batch.hidden=false;batch.textContent=T("docs.batch_done",
+          {accepted:String(d.accepted||0),skipped:String(d.skipped||0)});}
+        if(btn){btn.disabled=false;btn.textContent=T("docs.confirm_all");}
+        refresh();
+        return true;
+      }).catch(function(){
+        if(btn){btn.disabled=false;btn.textContent=T("docs.confirm_all");}
+        return false;
+      });
+  }
+  // Remove the per-line confirm notes a previous batch left, so a re-run does
+  // not stack stale "Confirmed: ..." lines on top of the fresh outcome.
+  function batchDrop(){
+    document.querySelectorAll("#docCands .note[data-line-note], "+
+      "#docFlows .note[data-batch-note], #docCands .refused-note, #docFlows .refused-note")
+      .forEach(function(n){n.remove();});
+  }
+  // Flip one row to its batch outcome. Positions and flows share the shape, so
+  // the row lookup keys off line + kind.
+  function applyBatchResult(res){
+    var isFlow=res.kind==="flow";
+    var sel=isFlow?('#docFlows .row[data-flow-line="'+res.line+'"]')
+                  :('#docCands .row[data-line="'+res.line+'"]');
+    var row=document.querySelector(sel);
+    if(res.status!=="accepted"){
+      if(row&&!row.querySelector(".refused-note")){
+        var p=document.createElement("p");
+        p.className="note refused-note";
+        p.textContent=T("docs.refused_confirm",{reason:res.reason||"error"});
+        row.parentNode.insertBefore(p,row.nextSibling);
+      }
+      return;
+    }
+    if(row){
+      var r=row.querySelector(".r");
+      if(r){
+        var old=r.querySelector("[data-confirm],[data-confirm-flow]");if(old){old.remove();}
+        var acc=document.createElement("span");acc.className="tag";
+        acc.textContent=T("docs.accepted");r.appendChild(acc);
+      }
+    }
+    var note=document.createElement("p");
+    note.className="note";
+    if(isFlow){
+      note.setAttribute("data-batch-note",res.line);
+      note.textContent=T("docs.accepted_flow",{flow:String(res.cash_flow_id||"").slice(0,8),
+        mode:(res.created?T("docs.flow_new"):T("docs.flow_dup"))});
+    }else{
+      note.setAttribute("data-line-note",res.line);
+      note.textContent=T("docs.accepted_ids",{asset:String(res.asset_id||"").slice(0,8),
+        val:String(res.valuation_id||"").slice(0,8),
+        mode:(res.superseded?T("docs.superseded"):T("docs.stacked"))});
+    }
+    if(row){row.parentNode.insertBefore(note,row.nextSibling);}
+  }
+  var confirmAllBtn=document.getElementById("docConfirmAll");
+  if(confirmAllBtn){
+    confirmAllBtn.addEventListener("click",function(){confirmAll(confirmAllBtn);});
+  }
+  document.querySelectorAll(".nav a").forEach(function(a){
+    a.addEventListener("click",function(){route(a.dataset.v);});
+  });
+  // The Insights card links into the one scenario engine (the old inline slider
+  // is gone), so a click routes there instead of leaving a dangling #hash.
+  var toScenario=document.getElementById("toScenario");
+  if(toScenario){
+    toScenario.addEventListener("click",function(e){e.preventDefault();route("scenario");});
+  }
+
+  // add form
+  var addForm=document.getElementById("addForm");
+  if(addForm){
+    addForm.addEventListener("submit",function(e){
+      e.preventDefault();
+      var n=document.getElementById("aName").value.trim()||"Untitled";
+      var c=document.getElementById("aClass").value;
+      var v=parseFloat(document.getElementById("aVal").value)||0;
+      var cur=document.getElementById("aCur").value;
+      var method=document.getElementById("aMethod").value;
+      var msg=document.getElementById("addMsg");
+      var est=(c==="realestate"||c==="private"||c==="collectibles"||c==="vehicles");
+      var chfv = c==="liability" ? -v : v;
+      // Write to the ledger through the same seam a statement confirm uses, so a
+      // manual holding survives a reload. A refusal (bad amount, unknown class)
+      // names the reason and writes nothing. The in-memory row is added only as
+      // a fallback when the ledger is unreachable, so the demo still works.
+      var asof=new Date().toISOString().slice(0,10);
+      var optimistic={n:n,c:c,v:v,cur:cur,est:est,
+        sub:(T(CLASSES[c].k))+" · "+method,
+        note:"Added manually. Method: "+method+". Synthetic, not from a source.",
+        lo:est?Math.round(v*0.9):0, hi:est?Math.round(v*1.1):0, pt:v};
+      fetch("api/positions",{method:"POST",cache:"no-store",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name:n,class:c,amount:v,currency:cur,method:method,as_of:asof})
+      }).then(function(r){return r.json();}).then(function(d){
+        if(d && d.ok){
+          msg.textContent=T("add.saved",{name:n,amount:chf(v),cur:cur});
+          return refresh();
+        }
+        msg.textContent=T("add.refused",{reason:(d&&d.reason)||"refused"});
+        return false;
+      }).catch(function(){
+        // Endpoint offline: keep the demo usable, but say so. Nothing persisted.
+        state.positions.push(optimistic);
+        msg.textContent=T("add.offline");
+        render(); route("portfolio");
+      });
+    });
+    document.getElementById("reset").addEventListener("click",function(){
+      state.positions=state.positions.filter(function(p){return p.n!=="Sample position";});
+      render(); route("portfolio");
+    });
+  }
+  // A manually recorded cash flow: money in or out with no statement to read it
+  // from. The kind fixes the sign (a withdrawal reads negative even when typed
+  // as a positive number), so the number the user types is the amount, not the
+  // direction. A saved flow writes one cash_flow_event under the synthetic
+  // source; it does not change net worth, it only shows on the flow side.
+  var flowForm=document.getElementById("flowForm");
+  if(flowForm){
+    var fAsOf=document.getElementById("fAsOf");
+    if(fAsOf && !fAsOf.value) fAsOf.value=new Date().toISOString().slice(0,10);
+    flowForm.addEventListener("submit",function(e){
+      e.preventDefault();
+      var kind=document.getElementById("fKind").value;
+      var amt=parseFloat(document.getElementById("fAmount").value)||0;
+      var cur=document.getElementById("fCur").value;
+      var asof=fAsOf.value;
+      var msg=document.getElementById("flowMsg");
+      if(!(amt>0)){ msg.textContent=T("flow.refused",{reason:"amount"}); return; }
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(asof)){ msg.textContent=T("flow.refused",{reason:"date"}); return; }
+      fetch("api/positions",{method:"POST",cache:"no-store",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({flow:true,kind:kind,amount:amt,currency:cur,as_of:asof})
+      }).then(function(r){return r.json();}).then(function(d){
+        if(d && d.ok){
+          msg.textContent=T(d.created?"flow.saved":"flow.dup",{amount:chf(amt),cur:cur,kind:T("flow.kind."+kind),date:asof});
+          if(d.created) return refresh();
+          return false;
+        }
+        msg.textContent=T("flow.refused",{reason:(d&&d.reason)||"refused"});
+        return false;
+      }).catch(function(){ msg.textContent=T("flow.offline"); });
+    });
+  }
+  // Remove a holding: a soft archive, never a hard delete. A confirm step keeps
+  // one stray click from removing data, and the note names what happened.
+  function addNote(text){
+    var el=document.getElementById("posNote");
+    if(!el) return;
+    el.textContent=text;
+    el.style.display="block";
+  }
+  var posList=document.getElementById("posList");
+  if(posList){
+    posList.addEventListener("click",function(e){
+      var hiBtn=e.target.closest("[data-history]");
+      if(hiBtn){
+        var hname=(hiBtn.closest(".row").querySelector(".l span")||{}).textContent||"";
+        openHistory(hiBtn.getAttribute("data-history"),hname);
+        return;
+      }
+      var edBtn=e.target.closest("[data-edit]");
+      if(edBtn){
+        var eid=edBtn.getAttribute("data-edit");
+        var ename=(edBtn.closest(".row").querySelector(".l span")||{}).textContent||"this holding";
+        editValue(eid,ename);
+        return;
+      }
+      var btn=e.target.closest("[data-archive]");
+      if(!btn) return;
+      var id=btn.getAttribute("data-archive");
+      var name=(btn.closest(".row").querySelector(".l span")||{}).textContent||"this holding";
+      if(!window.confirm(T("portfolio.remove_confirm",{name:name}))) return;
+      btn.disabled=true;
+      fetch("api/positions",{method:"POST",cache:"no-store",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({archive:true,id:id})
+      }).then(function(r){return r.json();}).then(function(d){
+        if(d && d.ok){ addNote(T("portfolio.removed",{name:name})); return refresh(); }
+        btn.disabled=false;
+        addNote(T("portfolio.remove_fail",{reason:(d&&d.reason)||"refused"}));
+        return false;
+      }).catch(function(){btn.disabled=false; addNote(T("portfolio.remove_fail",{reason:"offline"}));});
+    });
+  }
+  // Correct a holding's value. The prompt takes the new number, a confirm names
+  // the change, and the write posts {update:true,id,amount}: a fresh valuation
+  // that supersedes the mistaken one on the same as_of (the old row stays).
+  function editValue(id,name){
+    var cur=[].slice.call(document.querySelectorAll('[data-edit="'+id+'"]'))
+      .map(function(b){return b.getAttribute("data-cur");})[0];
+    cur=cur?Number(cur):null;
+    var input=window.prompt(T("portfolio.edit_prompt",{name:name}),
+      cur!=null?String(Math.round(cur)):"");
+    if(input===null) return;
+    var amount=Number(String(input).replace(/[\s,']/g,""));
+    if(!isFinite(amount)||amount<=0){
+      addNote(T("portfolio.edit_fail",{reason:"amount"}));
+      return;
+    }
+    if(!window.confirm(T("portfolio.edit_confirm",{name:name,amount:chf(amount)}))) return;
+    fetch("api/positions",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({update:true,id:id,amount:amount})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d && d.ok){ addNote(T("portfolio.edited",{name:name})); return refresh(); }
+      addNote(T("portfolio.edit_fail",{reason:(d&&d.reason)||"refused"}));
+      return false;
+    }).catch(function(){addNote(T("portfolio.edit_fail",{reason:"offline"}));});
+  }
+  // The Removed toggle, and a delegated Restore listener on the list it reveals.
+  var rmToggle=document.getElementById("rmToggle");
+  if(rmToggle){
+    rmToggle.addEventListener("click",function(){
+      archivedShown=!archivedShown;
+      rmToggle.setAttribute("aria-expanded",archivedShown?"true":"false");
+      renderArchived(window.__archived||[]);
+    });
+  }
+  var rmList=document.getElementById("rmList");
+  if(rmList){
+    rmList.addEventListener("click",function(e){
+      var btn=e.target.closest("[data-restore]");
+      if(!btn) return;
+      var name=(btn.closest(".row").querySelector(".l span")||{}).textContent||"this holding";
+      unarchive(btn.getAttribute("data-restore"),name,btn);
+    });
+  }
+  // gate
+
+  var gate=document.getElementById("gate");
+  // Load real positions from the Neon ledger when the endpoint is configured.
+  // Falls back to the bundled synthetic snapshot, so the page never breaks.
+  function loadLedger(){
+    return fetch("api/positions",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok || !d.positions || !d.positions.length) return false;
+        var CLASSBYKIND={cash:"cash",listed:"equity",equity:"equity",stocks:"equity",
+          funds:"equity",bonds:"bonds",bondfund:"bonds",private:"private",
+          realestate:"realestate",crypto:"crypto",metals:"metals",gold:"metals",
+          collectible:"collectibles",collectibles:"collectibles",vehicles:"vehicles",
+          car:"vehicles",pension:"private",other:"cash"};
+        // Income-method (Method B) property values (#149), keyed by holding name,
+        // so a rented property row can show the income estimate beside the
+        // indexed one. Estimates with ranges, from property_map + cap_rates.
+        window.__propIncome={};
+        ((d.property_income&&d.property_income.properties)||[]).forEach(function(x){
+          window.__propIncome[x.property]=x;
+        });
+        // A private-company stake carries 8.4 estimates (#155): revenue/EBITDA x
+        // sector multiple, last round, owner, reconciled with the ownership share
+        // and an illiquidity note. Estimates with ranges.
+        window.__privco={};
+        ((d.private_company&&d.private_company.companies)||[]).forEach(function(x){
+          window.__privco[x.company]=x;
+        });
+        state.positions = d.positions.map(function(p){
+          var src=(p.symbol?("Marked at "+(p.symbol||"")+". "):"")+(p.source||"");
+          var note=src+(p.as_of?(" As of "+p.as_of+"."):"");
+          // A private fund carries computed metrics (TVPI/DPI/RVPI) from its
+          // config attributes and its own ledger value, not a hardcoded string.
+          // Names the statement they were computed from (#132).
+          if(p.metrics){
+            // Skip the metrics source when it is the same statement the row
+            // already names, so the caption does not repeat it.
+            var sameSrc=p.metrics.source&&note.indexOf(p.metrics.source)>=0;
+            note=note+" "+T("portfolio.fund_metrics",{tvpi:(p.metrics.tvpi!=null?p.metrics.tvpi.toFixed(2):"n/a"),
+              dpi:(p.metrics.dpi!=null?p.metrics.dpi.toFixed(2):"n/a"),
+              rvpi:(p.metrics.rvpi!=null?p.metrics.rvpi.toFixed(2):"n/a")});
+            // XIRR only when the fund has a dated call/distribution history, so
+            // the caption never shows a rate with nothing behind it.
+            if(p.metrics.xirr!=null){
+              note=note+" "+T("portfolio.fund_metrics.xirr",{xirr:(p.metrics.xirr*100).toFixed(1)});
+            }
+            // Lifecycle: unfunded capital, age vs the stated term, and the
+            // J-curve position, each only when its inputs are known (#137).
+            if(p.metrics.unfunded!=null){
+              var cur=(p.currency||"CHF");
+              var unf=num(p.metrics.unfunded);
+              note=note+" "+T("portfolio.fund_metrics.unfunded",{amount:unf, currency:cur});
+            }
+            if(p.metrics.age_years!=null){
+              if(p.metrics.term_years!=null){
+                note=note+" "+T("portfolio.fund_metrics.age_term",{age:p.metrics.age_years.toFixed(1), term:p.metrics.term_years});
+              } else {
+                note=note+" "+T("portfolio.fund_metrics.age",{age:p.metrics.age_years.toFixed(1)});
+              }
+            }
+            if(p.metrics.jcurve){
+              note=note+" "+T("portfolio.fund_metrics.jcurve."+p.metrics.jcurve);
+            }
+            if(!sameSrc && p.metrics.source){
+              note=note+" "+T("portfolio.fund_metrics.src",{source:p.metrics.source, as_of:(p.metrics.as_of||"")});
+            }
+          }
+          // A mapped property carries income-method (B) and/or owner/appraisal
+          // (Method C) figures (#149, #151), each with a range, reconciled
+          // against its indexed value. Descriptive, with a range.
+          var pi=window.__propIncome[p.name];
+          if(pi){
+            if(pi.income_value!=null&&pi.checks){
+              note=note+" "+T("portfolio.prop_income",{value:num(pi.income_value), currency:pi.currency,
+                cap:(pi.cap_rate*100).toFixed(2), gross_yield:(pi.checks.gross_yield!=null?(pi.checks.gross_yield*100).toFixed(1):"n/a"),
+                rent_mult:(pi.checks.rent_multiplier!=null?pi.checks.rent_multiplier.toFixed(1):"n/a")});
+            }
+            if(pi.comparable){
+              note=note+" "+T("portfolio.prop_comparable",{value:num(pi.comparable.amount), currency:pi.currency,
+                area:num(pi.comparable.area_m2), perm2:num(pi.comparable.chf_per_m2)});
+            }
+            if(pi.appraisal){
+              note=note+" "+T("portfolio.prop_appraisal",{value:num(pi.appraisal.amount), currency:pi.currency,
+                kind:T("portfolio.prop_appraisal."+pi.appraisal.kind)});
+            }
+            if(pi.reconciliation){
+              note=note+" "+T("portfolio.prop_recon",{value:num(pi.reconciliation.amount), currency:pi.currency});
+            }
+            if(pi.cap_source){
+              note=note+" "+T("portfolio.prop_cap_src",{source:pi.cap_source, as_of:(pi.cap_as_of||"")});
+            }
+          }
+          // A mapped private-company stake carries 8.4 estimates (#155): the
+          // multiple method, the last round, reconciled, with the ownership share
+          // and the illiquidity note.
+          var pc=window.__privco[p.name];
+          if(pc){
+            if(pc.method_estimate){
+              note=note+" "+T("portfolio.privco_multiple",{value:num(pc.method_estimate.amount), currency:pc.currency,
+                metric:T("portfolio.privco_metric."+pc.method_estimate.metric),
+                low:pc.method_estimate.multiple_low, high:pc.method_estimate.multiple_high});
+            }
+            if(pc.last_round){
+              note=note+" "+T("portfolio.privco_last",{value:num(pc.last_round.amount), currency:pc.currency});
+            }
+            if(pc.reconciliation){
+              note=note+" "+T("portfolio.privco_recon",{value:num(pc.reconciliation.amount), currency:pc.currency,
+                own:pc.ownership_pct});
+            }
+            note=note+" "+T("portfolio.privco_illiq",{note:(pc.illiquidity_note||T(pc.illiquidity_note_key))});
+          }
+          return {id:p.id, n:p.name, c:(p.liability?"liability":(CLASSBYKIND[p.class]||"other")),
+            v:p.amount, cur:p.currency, est:!!p.estimate, stale:!!p.stale,
+            sub:p.method+", "+p.confidence+" confidence",
+            note:note,
+            lo:p.low||undefined, hi:p.high||undefined, pt:p.amount};
+        });
+        var tag=document.getElementById("srcTag");
+        if(tag){tag.setAttribute("data-i18n","portfolio.srctag.live");
+          tag.textContent=T("portfolio.srctag.live");tag.style.color="var(--pine)";}
+        if(d.stale_marks && d.stale_marks.length){
+          var m=document.getElementById("posMeta");
+          if(m){m.textContent=T("portfolio.stale_note",{symbols:d.stale_marks.join(", ")});}
+        }
+        renderArchived(d.archived||[]);
+        renderFlows(d.flows||[]);
+        renderPrivate(d.private,d.pacing,d.roll_forward);
+        window.__fundFlags=d.fund_flags||[];
+        return true;
+      }).catch(function(){return false;});
+  }
+  // The aggregate private-markets block, computed server-side from the same
+  // fund config the per-row metrics use (#139). Blended TVPI/DPI come from the
+  // summed numerators and denominators, not an average of the ratios. A blended
+  // XIRR is never shown (it is not additive across vintages), and unfunded is
+  // summed only where a commitment is known, with any fund that carries none
+  // named separately. Hidden when no holding is a mapped fund.
+  function renderPrivate(d,pacing,roll){
+    var card=document.getElementById("privateCard");
+    var listEl=document.getElementById("privateList");
+    var meta=document.getElementById("privateMeta");
+    var noteEl=document.getElementById("privateNote");
+    if(!card||!listEl) return;
+    if(!d || !d.fund_count){ card.style.display="none"; listEl.innerHTML=""; return; }
+    card.style.display="block";
+    if(meta){ meta.textContent=T("portfolio.private.meta",{n:d.fund_count}); }
+    var rows="";
+    rows+=row2(T("portfolio.private.value"),chf(d.nav)+" CHF");
+    rows+=row2(T("portfolio.private.unfunded"),chf(d.unfunded)+" CHF");
+    var tvpi=(d.tvpi!=null?d.tvpi.toFixed(2)+"x":"n/a");
+    var dpi=(d.dpi!=null?d.dpi.toFixed(2)+"x":"n/a");
+    rows+=row2(T("portfolio.private.ratios"),T("portfolio.private.ratios_val",{tvpi:tvpi,dpi:dpi}));
+    // The NAV roll-forward between statements (#147): the GP-reported anchor rolled
+    // to today (anchor - calls after the statement + distributions after it), with an
+    // optional labeled public-market proxy. An estimate between statements, named as
+    // such, with the movement since the anchor shown beside it.
+    if(roll && roll.funds && roll.funds.length){
+      rows+='<div class="row" style="border-top:1px solid var(--line);"><div class="l">'+
+        '<span style="font-weight:700;">'+T("portfolio.private.roll")+'</span><small>'+
+        T("portfolio.private.roll_sub")+'</small></div><div class="r"></div></div>';
+      rows+=row2(T("portfolio.private.roll_anchor"),chf(roll.anchor)+" CHF");
+      rows+=row2(T("portfolio.private.roll_rolled"),chf(roll.rolled)+" CHF");
+      rows+=row2(T("portfolio.private.roll_change"),
+        (roll.change>=0?"+":"")+chf(roll.change)+" CHF");
+    }
+    // The pacing model (#141): forward calls/distributions from the unfunded and
+    // the current value under an editable weight curve. A model, not a forecast;
+    // the years are shown with the assumption named beneath.
+    if(pacing && pacing.years && pacing.years.length){
+      rows+='<div class="row" style="border-top:1px solid var(--line);"><div class="l">'+
+        '<span style="font-weight:700;">'+T("portfolio.private.pacing")+'</span><small>'+
+        T("portfolio.private.pacing_sub")+'</small></div><div class="r"></div></div>';
+      pacing.years.forEach(function(y){
+        rows+=row2(T("portfolio.private.pacing_year",{year:y.year}),
+          T("portfolio.private.pacing_row",{calls:chf(Math.abs(y.calls)),
+            dists:chf(y.distributions)}));
+      });
+    }
+    listEl.innerHTML=rows;
+    if(noteEl){
+      var n=T("portfolio.private.note");
+      if(d.funds_without_commitment){
+        n=n+" "+T("portfolio.private.no_commit",{n:d.funds_without_commitment});
+      }
+      if(pacing && pacing.assumptions){
+        n=n+" "+T("portfolio.private.pacing_note",{source:pacing.assumptions.source});
+      }
+      if(roll && roll.funds && roll.funds.length){
+        var adj=roll.funds.some(function(f){return f.basis==="proxy-adjusted";});
+        n=n+" "+T(adj?"portfolio.private.roll_note_proxy":"portfolio.private.roll_note",
+          {date:roll.as_of||""});
+      }
+      noteEl.textContent=n;
+    }
+  }
+  function row2(label,val){
+    return '<div class="row"><div class="l"><span>'+label+'</span></div>'+
+      '<div class="r">'+val+'</div></div>';
+  }
+  // The archived holdings, collapsed behind a toggle. A restore brings one back
+  // to the portfolio and the wealth history with its valuations intact, since an
+  // archive only ever set a timestamp. A holding in the page's memory only (no
+  // id) never appears here.
+  var archivedShown=false;
+  function renderArchived(rows){
+    window.__archived=rows||[];
+    var wrap=document.getElementById("removedWrap");
+    var listEl=document.getElementById("rmList");
+    var tog=document.getElementById("rmToggle");
+    if(!wrap||!listEl||!tog) return;
+    if(!rows.length){ wrap.style.display="none"; listEl.innerHTML=""; return; }
+    wrap.style.display="block";
+    tog.textContent=T("portfolio.removed_n",{n:rows.length})+(archivedShown?" ▾":" ▸");
+    listEl.style.display=archivedShown?"block":"none";
+    if(!archivedShown) return;
+    listEl.innerHTML="";
+    rows.forEach(function(p){
+      var row=document.createElement("div");
+      row.className="row";
+      var amt=p.amount==null?"":(p.liability?"-":"")+chf(p.amount)+" CHF";
+      row.innerHTML='<div class="l"><span>'+p.name+'</span><small>'+T(CLASSES[p.class]?CLASSES[p.class].k:p.class)+'</small></div>'+
+        '<div class="r">'+amt+' <button class="restore" type="button" data-restore="'+p.id+'">'+T("portfolio.restore")+'</button></div>';
+      listEl.appendChild(row);
+    });
+  }
+  function unarchive(id,name,btn){
+    if(btn) btn.disabled=true;
+    fetch("api/positions",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({unarchive:true,id:id})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d && d.ok){ addNote(T("portfolio.restored",{name:name})); return refresh(); }
+      if(btn) btn.disabled=false;
+      addNote(T("portfolio.restore_fail",{reason:(d&&d.reason)||"refused"}));
+      return false;
+    }).catch(function(){if(btn) btn.disabled=false; addNote(T("portfolio.restore_fail",{reason:"offline"}));});
+  }
+  // The recorded cash flows, so a mistyped one can be found and undone. A flow is
+  // a plain record (money in or out), not a confirmed value, so removing it is a
+  // delete with a confirm step that names the flow and its date. The split on
+  // Insights updates on the next refresh.
+  var flowList=document.getElementById("flowList");
+  if(flowList){
+    flowList.addEventListener("click",function(e){
+      var btn=e.target.closest("[data-flow-remove]");
+      if(!btn) return;
+      var id=btn.getAttribute("data-flow-remove");
+      var kind=T(btn.getAttribute("data-kindkey")||"flow.kind");
+      var amt=btn.getAttribute("data-amount"), date=btn.getAttribute("data-date");
+      if(!window.confirm(T("flow.remove_confirm",{kind:kind,amount:amt,date:date}))) return;
+      removeFlow(id,btn);
+    });
+  }
+  function renderFlows(rows){
+    var card=document.getElementById("flowListCard");
+    var listEl=document.getElementById("flowList");
+    if(!card||!listEl) return;
+    if(!rows.length){ card.style.display="none"; listEl.innerHTML=""; return; }
+    card.style.display="block";
+    listEl.innerHTML="";
+    rows.forEach(function(f){
+      var sign=(f.kind==="distribution"||f.kind==="capital_call")?"-":"+";
+      var amt=sign+chf(f.amount)+" "+(f.currency||"CHF");
+      var kindKey="flow.kind."+f.kind;
+      var kindLabel=T(kindKey);
+      var row=document.createElement("div");
+      row.className="row";
+      row.innerHTML='<div class="l"><span>'+kindLabel+'</span><small>'+f.occurred_on+' · '+(f.source||"")+'</small></div>'+
+        '<div class="r">'+amt+' <button class="restore" type="button" data-flow-remove="'+f.id+'"'+
+        ' data-kindkey="'+kindKey+'" data-amount="'+chf(f.amount)+'" data-date="'+f.occurred_on+'">'+
+        T("flow.remove")+'</button></div>';
+      listEl.appendChild(row);
+    });
+  }
+  function removeFlow(id,btn){
+    if(btn) btn.disabled=true;
+    var msg=document.getElementById("flowListMsg");
+    fetch("api/positions",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({flow_remove:true,id:id})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d && d.ok){
+        if(msg){ msg.style.display="block"; msg.textContent=T("flow.removed"); }
+        return refresh();
+      }
+      if(btn) btn.disabled=false;
+      if(msg){ msg.style.display="block"; msg.textContent=T("flow.remove_fail",{reason:(d&&d.reason)||"refused"}); }
+      return false;
+    }).catch(function(){
+      if(btn) btn.disabled=false;
+      if(msg){ msg.style.display="block"; msg.textContent=T("flow.remove_fail",{reason:"offline"}); }
+    });
+  }
+  // A plain number, and an audit timestamp as a short local day+time. The audit
+  // `at` is an ISO-ish string from Postgres; keep it best-effort so a bad value
+  // shows as-is rather than throwing in the panel.
+  function num(x){ return (x==null||isNaN(x))?"?":Math.round(Number(x)).toLocaleString("de-CH"); }
+  function when(at){
+    try{
+      var d=new Date(String(at).replace(" ","T"));
+      if(isNaN(d.getTime())) return String(at);
+      return d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+    }catch(e){ return String(at); }
+  }
+  // A holding's value history, read-only. GETs /api/positions?history=<id> and
+  // renders each recorded valuation newest first, marking the live one current
+  // and any row a correction replaced as replaced, so the old number stays
+  // visible. Nothing here writes.
+  function openHistory(id,name){
+    var box=document.getElementById("hist");
+    if(!box) return;
+    window.__histAsset=id;
+    var ttl=document.getElementById("histTtl");
+    var sub=document.getElementById("histSub");
+    var rowsEl=document.getElementById("histRows");
+    var chgEl=document.getElementById("histChg");
+    if(ttl) ttl.textContent=name||"";
+    if(sub) sub.textContent=T("hist.loading");
+    if(rowsEl) rowsEl.innerHTML="";
+    if(chgEl) chgEl.innerHTML="";
+    box.classList.add("on");
+    fetch("api/positions?history="+encodeURIComponent(id),{cache:"no-store"})
+      .then(function(r){return r.json();}).then(function(d){
+        if(!d || !d.ok){
+          if(sub) sub.textContent=T("hist.fail",{reason:(d&&d.reason)||"refused"});
+          return;
+        }
+        if(ttl && d.name) ttl.textContent=d.name;
+        var hist=d.history||[];
+        if(sub) sub.textContent = hist.length<=1
+          ? T("hist.single") : T("hist.intro",{n:hist.length});
+        if(!rowsEl) return;
+        hist.forEach(function(h){
+          var row=document.createElement("div");
+          row.className="hrow"+(h.replaced?" rep":"")+(h.id===d.current_id?" cur":"");
+          var amt=(d.currency==="CHF"?chf(h.amount):h.amount.toLocaleString())+" "+d.currency;
+          var flag = h.id===d.current_id?T("hist.current"):(h.replaced?T("hist.replaced"):"");
+          var meta=h.as_of+" · "+h.method+" · "+h.source+" · "+T("hist.conf",{c:h.confidence});
+          // A live row can be corrected, and its date moved. A replaced row is
+          // history and is not editable: correcting it would rewrite the trail.
+          var fix = h.replaced?'':
+            '<button class="hfix" type="button" data-correct="'+h.id+'" data-camt="'+h.amount+
+            '" data-casof="'+h.as_of+'">'+T("hist.correct")+'</button>';
+          row.innerHTML='<div><div class="amt">'+amt+'</div><div class="meta">'+meta+'</div></div>'+
+            (flag?'<span class="flag">'+flag+'</span>':'')+fix;
+          rowsEl.appendChild(row);
+        });
+        // The holding's own audit trail (asset.add / archive / unarchive /
+        // update), newest first. A correction shows its from -> to amount and
+        // date, so the change is legible and dated rather than a bare count.
+        if(chgEl){
+          var chg=d.changes||[];
+          if(!chg.length){
+            chgEl.innerHTML='<div class="none">'+T("hist.no_changes")+'</div>';
+          }
+          chg.forEach(function(c){
+            var actKey="hist.act."+c.action;
+            var act=T(actKey);
+            if(act===actKey) act=c.action;
+            var det=c.detail||{};
+            var what="";
+            if(c.action==="asset.update" && det.from_amount!=null){
+              what=T("hist.chg.update",{from:num(det.from_amount),to:num(det.to_amount)});
+              if(det.to_as_of && det.to_as_of!==det.from_as_of){
+                what+=" "+T("hist.chg.moved",{from:det.from_as_of,to:det.to_as_of});
+              }
+            } else if(c.action==="asset.archive" || c.action==="asset.unarchive"){
+              what=det.name||"";
+            }
+            var row2=document.createElement("div");
+            row2.className="crow";
+            row2.innerHTML='<span class="act">'+act+'</span>'+
+              '<span class="what">'+what+'</span>'+
+              '<span class="when">'+when(c.at)+'</span>';
+            chgEl.appendChild(row2);
+          });
+        }
+      }).catch(function(){ if(sub) sub.textContent=T("hist.fail",{reason:"offline"}); });
+  }
+  var histBox=document.getElementById("hist");
+  if(histBox){
+    histBox.addEventListener("click",function(e){
+      var fix=e.target.closest("[data-correct]");
+      if(fix){
+        correctValue(window.__histAsset,histName(fix),fix.getAttribute("data-correct"),
+                     Number(fix.getAttribute("data-camt")),fix.getAttribute("data-casof"));
+        return;
+      }
+      if(e.target===histBox || e.target.closest("#histX")) histBox.classList.remove("on");
+    });
+  }
+  function histName(btn){ var t=document.getElementById("histTtl"); return t?t.textContent:""; }
+  // Correct one recorded value (and optionally move its date). Prompts for the
+  // number, then the date; the write names the row being corrected so the old
+  // point is marked replaced even when the date changes. A blank amount or a
+  // non-ISO date is refused before the request.
+  function correctValue(id,name,vid,curAmount,curAsOf){
+    var amount=window.prompt(T("hist.correct_prompt",{name:name}),
+      curAmount!=null?String(Math.round(curAmount)):"");
+    if(amount===null) return;
+    var amt=Number(String(amount).replace(/[\s,']/g,""));
+    if(!isFinite(amt)||amt<=0){ addNote(T("hist.correct_fail",{reason:"amount"})); return; }
+    var date=window.prompt(T("hist.move_prompt"), curAsOf||"");
+    if(date===null) return;
+    date=String(date).trim();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){ addNote(T("hist.correct_fail",{reason:"date"})); return; }
+    var moved=date!==curAsOf;
+    var ask=moved?T("hist.correct_move_confirm",{name:name,amount:chf(amt),from:curAsOf,to:date})
+                 :T("hist.correct_confirm",{name:name,amount:chf(amt),asof:date});
+    if(!window.confirm(ask)) return;
+    fetch("api/positions",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({update:true,id:id,amount:amt,as_of:date,correct:vid})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d && d.ok){
+        addNote(T("hist.corrected",{name:name}));
+        return refresh().then(function(){ openHistory(id,name); });
+      }
+      addNote(T("hist.correct_fail",{reason:(d&&d.reason)||"refused"}));
+      return false;
+    }).catch(function(){addNote(T("hist.correct_fail",{reason:"offline"}));});
+  }
+
+  // Net worth over time. A record of the past from the ledger's own valuations
+  // and stored marks, never a projection. Renders nothing if the endpoint is
+  // offline, so the card stays hidden rather than showing an empty chart.
+  function loadWealth(){
+    var card=document.getElementById("wealthCard");
+    return fetch("api/wealth",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok || !d.points || d.points.length<2){return false;}
+        renderWealth(d.points);
+        renderConverted(d.converted_flows||[],d.stale_days);
+        renderSkipped(d.skipped_flows||[]);
+        renderBreaks(d.breaks||[]);
+        if(card){card.hidden=false;}
+        return true;
+      }).catch(function(){return false;});
+  }
+  function renderWealth(pts){
+    var svg=document.getElementById("wealthChart");
+    var meta=document.getElementById("wealthMeta");
+    var note=document.getElementById("wealthNote");
+    if(!svg){return;}
+    var W=720,H=170,PAD=14;
+    var vals=pts.map(function(p){return p.net;});
+    var min=Math.min.apply(null,vals), max=Math.max.apply(null,vals);
+    var span=(max-min)||1;
+    var x=function(i){return PAD+i*(W-2*PAD)/(pts.length-1);};
+    var y=function(v){return H-PAD-((v-min)/span)*(H-2*PAD);};
+    var NS="http://www.w3.org/2000/svg";
+    while(svg.firstChild){svg.removeChild(svg.firstChild);}
+    var line=document.createElementNS(NS,"polyline");
+    line.setAttribute("points",pts.map(function(p,i){return x(i)+","+y(p.net);}).join(" "));
+    line.setAttribute("fill","none");
+    line.setAttribute("stroke","var(--pine)");
+    line.setAttribute("stroke-width","2.5");
+    svg.appendChild(line);
+    pts.forEach(function(p,i){
+      var c=document.createElementNS(NS,"circle");
+      c.setAttribute("cx",x(i));c.setAttribute("cy",y(p.net));c.setAttribute("r",p.cause==="mark"?4:3);
+      c.setAttribute("fill","var(--card)");c.setAttribute("stroke","var(--pine)");
+      c.setAttribute("stroke-width","2");
+      // Name the cause on the point itself, so a confirmed valuation is legible
+      // in the record, not just a moved line.
+      var t=document.createElementNS(NS,"title");
+      t.textContent=T("wealth.tip",{as_of:p.as_of,net:chf(p.net),
+        delta:(p.delta===null?"":((p.delta>0?"+":"")+chf(p.delta))),
+        cause:T("wealth.cause."+p.cause)});
+      c.appendChild(t);
+      svg.appendChild(c);
+      if(p.cause==="valuation"||p.cause==="mark"){
+        var tag=document.createElementNS(NS,"text");
+        tag.setAttribute("x",x(i));tag.setAttribute("y",y(p.net)-7);
+        tag.setAttribute("text-anchor","middle");
+        tag.setAttribute("font-size","9");
+        tag.setAttribute("fill",p.cause==="valuation"?"var(--pine)":"var(--est)");
+        tag.textContent=T("wealth.tag."+p.cause);
+        svg.appendChild(tag);
+      }
+    });
+    var last=pts[pts.length-1];
+    if(meta){meta.textContent=T("wealth.span",{from:pts[0].as_of,to:last.as_of,n:pts.length});}
+    if(note){
+      var dir=(last.delta>0)?"+":"";
+      note.textContent=T("wealth.note",{
+        as_of:last.as_of, net:chf(last.net),
+        delta:dir+chf(last.delta), cause:T("wealth.cause."+last.cause)});
+    }
+    renderSplit(last);
+    renderStack(pts);
+  }
+  // A non-CHF cash flow cannot be summed into a CHF net without an FX rate the
+  // event does not carry, so the split leaves it out. That is the honest call,
+  // and this is where it is made visible: a caption names what was left out, so
+  // a EUR contribution does not quietly go missing from the flow side. Hidden
+  // when nothing was skipped.
+  function renderSkipped(rows){
+    var el=document.getElementById("wealthSkipped");
+    if(!el) return;
+    if(!rows||!rows.length){ el.hidden=true; el.textContent=""; return; }
+    var byCur={};
+    rows.forEach(function(s){ byCur[s.currency]=(byCur[s.currency]||0)+Number(s.amount||0); });
+    var parts=Object.keys(byCur).map(function(cur){
+      return chf(byCur[cur])+" "+cur;
+    });
+    el.textContent=T("wealth.skipped",{flows:parts.join(", "),n:rows.length});
+    el.hidden=false;
+  }
+  // A non-CHF flow that HAD a rate known by its date is converted into the CHF
+  // split, not left out. This names the rate used, so a converted figure is
+  // legible and never a number with no basis. Hidden when nothing was converted.
+  function renderConverted(rows,staleDays){
+    var el=document.getElementById("wealthConverted");
+    if(!el) return;
+    if(!rows||!rows.length){ el.hidden=true; el.textContent=""; return; }
+    var byCur={};
+    rows.forEach(function(s){
+      var c=byCur[s.currency]||(byCur[s.currency]={chf:0,rate:s.rate,as_of:s.rate_as_of,src:s.source,stale:false});
+      c.chf+=Number(s.chf||0);
+      c.stale=c.stale||!!s.stale;
+    });
+    var anyStale=false;
+    var parts=Object.keys(byCur).map(function(cur){
+      var c=byCur[cur];
+      anyStale=anyStale||c.stale;
+      var mark=c.stale?(" "+T("wealth.rate_stale")):"";
+      return chf(c.chf)+" ("+cur+" at "+c.rate+", "+c.as_of+mark+")";
+    });
+    el.textContent=T("wealth.converted",{flows:parts.join(", "),n:rows.length});
+    if(anyStale){el.textContent+=" "+T("wealth.rate_stale.note",{days:(staleDays||5)});}
+    el.hidden=false;
+  }
+  // A market-priced leg whose provider changed since the previous point is a
+  // feed break, not a return. It is left out of the move above, so the line does
+  // not book a data-source switch as a market gain. This names every break, with
+  // both sources and prices, so the reconciliation is explicit. Hidden when no
+  // mark changed provider, which is the normal case.
+  function renderBreaks(rows){
+    var el=document.getElementById("wealthBreak");
+    if(!el) return;
+    if(!rows||!rows.length){ el.hidden=true; el.textContent=""; return; }
+    var parts=rows.map(function(b){
+      return b.symbol+" "+T("wealth.break.leg",{from_src:b.from_source,to_src:b.to_source,chf:chf(b.chf)});
+    });
+    el.textContent=T("wealth.break",{legs:parts.join("; "),n:rows.length});
+    el.hidden=false;
+  }
+  // Split the last change into money paid in or out vs the market and valuation
+  // move, so a contribution is not read as a market gain and a withdrawal is not
+  // read as a loss. delta always equals flow + move; if the ledger has no flows
+  // and no change, say so rather than print zeros.
+  function renderSplit(last){
+    var el=document.getElementById("wealthSplit");
+    if(!el){return;}
+    if(!last||last.delta===null||last.delta===undefined){el.hidden=true;return;}
+    var sgn=function(v){return (v>0?"+":"")+chf(v);};
+    if(Math.abs(last.delta)<0.005){
+      el.textContent=T("wealth.split.flat",{as_of:last.as_of});
+    }else{
+      el.textContent=T("wealth.split",{delta:sgn(last.delta),as_of:last.as_of,
+        flow:sgn(last.flow||0),move:sgn(last.move||0)});
+    }
+    el.hidden=false;
+  }
+  // One band per asset class, stacked to the point's total assets. The split
+  // sums to the total the net-worth line already shows, so a band rests on the
+  // same sourced, dated basis the point carries; there is no separate figure.
+  var CLASS_COLORS=[
+    ["equity","#2f6f5e"],["bonds","#5b8ea8"],["realestate","#c8a15a"],
+    ["private","#8a6db0"],["crypto","#d08a3e"],["metals","#b8a04a"],
+    ["collectibles","#a8705a"],["vehicles","#7d8a92"],["cash","#6f8a6a"]
+  ];
+  function colorFor(code){
+    for(var i=0;i<CLASS_COLORS.length;i++){if(CLASS_COLORS[i][0]===code){return CLASS_COLORS[i][1];}}
+    return "var(--muted)";
+  }
+  function renderStack(pts){
+    var wrap=document.getElementById("wealthStackWrap");
+    var svg=document.getElementById("wealthStack");
+    var legend=document.getElementById("wealthLegend");
+    if(!wrap||!svg||!pts||pts.length<1){return;}
+    // Class order: biggest today first, so the legend leads with what matters.
+    var last=pts[pts.length-1], byLast=last.by_class||{};
+    var codes=Object.keys(byLast).filter(function(c){return byLast[c]>0.5;})
+      .sort(function(a,b){return byLast[b]-byLast[a];});
+    if(!codes.length){wrap.hidden=true;return;}
+    wrap.hidden=false;
+    var W=720,H=150,PAD=14;
+    var totals=pts.map(function(p){return p.assets||0;});
+    var max=Math.max.apply(null,totals)||1;
+    var x=function(i){return PAD+(pts.length>1?i*(W-2*PAD)/(pts.length-1):(W-2*PAD)/2);};
+    var y=function(v){return H-PAD-(v/max)*(H-2*PAD);};
+    var NS="http://www.w3.org/2000/svg";
+    while(svg.firstChild){svg.removeChild(svg.firstChild);}
+    // Cumulative stack: each class band sits on the ones below it.
+    var cum=pts.map(function(){return 0;});
+    codes.forEach(function(code){
+      var top=pts.map(function(p,i){return cum[i]+(((p.by_class||{})[code])||0);});
+      var poly=document.createElementNS(NS,"polygon");
+      var up=pts.map(function(p,i){return x(i)+","+y(top[i]);});
+      var down=[];
+      for(var i=pts.length-1;i>=0;i--){down.push(x(i)+","+y(cum[i]));}
+      poly.setAttribute("points",up.concat(down).join(" "));
+      poly.setAttribute("fill",colorFor(code));
+      poly.setAttribute("fill-opacity","0.85");
+      svg.appendChild(poly);
+      cum=top;
+    });
+    if(legend){
+      legend.innerHTML=codes.map(function(code){
+        return '<span style="display:inline-flex;align-items:center;gap:5px;">'+
+          '<span style="width:10px;height:10px;border-radius:2px;background:'+colorFor(code)+';display:inline-block;"></span>'+
+          T("class."+code)+'</span>';
+      }).join("");
+    }
+  }
+  function loadTax(){
+    var tag=document.getElementById("taxTag");
+    return fetch("api/tax?year=2026",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok) { if(tag){tag.textContent=T("tax.tag.offline");} return false; }
+        if(tag){tag.textContent=d.jurisdiction+" "+d.tax_year;tag.style.color="var(--pine)";}
+        var money=function(n,c){return chf(n)+" "+(c||"CHF");};
+        var canton="";
+        (d.notes||[]).forEach(function(n){
+          if(n.key==="tax.note.canton") canton=(n.params&&n.params.canton)||"";
+        });
+        var wealth=d.line_items.filter(function(i){return i.category==="wealth_tax_asset";});
+        var debt=d.line_items.filter(function(i){return i.category==="wealth_tax_liability";});
+        var sum=function(a){return a.reduce(function(s,i){return s+i.amount;},0);};
+        var wa=sum(wealth), wl=sum(debt);
+        var wl0=document.getElementById("taxWealth");
+        if(wl0){wl0.innerHTML=
+          '<div class="l"><span style="font-weight:700;">'+T("tax.basis")+'</span>'+
+          '<small>'+T("tax.basis_sub",{as_of:d.as_of, canton:canton})+'</small></div>'+
+          '<div class="r"><b>'+chf(wa-wl)+'</b><br><small>'+
+          T("tax.basis_assets_line",{assets:chf(wa), debt:chf(wl)})+'</small></div>';}
+        var rows=function(list){return list.map(function(i){
+          var note = i.note_key ? T(i.note_key, i.params||{}) : "";
+          return '<div class="row"><div class="l"><span>'+i.label+'</span><small>'+i.source+
+            ' &middot; '+T("who.asof")+' '+i.as_of+(note?' &middot; '+note:'')+'</small></div>'+
+            '<div class="r">'+money(i.amount,i.currency)+
+            (i.estimate?' <span class="tag">EST</span>':'')+'</div></div>';}).join("");};
+        var body=document.getElementById("taxBody");
+        if(body){body.innerHTML=
+          '<section class="card" style="margin-top:18px;"><h2>'+T("tax.yearend",{as_of:d.as_of})+'</h2>'+
+          rows(wealth)+'<div class="row" style="border-top:2px solid var(--line);"><div class="l">'+
+          '<b>'+T("tax.debt")+'</b></div><div class="r">'+chf(wl)+'</div></div></section>'+
+          (d.line_items.some(function(i){return i.category==="capital_gain_info";})?
+            '<section class="card" style="margin-top:18px;"><h2>'+T("tax.gains")+' '+
+            '<span style="font-weight:400;color:var(--muted);font-size:.82rem;">&middot; '+T("tax.gains_note")+'</span></h2>'+
+            rows(d.line_items.filter(function(i){return i.category==="capital_gain_info";}))+
+            '<p class="note">'+T("tax.gains_body")+'</p></section>':'')+
+          (d.line_items.some(function(i){return i.category==="withholding";})?
+            '<section class="card" style="margin-top:18px;"><h2>'+T("tax.withholding")+'</h2>'+
+            rows(d.line_items.filter(function(i){return i.category==="withholding";}))+
+            '<p class="note">'+T("tax.withholding_body")+'</p></section>':'')+
+          '<section class="card" style="margin-top:18px;"><h2>'+T("tax.checklist")+'</h2>'+
+          d.checklist.map(function(c){return '<div class="row"><div class="l"><span>'+(c.received?'&#10003; ':'&#10007; ')+
+            T(c.key, c.params||{})+'</span></div><div class="r"><span class="tag">'+(c.received?T("tax.received"):T("tax.missing"))+
+            '</span></div></div>';}).join("")+'</section>';}
+        var notes=document.getElementById("taxNotes");
+        if(notes){notes.innerHTML='<b>'+T("tax.notadvice")+'</b> '+
+          (d.notes||[]).map(function(n){return T(n.key, n.params||{});}).join(" ");}
+        renderHarvest(d.cost_basis);
+        return true;
+      }).catch(function(){if(tag){tag.textContent=T("tax.tag.offline");}return false;});
+  }
+  // Cost-basis lots + loss-harvesting view (#172, idea 4). Reuses the valued
+  // amounts the tax pack already read; lot rows are config-as-data. "If this
+  // happened", not a forecast, and never a recommendation to sell.
+  function renderHarvest(cb){
+    var tag=document.getElementById("harvestTag");
+    var body=document.getElementById("harvestBody");
+    if(!body) return;
+    if(!cb || !cb.holdings || !cb.holdings.length){
+      if(tag){tag.textContent=T("harvest.tag.none");tag.style.color="var(--muted)";}
+      body.innerHTML='<p class="note">'+T("harvest.none")+'</p>';
+      return;
+    }
+    if(tag){tag.textContent=T("harvest.tag.ok");tag.style.color="var(--pine)";}
+    var sgn=function(v){return (v>0?"+":"")+chf(v);};
+    var lot=function(l){
+      return '<div class="row" style="padding-left:14px;"><div class="l"><span>'+
+        T("harvest.acquired")+' '+esc(l.acquired)+' &middot; '+l.units+' &times; '+chf(l.price)+'</span>'+
+        '<small>'+esc(l.source)+' &middot; '+T("who.asof")+' '+esc(l.as_of)+'</small></div>'+
+        '<div class="r">'+chf(l.value)+' <small>'+(l.at_loss?
+          '<span class="chg down num">'+sgn(l.gain)+'</span>':
+          '<span class="chg num">'+sgn(l.gain)+'</span>')+'</small></div></div>';};
+    var hold=function(h){
+      return '<div style="margin-top:10px;"><div class="row" style="border-top:1px solid var(--line);">'+
+        '<div class="l"><b>'+esc(h.holding)+'</b><small>'+esc(h.method)+'</small></div>'+
+        '<div class="r"><small>'+T("harvest.cost")+': '+chf(h.cost)+' &middot; '+
+        T("harvest.value")+': '+chf(h.value)+'</small></div></div>'+
+        h.lots.map(lot).join("")+'</div>';};
+    var hv=cb.harvest||{};
+    var summary='<div class="row"><div class="l"><span>'+T("harvest.net")+'</span></div>'+
+      '<div class="r"><b class="'+(hv.net_unrealised<0?"chg down num":"chg num")+'">'+
+      sgn(hv.net_unrealised||0)+'</b></div></div>';
+    var losses=(hv.loss_lots&&hv.loss_lots.length)?
+      '<h2 style="font-size:.85rem;margin-top:14px;">'+T("harvest.loss_lots")+'</h2>'+
+      hv.loss_lots.map(function(l){
+        return '<div class="row"><div class="l"><span>'+esc(l.holding)+' &middot; '+esc(l.acquired)+'</span>'+
+          '<small>'+esc(l.source)+' &middot; '+T("who.asof")+' '+esc(l.as_of)+'</small></div>'+
+          '<div class="r"><span class="chg down num">'+chf(l.gain)+'</span></div></div>';}).join(""):
+      '<p class="note">'+T("harvest.none")+'</p>';
+    body.innerHTML=summary+cb.holdings.map(hold).join("")+losses+
+      '<p class="note">'+T("harvest.note.if")+' '+T("harvest.note.notadvice")+'</p>';
+  }
+  // Scenario engine: what-if, not a forecast. Each shock re-runs an existing
+  // valuation function on one input and the engine returns the diff over the
+  // live positions plus the shocked series' reconciliation. Renders nothing if
+  // the endpoint is offline, so the view stays empty rather than broken.
+  function loadScenario(){
+    var tag=document.getElementById("scenarioTag");
+    return fetch("api/scenario",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok) { if(tag){tag.textContent=T("scenario.tag.offline");} return false; }
+        if(tag){tag.textContent=T("scenario.tag.loaded");tag.style.color="var(--pine)";}
+        var sgn=function(v){return (v>0?"+":"")+chf(v);};
+        var base=document.getElementById("scenarioBase");
+        if(base){base.innerHTML=
+          '<div class="l"><span style="font-weight:700;">'+T("scenario.base")+'</span>'+
+          '<small>'+T("who.asof")+' '+esc(d.as_of||"")+'</small></div>'+
+          '<div class="r"><b>'+chf(d.base_net)+'</b></div>';}
+        var body=document.getElementById("scenarioBody");
+        if(body){body.innerHTML=(d.scenarios||[]).map(function(s){
+          var dir=(s.delta>0)?"+":"";
+          var pct=(s.delta_pct==null)?"":(" ("+dir+(s.delta_pct*100).toFixed(1)+"%)");
+          var moves=(s.moves&&s.moves.length)?
+            s.moves.map(function(m){
+              return '<div class="row"><div class="l"><span>'+esc(m.name)+'</span><small>'+
+                esc(m.method)+'</small></div><div class="r">'+
+                T("scenario.moved_row",{base:chf(m.base),shocked:chf(m.shocked),move:sgn(m.move)})+
+                '</div></div>';}).join(""):
+            '<p class="note">'+T("scenario.no_moves")+'</p>';
+          return '<section class="card" style="margin-top:18px;">'+
+            '<h2>'+T(s.label_key)+'</h2>'+
+            '<p class="sub" style="margin:2px 0 10px;">'+T("scenario.assumption",{source:esc(s.source)})+'</p>'+
+            '<div class="row"><div class="l"><span>'+T("scenario.shocked_net")+'</span></div>'+
+            '<div class="r"><b>'+(s.shocked_net==null?"?":chf(s.shocked_net))+'</b><br><small>'+
+            T("scenario.delta")+': <span class="'+(s.delta<0?"chg down":"chg")+' num">'+sgn(s.delta)+pct+'</span></small></div></div>'+
+            '<h2 style="font-size:.95rem;margin-top:12px;">'+T("scenario.moved")+'</h2>'+moves+
+            '<p class="note">'+(s.series_ok?T("scenario.series_ok"):T("scenario.series_bad",{n:"?"}))+'</p>'+
+            '</section>';}).join("");}
+        var notes=document.getElementById("scenarioNotes");
+        if(notes){notes.innerHTML='<b>'+T("scenario.notadvice")+'</b> '+T("scenario.note");}
+        return true;
+      }).catch(function(){if(tag){tag.textContent=T("scenario.tag.offline");}return false;});
+  }
+  function loadGovernance(){
+    var tag=document.getElementById("govTag");
+    return fetch("api/governance",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok) { if(tag){tag.textContent=T("governance.tag.fail");tag.style.color="var(--muted)";} return false; }
+        if(tag){tag.textContent=T("governance.tag.ok");tag.style.color="var(--pine)";}
+        var rt=d.redteam||{};
+        var at=document.getElementById("govAttacks");
+        if(at){at.textContent=(rt.blocked||0)+" / "+(rt.total||0);}
+        var co=document.getElementById("govControls");
+        if(co){co.textContent=(rt.controls_passed||0)+" / "+(rt.controls_total||0);}
+        var ci=document.getElementById("govCites");
+        if(ci){ci.innerHTML=(d.citation_fields||[]).map(function(f){return '<code>'+esc(f)+'</code>';}).join(" + ");}
+        var notes=document.getElementById("govNotes");
+        if(notes){notes.innerHTML='<b>'+T("governance.title")+'</b> '+T("governance.note");}
+        return true;
+      }).catch(function(){if(tag){tag.textContent=T("governance.tag.offline");}return false;});
+  }
+  // Ownership & beneficiaries + a gifting simulator (#173, idea 5). Ownership
+  // and the beneficiary map are config-as-data; the amounts reuse the ledger's
+  // valued figures. "If this happened", not a forecast, and never advice.
+  function loadEstate(){
+    var tag=document.getElementById("estateTag");
+    return fetch("api/estate",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok) { if(tag){tag.textContent=T("estate.tag.offline");tag.style.color="var(--muted)";} return false; }
+        if(tag){tag.textContent=T("estate.tag.ok");tag.style.color="var(--pine)";}
+        var tot=document.getElementById("estateTotal");
+        if(tot){tot.innerHTML=
+          '<div class="l"><span style="font-weight:700;">'+T("estate.estate_total")+'</span>'+
+          '<small>'+T("who.asof")+' '+esc(d.as_of||"")+'</small></div>'+
+          '<div class="r"><b>'+chf(d.estate.total)+'</b></div>';}
+        var body=document.getElementById("estateBody");
+        if(!body) return true;
+        var ent=(d.entities||[]).map(function(e){
+          var held=Object.keys(e.held_by||{}).map(function(k){return k+' '+(e.held_by[k]*100).toFixed(1)+'%';}).join(", ");
+          return '<div class="row"><div class="l"><span>'+esc(e.name)+'</span>'+
+            '<small>'+T("estate.entity_held_by")+': '+esc(held)+' &middot; '+esc(e.source)+'</small></div>'+
+            '<div class="r">'+chf(e.net)+'</div></div>';}).join("");
+        var own=(d.ownership||[]).map(function(o){
+          return '<div class="row"><div class="l"><span>'+esc(o.name)+'</span>'+
+            '<small>'+T("estate.direct")+': '+chf(o.direct||0)+' &middot; '+
+            T("estate.via")+': '+chf(o.via_entities||0)+'</small></div>'+
+            '<div class="r"><b>'+chf(o.total)+'</b></div></div>';}).join("");
+        var ben=(d.beneficiaries||[]).map(function(b){
+          return '<div class="row"><div class="l"><span>'+esc(b.name)+'</span>'+
+            '<small>'+T("estate.share")+': '+(b.share*100).toFixed(1)+'% &middot; '+
+            T("estate.exempt")+': '+chf(b.exempt)+' &middot; '+
+            T("estate.headroom")+': '+chf(b.headroom)+'</small></div>'+
+            '<div class="r">'+chf(b.amount)+'</div></div>';}).join("");
+        var g=d.gift||{};
+        var grows=(g.rows||[]).map(function(r){
+          return '<div class="row"><div class="l"><span>'+esc(r.name)+'</span>'+
+            '<small>'+T("estate.gift_exempt_used")+': '+chf(r.exempt_used)+' &middot; '+
+            T("estate.gift_beyond")+': '+chf(r.beyond_exempt)+'</small></div>'+
+            '<div class="r">'+chf(r.amount)+'</div></div>';}).join("");
+        body.innerHTML=
+          '<section class="card" style="margin-top:18px;"><h2>'+T("estate.entities")+'</h2>'+ent+'</section>'+
+          '<section class="card" style="margin-top:18px;"><h2>'+T("estate.ownership")+'</h2>'+own+'</section>'+
+          '<section class="card" style="margin-top:18px;"><h2>'+T("estate.beneficiaries")+'</h2>'+ben+'</section>'+
+          '<section class="card" style="margin-top:18px;"><h2>'+T("estate.gift")+' '+
+            '<span style="font-weight:400;color:var(--muted);font-size:.82rem;">&middot; '+
+            T("estate.gift_amount")+': '+chf(g.gift_total||0)+'</span></h2>'+
+            '<p class="sub">'+T("estate.gift_sub")+'</p>'+grows+
+            '<div class="row" style="border-top:2px solid var(--line);"><div class="l"><b>'+
+            T("estate.gift_beyond_total")+'</b></div><div class="r">'+chf(g.beyond_exempt_total||0)+'</div></div>'+
+          '</section>';
+        var notes=document.getElementById("estateNotes");
+        if(notes){notes.innerHTML='<b>'+T("estate.note.notadvice")+'</b> '+T("estate.note.if");}
+        return true;
+      }).catch(function(){if(tag){tag.textContent=T("estate.tag.offline");}return false;});
+  }
+  // One-click evidence pack (#174, idea 9). Read-only: control matrix, records
+  // of processing, a live evidence item and the tenant's audit extract, sealed
+  // with a SHA-256 content digest. Evidence of readiness, not a certification.
+  function loadEvidence(){
+    var tag=document.getElementById("evidenceTag");
+    return fetch("api/evidence",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok) { if(tag){tag.textContent=T("evidence.tag.offline");tag.style.color="var(--muted)";} return false; }
+        if(tag){tag.textContent=T("evidence.tag.ok");tag.style.color="var(--pine)";}
+        var seal=document.getElementById("evidenceSeal");
+        if(seal){seal.innerHTML=
+          '<div class="l"><span style="font-weight:700;">'+T("evidence.seal")+': '+
+          esc((d.seal&&d.seal.algo)||"")+'</span><small>'+T("evidence.seal_note")+'</small></div>'+
+          '<div class="r"><code style="font-size:.7rem;word-break:break-all;">'+
+          esc(((d.seal&&d.seal.digest)||"").slice(0,16))+'…</code></div>';}
+        var body=document.getElementById("evidenceBody");
+        if(!body) return true;
+        var rdy=(d.controls&&d.controls.readiness)||{};
+        var fw=Object.keys(rdy.by_framework||{}).map(function(k){
+          var g=rdy.by_framework[k];
+          return '<div class="row"><div class="l"><span>'+esc(g.label)+'</span>'+
+            '<small>'+g.total+' '+T("evidence.controls")+'</small></div>'+
+            '<div class="r">'+g.implemented+' / '+g.total+
+            ' <small>('+(g.pct_implemented*100).toFixed(0)+'%)</small></div></div>';}).join("");
+        var proc=((d.processing&&d.processing.records)||[]).map(function(r){
+          return '<div class="row"><div class="l"><span>'+esc(r.activity)+'</span>'+
+            '<small>'+esc(r.purpose)+'</small>'+
+            '<small>'+T("evidence.basis")+': '+esc(r.lawful_basis)+' &middot; '+
+            T("evidence.retention")+': '+esc(r.retention)+'</small></div>'+
+            '<div class="r"><span class="tag">'+esc(r.id)+'</span></div></div>';}).join("");
+        var live=(d.live_evidence||[]).map(function(e){
+          return '<div class="row"><div class="l"><span>'+esc(e.name)+'</span>'+
+            '<small>'+esc(e.source)+'</small></div>'+
+            '<div class="r">'+(e.result==="pass"?'&#10003; ':'&#10007; ')+esc(e.result)+'</div></div>';}).join("");
+        var rows=(d.audit_extract&&d.audit_extract.rows)||[];
+        var audit=rows.length?rows.slice(0,20).map(function(a){
+          return '<div class="row"><div class="l"><span>'+esc(a.action)+'</span>'+
+            '<small>'+esc(a.at)+' &middot; '+esc(a.actor||"")+'</small></div>'+
+            '<div class="r"><small>'+esc(a.target_type||"")+'</small></div></div>';}).join(""):
+          '<p class="note">'+T("evidence.audit_empty")+'</p>';
+        body.innerHTML=
+          '<section class="card" style="margin-top:18px;"><h2>'+T("evidence.readiness")+'</h2>'+fw+'</section>'+
+          '<section class="card" style="margin-top:18px;"><h2>'+T("evidence.processing")+'</h2>'+
+            '<p class="sub">'+T("evidence.processing_sub")+'</p>'+proc+'</section>'+
+          '<section class="card" style="margin-top:18px;"><h2>'+T("evidence.live")+'</h2>'+live+'</section>'+
+          '<section class="card" style="margin-top:18px;"><h2>'+T("evidence.audit")+' '+
+            '<span style="font-weight:400;color:var(--muted);font-size:.82rem;">&middot; '+
+            ((d.audit_extract&&d.audit_extract.count)||0)+'</span></h2>'+
+            '<p class="sub">'+T("evidence.audit_sub")+'</p>'+audit+'</section>';
+        var notes=document.getElementById("evidenceNotes");
+        if(notes){notes.innerHTML='<b>'+T("evidence.title")+'</b> '+T("evidence.note");}
+        return true;
+      }).catch(function(){if(tag){tag.textContent=T("evidence.tag.offline");}return false;});
+  }
+  // Refresh everything a write can move: the positions, net worth and the
+  // wealth-over-time chart. One call site, so a confirm can never update the
+  // total while leaving the series stale.
+  function refresh(){
+    return loadLedger().then(function(ok){
+      if(ok){try{render();}catch(e){}}
+      return loadWealth();
+    });
+  }
+  function enter(){
+    gate.classList.add("hidden");
+    document.getElementById("emailOut").textContent =
+      T("who.anonymous")+" ("+T("who.signed_in_as")+" "+document.getElementById("em").value+")";
+    refresh();
+    loadTax();
+    loadScenario();
+    loadGovernance();
+    loadEstate();
+    loadEvidence();
+  }
+  document.getElementById("signin").addEventListener("click",enter);
+  // A landing-page "open the demo" link lands here with #demo and skips the
+  // gate straight into the synthetic household.
+  if(location.hash==="#demo"||location.hash==="#signin") enter();
+  document.getElementById("pw").addEventListener("keydown",function(e){if(e.key==="Enter")enter();});
+  document.getElementById("newacc").addEventListener("click",function(){
+    document.getElementById("em").value="new.client@example.ch";
+    document.getElementById("pw").value="";
+    document.getElementById("pw").placeholder="choose a password";
+    document.getElementById("em").focus();
+  });
+  document.getElementById("delacc").addEventListener("click",function(){
+    alert("Account deletion is a Phase 0 requirement. In the real app this erases all data and signs you out.");
+  });
+
+  var langBtn=document.getElementById("langBtn");
+  if(langBtn){
+    langBtn.addEventListener("click",function(){ setLang(LANG==="de"?"en":"de"); });
+  }
+
+  // Load catalogues, then apply. Both EN and the active language are fetched so
+  // the toggle is instant and a missing key falls back to English.
+  Promise.all([loadBrand(), loadCatalogue("en"), loadMarket(), loadTour(),
+    LANG!=="en"?loadCatalogue(LANG):Promise.resolve()]).then(function(){
+    applyI18n();
+    document.title = T("brand.name")+" - slice preview";
+    var fb=document.getElementById("footBrand"); if(fb) fb.textContent = T("brand.name");
+    var am=document.querySelector('meta[name="apple-mobile-web-app-title"]');
+    if(am) am.setAttribute("content", T("brand.name"));
+    renderStrip();
+    renderQuiz();
+    renderStyles();
+    render();
+    // Deep-link into the tour: #tour, or #tour=3 for a step.
+    var m=/^#tour(?:=(\d+))?$/.exec(location.hash||"");
+    if(m) openTour(m[1]?parseInt(m[1],10)-1:0);
+  });
+})();
+</script>
+</body>
+</html>

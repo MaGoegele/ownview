@@ -1,0 +1,140 @@
+{
+  "note": "Indicative market content for the landing page and the app strip, as data. One source of truth: the landing panel and the app strip both read this file, so a level, a date or a headline is an edit here, not a code change. Every item carries a named source and a date (no number without a source). Synthetic demo content; do not scrape. See issue #39.",
+  "updated": "2026-09-24",
+  "levels": [
+    {
+      "name": "SMI",
+      "value": "11,842",
+      "change": "+0.6%",
+      "source": "SIX",
+      "date": "23 Sep 2026"
+    },
+    {
+      "name": "Euro Stoxx 50",
+      "value": "4,976",
+      "change": "+0.3%",
+      "source": "Stoxx",
+      "date": "23 Sep 2026"
+    },
+    {
+      "name": "S&P 500",
+      "value": "5,614",
+      "change": "-0.2%",
+      "source": "S&P DJI",
+      "date": "23 Sep 2026"
+    },
+    {
+      "name": "SNB policy rate",
+      "value": "0.50%",
+      "change": "hold",
+      "source": "SNB",
+      "date": "18 Sep 2026"
+    },
+    {
+      "name": "10y Swiss confed.",
+      "value": "0.41%",
+      "change": "+2bp",
+      "source": "SIX",
+      "date": "23 Sep 2026"
+    },
+    {
+      "name": "EUR/CHF",
+      "value": "0.9385",
+      "change": "-0.1%",
+      "source": "ECB ref",
+      "date": "23 Sep 2026"
+    },
+    {
+      "name": "Gold USD/oz",
+      "value": "2,641",
+      "change": "+0.4%",
+      "source": "LBMA",
+      "date": "23 Sep 2026"
+    },
+    {
+      "name": "Brent USD/bbl",
+      "value": "74.20",
+      "change": "-1.1%",
+      "source": "ICE",
+      "date": "23 Sep 2026"
+    },
+    {
+      "name": "BTC USD",
+      "value": "63,180",
+      "change": "+2.3%",
+      "source": "CoinGecko",
+      "date": "24 Sep 2026"
+    },
+    {
+      "name": "Wuest Partner ZH",
+      "value": "+1.2% yoy",
+      "change": "Q3",
+      "source": "Wuest Partner",
+      "date": "12 Sep 2026"
+    }
+  ],
+  "news": [
+    {
+      "title": {
+        "en": "SNB holds the policy rate at 0.50%",
+        "de": "SNB belässt den Leitzins bei 0.50%"
+      },
+      "body": {
+        "en": "The Swiss National Bank left its policy rate unchanged at its September assessment and repeated that it will watch inflation and the franc.",
+        "de": "Die Schweizerische Nationalbank liess den Leitzins an ihrer September-Sitzung unverändert und wiederholte, dass sie Inflation und Franken beobachten wird."
+      },
+      "source": "SNB",
+      "date": "18 Sep 2026"
+    },
+    {
+      "title": {
+        "en": "Zurich apartment prices up 1.2% year on year",
+        "de": "Zürcher Wohnungspreise 1.2% über Vorjahr"
+      },
+      "body": {
+        "en": "The Q3 reading of the cantonal house-price index points to a slower rise than a year earlier. Used as the Method D index for direct property.",
+        "de": "Der Q3-Wert des kantonalen Immobilienpreisindex zeigt einen langsameren Anstieg als ein Jahr zuvor. Dient als Method-D-Index für Direktimmobilien."
+      },
+      "source": "Wuest Partner",
+      "date": "12 Sep 2026"
+    },
+    {
+      "title": {
+        "en": "Gold firm on a softer dollar",
+        "de": "Gold fester bei schwächerem Dollar"
+      },
+      "body": {
+        "en": "The LBMA PM price edged up as the dollar eased. Precious metals are held at spot times weight, sourced and dated.",
+        "de": "Der LBMA-PM-Preis stieg leicht, als der Dollar nachgab. Edelmetalle werden zu Spot mal Gewicht gehalten, mit Quelle und Datum."
+      },
+      "source": "LBMA",
+      "date": "23 Sep 2026"
+    }
+  ],
+  "papers": [
+    {
+      "title": {
+        "en": "How we value a Swiss apartment",
+        "de": "Wie wir eine Schweizer Wohnung bewerten"
+      },
+      "blurb": {
+        "en": "Method D in plain words: the indexed purchase price, the age and condition factors, and why the result is a range rather than a number.",
+        "de": "Methode D in klaren Worten: der indexierte Kaufpreis, die Alters- und Zustandsfaktoren und warum das Ergebnis eine Bandbreite ist, keine Zahl."
+      },
+      "href": "papers/how-we-value-a-swiss-apartment.html",
+      "status": "live"
+    },
+    {
+      "title": {
+        "en": "What the private investor rule does not cover",
+        "de": "Was die Regel des privaten Anlegers nicht abdeckt"
+      },
+      "blurb": {
+        "en": "Why capital gains are usually tax free for a private investor, where that stops, and why the judgment belongs to your adviser, not the software.",
+        "de": "Warum Kapitalgewinne für einen privaten Anleger meist steuerfrei sind, wo das endet und warum das Urteil bei deiner Beratung liegt, nicht bei der Software."
+      },
+      "href": "papers/private-investor-rule.html",
+      "status": "live"
+    }
+  ]
+}

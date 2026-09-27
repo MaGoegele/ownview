@@ -1,0 +1,21 @@
+{
+  "b2c": {
+    "brand": "WealthView",
+    "domain": "wealthview.example",
+    "tagline": {
+      "en": "Everything you own. One view.",
+      "de": "Alles was du besitzt. Ein Blick."
+    },
+    "accent": "#1F5E4C"
+  },
+  "b2b": {
+    "brand": "AltPilot",
+    "domain": "altpilot.example",
+    "tagline": {
+      "en": "The private-markets co-pilot for banks.",
+      "de": "Der Private-Markets-Copilot fuer Banken."
+    },
+    "accent": "#3B4C7A"
+  },
+  "note": "Working titles. Renames cost no code (prompt rule 10). See DOMAIN_BRAND_REPORT.md."
+}
