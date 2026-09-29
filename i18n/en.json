@@ -803,5 +803,12 @@
   "profile.selected": "Selected:",
   "profile.source.quiz": "matched from your questionnaire answers",
   "profile.source.self": "chosen by you",
-  "profile.clear": "Clear answers"
+  "profile.clear": "Clear answers",
+  "edu.valuation.h": "Valuation versus history",
+  "edu.valuation.lead": "A descriptive read of the equity multiple versus the same index's own long-run reference, each from a named, dated source. It describes a level, not a forecast, and never a call.",
+  "edu.val.empty": "No sourced valuation reading is available yet. Valuation appears once a dated row is added to the table.",
+  "edu.context.valuation.cheap": "{symbol} is shown at a valuation below its own long-run reference ({pe} against {reference_pe}, source and date cited). A lower starting multiple has historically accompanied higher long-run returns, but this describes the level, it is not a forecast.",
+  "edu.context.valuation.fair": "{symbol} is shown at a valuation close to its own long-run reference ({pe} against {reference_pe}, source and date cited). A multiple near its own history is a middle reading; it says nothing on its own about what comes next.",
+  "edu.context.valuation.elevated": "{symbol} is shown at an elevated valuation versus its own history ({pe} against {reference_pe}, source and date cited). Higher starting multiples have historically accompanied lower long-run returns and deeper drawdowns, but this is a description, not a prediction.",
+  "edu.context.valuation.expensive": "{symbol} is shown at a valuation well above its own long-run reference ({pe} against {reference_pe}, source and date cited). Very high starting multiples have historically accompanied lower long-run returns and deeper drawdowns, and they can persist for a long time; this is a description, not a forecast."
 }

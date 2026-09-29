@@ -1,0 +1,23 @@
+{
+  "note": "Bundled offline catalogue for the education view (#228 workstream B, #235). Mirrors the core registry (core/education.py + core/valuation_levels.json) so the education view renders with no backend: the dated reference and the equity-valuation rows. The band per row is derived the same way the server does (multiple versus its own long-run reference), never typed in. Synthetic demo content; do not scrape.",
+  "reference": {
+    "source": "OwnView education reference v0.1, drafted 24 Sep 2026. General information about asset classes, not advice.",
+    "as_of": "2026-09-24"
+  },
+  "valuation": [
+    {
+      "symbol": "SPX",
+      "pe": 24.8,
+      "reference_pe": 20.0,
+      "source": "Synthetic demo equity multiple, S&P 500 trailing P/E versus its long-run median (illustrative)",
+      "as_of": "2026-09-30"
+    },
+    {
+      "symbol": "SX5E",
+      "pe": 15.2,
+      "reference_pe": 14.6,
+      "source": "Synthetic demo equity multiple, Euro Stoxx 50 trailing P/E versus its long-run median (illustrative)",
+      "as_of": "2026-09-30"
+    }
+  ]
+}

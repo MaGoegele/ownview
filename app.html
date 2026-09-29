@@ -632,6 +632,11 @@
         Market page, phrased as education. It says what a level is and has done, never what it does
         next.</p>
         <div id="eduContext"></div>
+        <h3 data-i18n="edu.valuation.h" style="margin:16px 0 4px;font-size:1rem;">Valuation versus history</h3>
+        <p class="sub" data-i18n="edu.valuation.lead">A descriptive read of the equity multiple
+        versus the same index's own long-run reference, each from a named, dated source. It describes
+        a level, not a forecast, and never a call.</p>
+        <div id="eduValuation"></div>
       </section>
 
       <div class="nocall">
@@ -3068,42 +3073,81 @@
   // today's stored levels. Every note is screened server-side by the governance
   // layer; a note whose gate refuses it is dropped rather than shown. General
   // information, never advice.
+  // The valuation band, mirrored from core/education._VALUATION_BANDS: the
+  // multiple versus the index's own long-run reference, so the offline read
+  // agrees with the server's. Descriptive, never a call.
+  function eduValBand(pe,ref){
+    var r=pe/ref;
+    if(r<0.90) return "cheap";
+    if(r<1.10) return "fair";
+    if(r<1.30) return "elevated";
+    return "expensive";
+  }
+  function eduRenderValuation(d){
+    var box=document.getElementById("eduValuation");
+    if(!box) return;
+    var keep=function(n){return n && n.screen && n.screen.shown;};
+    var notes=(d.valuation||[]).filter(keep);
+    // Offline the server screen is absent; the bundled rows carry the same
+    // sourced/dated shape, so band them here and describe them the same way.
+    if(!notes.length && d.valuation && d.valuation.length===0 && d._rows){
+      notes=d._rows.map(function(e){
+        return {key:e.symbol, note_key:"edu.context.valuation."+eduValBand(e.pe,e.reference_pe),
+                params:{symbol:e.symbol,pe:e.pe.toFixed(1),reference_pe:e.reference_pe.toFixed(1)}};
+      });
+    }
+    box.innerHTML=notes.length?notes.map(function(n){
+      return '<div class="row"><div class="l"><span>'+esc(n.key)+'</span>'+
+        '<small>'+esc(T(n.note_key,n.params||{}))+'</small></div></div>';}).join("")
+      :'<p class="note">'+T("edu.val.empty")+'</p>';
+  }
+  function eduPaint(d){
+    var ref=d.reference||{};
+    var rf=document.getElementById("eduRef");
+    if(rf){rf.textContent=T("edu.reference.line",{source:ref.source||"",as_of:ref.as_of||""});}
+    // The screen decides what shows: keep only notes the gate+guard passed.
+    var keep=function(n){return n && n.screen && n.screen.shown;};
+    var cl=document.getElementById("eduClasses");
+    if(cl){
+      var cls=(d.class_notes||[]).filter(keep);
+      cl.innerHTML=cls.length?cls.map(function(n){
+        return '<div class="row"><div class="l"><span style="font-weight:600;">'+esc(T("class."+n.key))+'</span>'+
+          '<small>'+esc(T(n.note_key,n.params||{}))+'</small></div></div>';}).join("")
+        :'<p class="note">'+T("edu.context.empty")+'</p>';
+    }
+    var co=document.getElementById("eduConcepts");
+    if(co){
+      var cps=(d.concepts||[]);
+      co.innerHTML=cps.map(function(c){
+        return '<div class="row"><div class="l"><span style="font-weight:600;">'+esc(T(c.name_key))+'</span>'+
+          '<small>'+esc(T(c.note_key))+'</small></div></div>';}).join("");
+    }
+    var cx=document.getElementById("eduContext");
+    if(cx){
+      var ctx=(d.context||[]).filter(keep);
+      cx.innerHTML=ctx.length?ctx.map(function(n){
+        return '<div class="row"><div class="l"><span>'+esc(n.key)+'</span>'+
+          '<small>'+esc(T(n.note_key,n.params||{}))+'</small></div></div>';}).join("")
+        :'<p class="note">'+T("edu.context.empty")+'</p>';
+    }
+    eduRenderValuation(d);
+  }
   function loadEducation(){
     var tag=document.getElementById("eduTag");
     return fetch("api/education",{cache:"no-store"}).then(function(r){return r.json();})
       .then(function(d){
-        if(!d || !d.ok) { if(tag){tag.textContent=T("edu.tag.offline");tag.style.color="var(--muted)";} return false; }
+        if(!d || !d.ok) { throw new Error("offline"); }
         if(tag){tag.textContent=T("edu.tag.ok");tag.style.color="var(--pine)";}
-        var ref=d.reference||{};
-        var rf=document.getElementById("eduRef");
-        if(rf){rf.textContent=T("edu.reference.line",{source:ref.source||"",as_of:ref.as_of||""});}
-        // The screen decides what shows: keep only notes the gate+guard passed.
-        var keep=function(n){return n && n.screen && n.screen.shown;};
-        var cl=document.getElementById("eduClasses");
-        if(cl){
-          var cls=(d.class_notes||[]).filter(keep);
-          cl.innerHTML=cls.length?cls.map(function(n){
-            return '<div class="row"><div class="l"><span style="font-weight:600;">'+esc(T("class."+n.key))+'</span>'+
-              '<small>'+esc(T(n.note_key,n.params||{}))+'</small></div></div>';}).join("")
-            :'<p class="note">'+T("edu.context.empty")+'</p>';
-        }
-        var co=document.getElementById("eduConcepts");
-        if(co){
-          var cps=(d.concepts||[]);
-          co.innerHTML=cps.map(function(c){
-            return '<div class="row"><div class="l"><span style="font-weight:600;">'+esc(T(c.name_key))+'</span>'+
-              '<small>'+esc(T(c.note_key))+'</small></div></div>';}).join("");
-        }
-        var cx=document.getElementById("eduContext");
-        if(cx){
-          var ctx=(d.context||[]).filter(keep);
-          cx.innerHTML=ctx.length?ctx.map(function(n){
-            return '<div class="row"><div class="l"><span>'+esc(n.key)+'</span>'+
-              '<small>'+esc(T(n.note_key,n.params||{}))+'</small></div></div>';}).join("")
-            :'<p class="note">'+T("edu.context.empty")+'</p>';
-        }
+        eduPaint(d);
         return true;
-      }).catch(function(){if(tag){tag.textContent=T("edu.tag.offline");}return false;});
+      }).catch(function(){
+        // No live backend: fall back to the bundled catalogue so the view still
+        // renders (reference + valuation rows live in education.config.json).
+        if(tag){tag.textContent=T("edu.tag.offline");tag.style.color="var(--muted)";}
+        return fetch("education.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+          .then(function(d){ d=d||{}; d._rows=d.valuation||[]; eduPaint(d); return true; })
+          .catch(function(){ return false; });
+      });
   }
   // Life-change check-in (#228 workstream D): the events + their screened
   // consequences. The screen decides what shows; an answer is posted back and

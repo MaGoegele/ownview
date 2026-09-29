@@ -803,5 +803,12 @@
   "profile.selected": "Ausgewaehlt:",
   "profile.source.quiz": "aus Ihren Antworten abgeleitet",
   "profile.source.self": "von Ihnen gewaehlt",
-  "profile.clear": "Antworten leeren"
+  "profile.clear": "Antworten leeren",
+  "edu.valuation.h": "Bewertung im Vergleich zur Historie",
+  "edu.valuation.lead": "Eine beschreibende Einordnung des Aktienmultiplikators im Vergleich zur eigenen langfristigen Referenz desselben Index, jeweils aus einer benannten, datierten Quelle. Sie beschreibt ein Niveau, keine Prognose, und nie eine Empfehlung.",
+  "edu.val.empty": "Noch keine belegte Bewertungsangabe verfuegbar. Die Bewertung erscheint, sobald eine datierte Zeile in die Tabelle aufgenommen wird.",
+  "edu.context.valuation.cheap": "{symbol} wird mit einer Bewertung unterhalb der eigenen langfristigen Referenz gezeigt ({pe} gegenueber {reference_pe}, Quelle und Datum genannt). Ein tieferer Startmultiplikator ging historisch mit hoeheren langfristigen Renditen einher, doch das beschreibt das Niveau, es ist keine Prognose.",
+  "edu.context.valuation.fair": "{symbol} wird mit einer Bewertung nahe der eigenen langfristigen Referenz gezeigt ({pe} gegenueber {reference_pe}, Quelle und Datum genannt). Ein Multiplikator nahe der eigenen Historie ist ein mittleres Niveau und sagt fuer sich nichts darueber aus, was als Naechstes kommt.",
+  "edu.context.valuation.elevated": "{symbol} wird mit einer erhoehten Bewertung gegenueber der eigenen Historie gezeigt ({pe} gegenueber {reference_pe}, Quelle und Datum genannt). Hoehere Startmultiplikatoren gingen historisch mit tieferen langfristigen Renditen und staerkeren Rueckschlaegen einher, doch das ist eine Beschreibung, keine Vorhersage.",
+  "edu.context.valuation.expensive": "{symbol} wird mit einer Bewertung deutlich ueber der eigenen langfristigen Referenz gezeigt ({pe} gegenueber {reference_pe}, Quelle und Datum genannt). Sehr hohe Startmultiplikatoren gingen historisch mit tieferen langfristigen Renditen und staerkeren Rueckschlaegen einher und koennen lange bestehen bleiben; das ist eine Beschreibung, keine Prognose."
 }
