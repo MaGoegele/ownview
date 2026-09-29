@@ -1,12 +1,13 @@
 {
+  "site": "https://magoegele.github.io/ownview",
   "b2c": {
-    "brand": "WealthView",
-    "domain": "wealthview.example",
+    "brand": "NetworthXray",
+    "domain": "networthxray.com",
     "tagline": {
-      "en": "Your wealth, one click.",
-      "de": "Dein Vermoegen, ein Klick."
+      "en": "One view of everything you own. Balance it, store it, optimize it.",
+      "de": "Ein Blick auf alles, was du besitzt. Balancieren, verwahren, optimieren."
     },
-    "accent": "#1F5E4C"
+    "accent": "#8A6A1E"
   },
   "b2b": {
     "brand": "AltPilot",

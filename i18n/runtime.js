@@ -32,10 +32,17 @@ window.OwnViewI18n = (function () {
 
   // b2c brand from brand.config.json at the deployment root. Empty until it
   // loads, so callers must not paint the brand before loadBrand resolves.
+  // The accent rides along: a rename or a recolour stays a data edit, and the
+  // landing paints the same accent the app does instead of a hardcoded green.
   function loadBrand() {
     return fetch(BASE + "brand.config.json", { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (d) { BRAND = (d && d.b2c && d.b2c.brand) || ""; return BRAND; })
+      .then(function (d) {
+        BRAND = (d && d.b2c && d.b2c.brand) || "";
+        var accent = (d && d.b2c && d.b2c.accent) || "";
+        if (accent) document.documentElement.style.setProperty("--pine", accent);
+        return BRAND;
+      })
       .catch(function () { BRAND = ""; return BRAND; });
   }
 
@@ -46,17 +53,38 @@ window.OwnViewI18n = (function () {
       .catch(function () { I18N[l] = {}; });
   }
 
-  // Market content as data (market.config.json at the root). The landing panel
-  // and the app strip both read this one file, so a level, a date or a headline
-  // is a data edit, not a code change. Cached after the first fetch.
+  // Market content: the strip reads /api/market live (levels and sentiment
+  // derived from the stored price table the scheduled worker keeps current, so
+  // a moved level is a data refresh, not an edit here), and falls back to the
+  // bundled market.config.json when the API is unreachable, so a page never
+  // renders empty. News and papers stay in the config file. Cached after the
+  // first fetch.
   var MARKET = null;
   function loadMarket() {
     if (MARKET) return Promise.resolve(MARKET);
     return fetch(BASE + "market.config.json", { cache: "no-store" })
       .then(function (r) { return r.json(); })
       .then(function (d) { MARKET = d || {}; return MARKET; })
-      .catch(function () { MARKET = {}; return MARKET; });
+      .catch(function () { MARKET = {}; return MARKET; })
+      .then(function (base) {
+        // Overlay the live strip when it answers with levels; a miss keeps the
+        // bundled snapshot quietly, so the page degrades, never blanks.
+        return fetch(BASE + "api/market", { cache: "no-store" })
+          .then(function (r) { return r.json(); })
+          .then(function (live) {
+            if (live && live.ok) {
+              if ((live.levels || []).length) MARKET.levels = live.levels;
+              if (live.sentiment) MARKET.sentiment = live.sentiment;
+              if ((live.events || []).length) MARKET.events = live.events;
+              MARKET.live = !!(live.levels || []).length;
+            }
+            return MARKET;
+          })
+          .catch(function () { return MARKET; });
+      });
   }
+  // The scheduled-events feed, kept short and sorted, from whichever source won.
+  function events() { return (MARKET && MARKET.events) || []; }
   // Pick the active language's text from a {en, de} field, falling back to en.
   function loc(field) {
     if (field == null) return "";
@@ -98,6 +126,7 @@ window.OwnViewI18n = (function () {
     T: T, applyI18n: applyI18n, loadCatalogue: loadCatalogue, loadBrand: loadBrand,
     loadMarket: loadMarket, loc: loc,
     market: function () { return MARKET || {}; },
+    events: events,
     init: init, setLang: setLang, toggle: toggle,
     lang: function () { return LANG; },
     brand: function () { return BRAND; }

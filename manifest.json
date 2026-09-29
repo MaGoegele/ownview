@@ -1,12 +1,12 @@
 {
-  "name": "OwnView wealth",
-  "short_name": "OwnView",
-  "description": "Personal wealth tracking on a Swiss ledger. Synthetic demo.",
+  "name": "NetworthXray",
+  "short_name": "NetworthXray",
+  "description": "One view of everything you own: balance it, store it, optimize it. Synthetic demo.",
   "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#F6F4EE",
-  "theme_color": "#1F5E4C",
+  "theme_color": "#C9962F",
   "icons": [
     {
       "src": "icon.svg",

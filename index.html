@@ -9,23 +9,23 @@
 <meta name="theme-color" content="#1F5E4C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="">
-<title>OwnView: your wealth, one click</title>
-<meta name="description" content="OwnView shows every asset you own in one view: listed, property, private markets, crypto, metals, collectibles and cash, across currencies and countries. Each figure keeps its method, source and as-of date, with a Swiss tax pack as one feature. Portfolio information, not advice.">
+<title>NetworthXray: one view of everything you own</title>
+<meta name="description" content="NetworthXray shows every asset you own in one view: listed, property, private markets, crypto, metals, collectibles and cash, across currencies and countries. Each figure keeps its method, source and as-of date, with a Swiss tax pack as one feature. Portfolio information, not advice.">
 <meta name="robots" content="index,follow">
-<meta name="author" content="OwnView">
+<meta name="author" content="NetworthXray">
 <link rel="canonical" href="https://magoegele.github.io/ownview/">
 
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="OwnView">
-<meta property="og:title" content="OwnView: your wealth, one click">
+<meta property="og:site_name" content="NetworthXray">
+<meta property="og:title" content="NetworthXray: one view of everything you own">
 <meta property="og:description" content="Every asset in one view, across currencies and countries, each figure with its method, source and date. Swiss tax pack as a feature. Portfolio information, not advice.">
 <meta property="og:locale" content="en_CH">
 <meta property="og:locale:alternate" content="de_CH">
 <meta property="og:url" content="https://magoegele.github.io/ownview/">
 <meta property="og:image" content="https://magoegele.github.io/ownview/portfolio.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="OwnView: your wealth, one click">
+<meta name="twitter:title" content="NetworthXray: one view of everything you own">
 <meta name="twitter:description" content="Every asset in one view, across currencies and countries, each figure with its method, source and date.">
 <meta name="twitter:image" content="https://magoegele.github.io/ownview/portfolio.png">
 <link rel="alternate" hreflang="en" href="https://magoegele.github.io/ownview/">
@@ -37,7 +37,7 @@
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "OwnView",
+  "name": "NetworthXray",
   "applicationCategory": "FinanceApplication",
   "operatingSystem": "Web",
   "description": "Personal wealth cockpit: every asset in one view across currencies and countries, each figure with its method, source and date, with a Swiss tax pack as one feature.",
@@ -59,7 +59,8 @@
   a{color:var(--pine);}
   header{border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:20;}
   .bar{max-width:1080px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:18px;}
-  .brand{font-weight:700;letter-spacing:-.01em;font-size:1.05rem;text-decoration:none;color:var(--ink);}
+  .brand{display:inline-flex;align-items:center;gap:9px;font-weight:700;letter-spacing:-.01em;font-size:1.05rem;text-decoration:none;color:var(--ink);}
+  .brand .mk{width:26px;height:26px;border-radius:7px;display:block;}
   .bnav{display:flex;gap:18px;margin-left:auto;align-items:center;}
   .bnav a{font-size:.83rem;color:var(--muted);text-decoration:none;font-weight:500;}
   .bnav a:hover{color:var(--ink);}
@@ -82,6 +83,7 @@
   .eyebrow{font-family:ui-monospace,monospace;font-size:.68rem;letter-spacing:.14em;
     text-transform:uppercase;color:var(--est);font-weight:700;}
   h1{font-size:2.5rem;line-height:1.12;letter-spacing:-.02em;margin:14px 0 0;max-width:20ch;}
+  .tagline{font-size:1.28rem;font-weight:600;letter-spacing:-.01em;color:var(--pine);margin:12px 0 0;max-width:34ch;line-height:1.3;}
   .lead{font-size:1.05rem;color:var(--muted);max-width:62ch;margin:18px 0 0;}
   .cta{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap;}
   .note{font-size:.76rem;color:var(--muted);margin-top:16px;font-family:ui-monospace,monospace;}
@@ -157,7 +159,7 @@
 
 <header>
   <div class="bar">
-    <a class="brand" id="brandLink" href="index.html"></a>
+    <a class="brand" id="brandLink" href="index.html"><img class="mk" src="icon.svg" alt=""><span id="brandText"></span></a>
     <nav class="bnav">
       <a class="hide" href="#product" data-i18n="landing.nav.product"></a>
       <a class="hide" href="#market" data-i18n="landing.nav.market"></a>
@@ -173,6 +175,7 @@
 <div class="hero wrap">
   <div class="eyebrow" data-i18n="landing.hero.eyebrow"></div>
   <h1 data-i18n="landing.title"></h1>
+  <p class="tagline" data-i18n="landing.tagline"></p>
   <p class="lead" data-i18n="landing.hero.lead"></p>
   <div class="cta">
     <a class="btn p" href="app.html#demo" data-i18n="landing.nav.demo"></a>
@@ -255,7 +258,12 @@
     <div class="cols">
       <div class="card">
         <h3 style="margin:0 0 10px;font-size:.95rem;" data-i18n="landing.market.trends_h"></h3>
+        <div id="wSentiment"></div>
         <div id="wTrends"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:.95rem;" data-i18n="landing.market.events_h"></h3>
+        <div id="wEvents"></div>
       </div>
       <div class="card">
         <h3 style="margin:0 0 10px;font-size:.95rem;" data-i18n="landing.market.news_h"></h3>
@@ -377,6 +385,24 @@
       d.innerHTML='<span class="nm">'+t.name+'</span>'+
         '<span><span class="vl num">'+t.value+'</span> <span class="chg '+cls+'">'+chg+'</span>'+
         '<span class="dt">'+t.source+' &middot; '+t.date+'</span></span>';
+      s.appendChild(d);
+    });
+  }
+  function renderSentiment(){
+    var s=document.getElementById("wSentiment"); if(!s) return; s.innerHTML="";
+    var sent=MKT().sentiment; if(!sent) return;
+    var d=document.createElement("div"); d.className="item";
+    d.innerHTML='<div class="t">'+T("market.sentiment.h")+': '+T(sent.note_key)+'</div>'+
+      '<div class="d">'+T("market.sentiment.method",{vix:sent.vix.toFixed(2),band:T(sent.note_key)})+'</div>'+
+      '<span class="src">'+sent.source+', '+sent.date+'</span>';
+    s.appendChild(d);
+  }
+  function renderEvents(){
+    var s=document.getElementById("wEvents"); if(!s) return; s.innerHTML="";
+    (MKT().events||[]).forEach(function(e){
+      var d=document.createElement("div"); d.className="item";
+      d.innerHTML='<div class="t">'+loc(e.title)+'</div><div class="d">'+loc(e.what)+'</div>'+
+        '<span class="src">'+e.source+', '+e.date+'</span>';
       s.appendChild(d);
     });
   }
@@ -544,7 +570,7 @@
   // paint() waits on the market config first (init loads it), so the trends,
   // news and paper lists share one source of truth with the app strip.
   function paint(){
-    renderTrends(); renderNews(); renderPapers();
+    renderTrends(); renderSentiment(); renderEvents(); renderNews(); renderPapers();
     renderPortfolio(); renderValuation();
     renderStyle(); renderFlags(); renderTax(); renderTour();
   }
@@ -559,8 +585,8 @@
       window.OwnViewI18n.applyI18n();
       var b = window.OwnViewI18n.brand();
       document.title = T("landing.title") + " - " + b;
-      document.getElementById("brandLink").textContent = b;
-      var fb = document.getElementById("footBrand"); if(fb) fb.textContent = b;
+      var bt = document.getElementById("brandText"); if(bt) bt.textContent = b;
+      var bt2 = document.getElementById("footBrand"); if(bt2) bt2.textContent = b;
       var am = document.querySelector('meta[name="apple-mobile-web-app-title"]');
       if(am) am.setAttribute("content", b);
       paint();

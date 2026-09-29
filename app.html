@@ -10,9 +10,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="">
-<title>OwnView app</title>
+<title>NetworthXray</title>
 <meta name="robots" content="noindex,nofollow">
-<meta name="description" content="OwnView app: the personal wealth cockpit behind the sign-in. Net worth, allocation, valuations across currencies, a Swiss tax pack, all with method, source and date.">
+<meta name="description" content="NetworthXray app: the personal wealth cockpit behind the sign-in. Net worth, allocation, valuations across currencies, a Swiss tax pack, all with method, source and date.">
 <style>
   :root{
     --pine:#1F5E4C; --pine-soft:#E7F0EA; --paper:#F6F4EE; --card:#FFFFFF;
@@ -25,7 +25,8 @@
   .num{font-variant-numeric:tabular-nums;}
   header{border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:20;}
   .bar{max-width:1160px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:16px;}
-  .brand{font-weight:700;letter-spacing:-.01em;font-size:1.05rem;}
+  .brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;letter-spacing:-.01em;font-size:1.05rem;}
+  .brand .mk{width:24px;height:24px;border-radius:6px;display:block;}
   .brand b{color:var(--pine);}
   .who{margin-left:auto;font-size:.8rem;color:var(--muted);}
   .demo{font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
@@ -176,6 +177,7 @@
     padding-top:12px;border-top:1px solid var(--line);font-size:.74rem;}
   .gate .gatefoot a{color:var(--muted);text-decoration:none;}
   .gate .gatefoot a:hover{color:var(--pine);}
+  .gate .gateerr{color:#b3261e;font-size:.8rem;margin-top:10px;min-height:1em;}
   .gate .drafttag{margin-left:auto;background:#fdf6e6;border:1px solid #e8d5a8;color:#8a5a12;
     border-radius:5px;padding:1px 7px;font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;}
 
@@ -314,21 +316,34 @@
 
 <div class="gate" id="gate">
   <div class="box">
-    <span class="eyebrow" data-i18n="gate.eyebrow">{brand} &middot; sign in</span>
+    <span class="eyebrow" data-i18n="gate.eyebrow">NetworthXray &middot; sign in</span>
     <h1 data-i18n="gate.title">Welcome back</h1>
     <p data-i18n="gate.sub">Slice preview. Synthetic data only, no real accounts.</p>
-    <label for="em" data-i18n="gate.email">Email</label>
-    <input id="em" type="email" value="lena.muster@example.ch" autocomplete="username">
-    <label for="pw" data-i18n="gate.password">Password</label>
-    <input id="pw" type="password" value="demo-ownview" autocomplete="current-password">
-    <button class="go" id="signin" data-i18n="gate.signin">Sign in</button>
-    <div class="passkey"><span class="src"><span class="dot"></span></span> <span data-i18n="gate.passkey">or use a passkey (Phase 0 target)</span></div>
-    <div class="ops">
-      <button id="newacc" data-i18n="gate.create">Create account</button>
-      <button id="delacc" data-i18n="gate.delete">Delete account</button>
+    <div id="loginForm">
+      <label for="em" data-i18n="gate.email">Email</label>
+      <input id="em" type="email" placeholder="you@example.com" autocomplete="username">
+      <label for="pw" data-i18n="gate.password">Password</label>
+      <input id="pw" type="password" placeholder="********" autocomplete="current-password">
+      <button class="go" id="signin" data-i18n="gate.signin">Sign in</button>
+      <div class="gateerr" id="gateErr" role="alert"></div>
+      <div class="passkey"><span class="src"><span class="dot"></span></span> <span data-i18n="gate.passkey">or use a passkey (Phase 0 target)</span></div>
+      <div class="ops">
+        <button id="newacc" data-i18n="gate.create">Create account</button>
+        <button id="delacc" data-i18n="gate.delete">Delete account</button>
+      </div>
+      <div class="hint"><span data-i18n="gate.hint">Your own account. The synthetic demo is still open from the landing page.</span>
+      <span data-i18n="gate.hint_identity">Sign-in:</span> <code>matthias.goegele@gmail.com</code></div>
     </div>
-    <div class="hint"><span data-i18n="gate.hint">Demo login prefilled. Anything works, this is the slice shell.</span>
-    <span data-i18n="gate.hint_identity">Dummy identity:</span> <code>lena.muster@example.ch</code> / <code>demo-ownview</code>.</div>
+    <div id="resetForm" style="display:none;">
+      <h1 data-i18n="gate.reset_title">Set a new password</h1>
+      <p data-i18n="gate.reset_sub">This account was opened with a temporary password. Choose a new one to continue.</p>
+      <label for="pw1" data-i18n="gate.reset_new">New password</label>
+      <input id="pw1" type="password" autocomplete="new-password">
+      <label for="pw2" data-i18n="gate.reset_confirm">Confirm new password</label>
+      <input id="pw2" type="password" autocomplete="new-password">
+      <button class="go" id="resetGo" data-i18n="gate.reset_go">Save and continue</button>
+      <div class="gateerr" id="resetErr" role="alert"></div>
+    </div>
     <div class="gatefoot">
       <a href="legal/imprint.html" data-i18n="legal.imprint.title">Imprint</a>
       <a href="legal/privacy.html" data-i18n="legal.privacy.title">Privacy</a>
@@ -340,7 +355,7 @@
 
 <header id="app">
   <div class="bar">
-    <span class="brand" data-i18n="brand.name">{brand}</span>
+    <span class="brand"><img class="mk" src="icon.svg" alt=""><span data-i18n="brand.name">NetworthXray</span></span>
     <span class="demo" data-i18n="brand.demo">synthetic demo</span>
     <span class="demo aidraft" style="color:var(--pine);background:var(--pine-soft);" data-i18n="brand.aidraft">AI draft, model generated</span>
     <button class="langbtn" id="langBtn" type="button" title="Language"><span id="langLabel">DE</span></button>
@@ -446,7 +461,7 @@
       </section>
 
       <div class="nocall">
-        <b data-i18n="portfolio.nocall.title">Information, not advice.</b> <span data-i18n="portfolio.nocall.body">{brand} computes, visualizes and explains facts about your
+        <b data-i18n="portfolio.nocall.title">Information, not advice.</b> <span data-i18n="portfolio.nocall.body">NetworthXray computes, visualizes and explains facts about your
         own data. It never tells you to buy, sell, hold or switch a specific asset, and it does not
         compute personal tax strategies. Every market number carries a named source and a date. If a
         source is unavailable you see "unavailable" and the last known value with its date, never a
@@ -461,6 +476,17 @@
       <p class="sub" style="margin-bottom:16px;">Each tile shows value, source, and the date the
       source published. Nothing on this page is a forecast or a recommendation.</p>
       <div class="strip" id="strip"></div>
+
+      <section class="card" style="margin-top:20px;">
+        <h2 data-i18n="market.sentiment.h">Sentiment</h2>
+        <div id="sentiment"></div>
+      </section>
+
+      <section class="card" style="margin-top:16px;">
+        <h2 data-i18n="market.events.h">Calendar</h2>
+        <p class="sub" style="margin-bottom:10px;" data-i18n="market.events.lead">Scheduled releases, each with the body that publishes it and the date. A calendar, not a forecast.</p>
+        <div id="events"></div>
+      </section>
 
       <section class="card" style="margin-top:20px;">
         <h2>Themes <span style="font-weight:400;color:var(--muted);font-size:.82rem;">&middot; draft, pending admin review before publish</span></h2>
@@ -514,6 +540,7 @@
       <section class="card" style="margin-top:18px;">
         <h2>4. What the gap flags, and which decisions sit behind it</h2>
         <div id="styleFlags"></div>
+        <div id="driftScreen" style="margin-top:14px;"></div>
       </section>
 
       <section class="card" style="margin-top:18px;">
@@ -574,9 +601,9 @@
       and an advice guardrail blocks anything that reads as advice. The red-team suite below runs live.</p>
       <section class="card">
         <div class="row"><div class="l"><span data-i18n="governance.attacks">adversarial prompts blocked</span></div>
-          <div class="r"><b id="govAttacks">–</b></div></div>
+          <div class="r"><b id="govAttacks">-</b></div></div>
         <div class="row"><div class="l"><span data-i18n="governance.controls">information controls passed</span></div>
-          <div class="r"><b id="govControls">–</b></div></div>
+          <div class="r"><b id="govControls">-</b></div></div>
         <div class="row"><div class="l"><span data-i18n="governance.cites">required citation fields</span></div>
           <div class="r" id="govCites"></div></div>
       </section>
@@ -752,7 +779,7 @@
 
 <footer>
   Synthetic demo data. No real person, no real client. Slice preview deployed from
-  projects/wealthview. Working title <span id="footBrand">{brand}</span>, see DOMAIN_BRAND_REPORT.md.
+  projects/wealthview. Working title <span id="footBrand">NetworthXray</span>, see DOMAIN_BRAND_REPORT.md.
 </footer>
 
 <!-- Demo tour: a screenshot walk-through, data-driven from tour.config.json. -->
@@ -807,6 +834,35 @@
     try {
       if (typeof input === "string" && input.indexOf("api/") === 0) {
         input = B + "/" + input;
+      }
+    } catch (e) {}
+    return of.call(this, input, init);
+  };
+})();
+</script>
+<script>
+// Session bearer: when a token is stored, every api/ request carries it in an
+// Authorization header, so the server scopes the call to the signed-in account.
+// Wrapping fetch once keeps this out of the ~20 individual call sites.
+(function(){
+  var token = null;
+  try { token = localStorage.getItem("ownview.token"); } catch(e) {}
+  window.ownviewToken = function(){ return token; };
+  window.ownviewSetToken = function(t){
+    token = t || null;
+    try { t ? localStorage.setItem("ownview.token", t) : localStorage.removeItem("ownview.token"); } catch(e) {}
+  };
+  var of = window.fetch;
+  window.fetch = function(input, init){
+    try {
+      var isApi = (typeof input === "string" && input.indexOf("api/") === 0) ||
+                  (typeof input === "string" && input.indexOf("/api/") >= 0);
+      if (isApi && token) {
+        init = init || {};
+        init.headers = init.headers || {};
+        if (!init.headers["Authorization"] && !init.headers["authorization"]) {
+          init.headers["Authorization"] = "Bearer " + token;
+        }
       }
     } catch (e) {}
     return of.call(this, input, init);
@@ -884,7 +940,7 @@
     var cat = I18N[LANG] || I18N.en || {};
     var s = cat[key] != null ? cat[key] : ((I18N.en||{})[key] != null ? I18N.en[key] : key);
     if(params){ Object.keys(params).forEach(function(k){ s = s.split("{"+k+"}").join(params[k]); }); }
-    if(BRAND && s.indexOf("{brand}")>=0) s = s.split("{brand}").join(BRAND);
+    if(BRAND && s.indexOf("NetworthXray")>=0) s = s.split("NetworthXray").join(BRAND);
     return s;
   }
   // Pick the active language's text from a {en, de} field, falling back to en.
@@ -916,7 +972,7 @@
       try { if(document.getElementById("govAttacks")) loadGovernance(); } catch(e){}
       try { if(document.getElementById("estateTotal")) loadEstate(); } catch(e){}
       try { if(document.getElementById("evidenceSeal")) loadEvidence(); } catch(e){}
-      try { if(document.getElementById("strip")) renderStrip(); } catch(e){}
+      try { if(document.getElementById("strip")) { renderStrip(); renderMarketPanel(); } } catch(e){}
       try { if(document.getElementById("styleChips")) renderStyles(); } catch(e){}
       try { if(document.getElementById("quizList")) renderQuiz(); } catch(e){}
     });
@@ -925,7 +981,7 @@
     return fetch("i18n/"+l+".json",{cache:"no-store"}).then(function(r){return r.json();})
       .then(function(d){ I18N[l]=d; }).catch(function(){ I18N[l]={}; });
   }
-  // b2c brand from brand.config.json, applied over {brand} in catalogue strings.
+  // b2c brand from brand.config.json, applied over NetworthXray in catalogue strings.
   var BRAND="";
   function loadBrand(){
     return fetch("brand.config.json",{cache:"no-store"}).then(function(r){return r.json();})
@@ -960,7 +1016,7 @@
   // A donut of the allocation. Every slice is a class already in byClass, drawn
   // with the same CLASSES colour the bar uses, so the two views agree by
   // construction. Built with stroke-dasharray arcs on one circle (no path math
-  // to get wrong) — a class at zero simply draws nothing.
+  // to get wrong), a class at zero simply draws nothing.
   function renderAllocDonut(order, byClass, ta){
     var svg=document.getElementById("allocDonut");
     var legend=document.getElementById("allocDonutLegend");
@@ -1145,27 +1201,27 @@
   var STYLES = [
     {n:"Capital preservation", t:{cash:30,bonds:42,equity:8,metals:5,realestate:10,private:5},
      d:"Illustrative reference profile for a capital-first style.",
-     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+     src:"Illustrative NetworthXray reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
     {n:"Income", t:{cash:10,bonds:45,equity:20,metals:5,realestate:15,private:5},
      d:"Illustrative reference profile for an income-first style.",
-     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+     src:"Illustrative NetworthXray reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
     {n:"Balanced", t:{cash:12,bonds:28,equity:28,metals:5,realestate:15,private:12},
      d:"Illustrative reference profile for a middle-of-the-road style.",
-     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+     src:"Illustrative NetworthXray reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
     {n:"Growth", t:{cash:5,bonds:12,equity:47,metals:6,realestate:16,private:14},
      d:"Illustrative reference profile for a growth-first style.",
-     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
+     src:"Illustrative NetworthXray reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."},
     {n:"Aggressive", t:{cash:3,bonds:5,equity:55,metals:7,realestate:6,private:24},
      d:"Illustrative reference profile for a highest-risk style.",
-     src:"Illustrative {brand} reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."}
+     src:"Illustrative NetworthXray reference weights v0.2, drafted 24 Sep 2026. Not a product, not advice."}
   ];
   // Order used by the gap view. Crypto, collectibles and vehicles carry no
   // target weight: they are satellite holdings, shown in the allocation but
   // reported as "no target" rather than nudged toward a number.
   var GAPCLASSES = ["cash","bonds","equity","realestate","metals","private"];
   var REPORTS = {"Capital preservation": "Asset classes\nA capital preservation illustrative profile normally gives its largest weights to cash and bonds, with smaller equity, metals, real estate and private markets. Here, cash at 5.7 percent and bonds at 5.0 percent sit well below those reference weights, while equity at 21.7 percent and real estate at 43.3 percent sit above. Metals at 3.5 percent are modestly below, and private markets at 13.7 percent are above. Crypto, collectibles and vehicles carry no reference weight and appear as satellites at 2.5, 1.8 and 2.8 percent. The CHF 780,000 mortgage is a liability outside these weights; net worth is CHF 2,637,200.\n\nThemes\nThe illustrative profile typically emphasises liquidity, capital stability, high quality credit and broad defensive diversification. The current mix instead carries themes of direct property concentration, global equity growth, private market exposure, and alternative stores of value such as vaulted gold, self custodied crypto, a vintage watch collection and a Porsche 911. These are descriptive differences only.\n\nRegions\nA capital preservation profile often has broad developed market cash and bond exposure, frequently with a Swiss base. The current portfolio is Swiss concentrated through a Zurich apartment, CHF and EUR cash and a Swiss bond fund, while the global equity ETF and private holdings add non Swiss exposure. Region data may be incomplete for private assets.\n\nThis is an illustrative draft, not advice.", "Income": "Asset classes\nAn illustrative Income profile typically emphasizes bonds and real estate, with cash, equity, metals and private markets as smaller components. Reference weights are cash 10 percent, bonds 45 percent, equity 20 percent, metals 5 percent, real estate 15 percent and private 5 percent. Current allocation is cash 5.7, bonds 5.0, equity 21.7, real estate 43.3, metals 3.5, private markets 13.7, crypto 2.5, collectibles 1.8 and vehicles 2.8 percent. Bonds are therefore far below reference, while real estate and private markets are above. Equity is slightly above, cash and metals below. Crypto, collectibles and vehicles have no reference weight in any style and sit as satellites. A CHF 780,000 mortgage is a liability outside these weights. Total assets are CHF 3,417,200 and net worth CHF 2,637,200 after that liability.\n\nThemes\nThe reference style generally holds income-producing bonds, listed real estate or direct property, dividend equity and some gold for diversification. Current portfolio themes include direct Zurich residential property, global equity, Swiss bonds, vaulted gold, private equity, a synthetic private-company stake, self-custodied Bitcoin and Ethereum, vintage watches and a Porsche 911.\n\nRegions\nThe reference does not set regional weights, but a Swiss income orientation often has domestic bond and property exposure plus global equity. Current holdings appear concentrated in Swiss real estate and Swiss bonds, with global equity and international crypto, while private markets include a synthetic stake. Cash is held in CHF and EUR.\n\nThis is an illustrative draft, not advice.", "Balanced": "Asset classes\nA Balanced reference profile typically holds cash 12%, bonds 28%, equity 28%, metals 5%, real estate 15% and private markets 12%. Your current allocation shows cash at 5.7% and bonds at 5.0%, below those illustrative weights. Equity at 21.7% is below the reference, while real estate at 43.3% is well above it, reflecting the Zurich apartment. Metals at 3.5% sit under the reference. Private markets at 13.7% are above. Crypto at 2.5%, collectibles at 1.8% and vehicles at 2.8% are satellites with no reference weight. Total assets are CHF 3,417,200; the CHF 780,000 mortgage is a liability outside these weights, leaving net worth of CHF 2,637,200.\n\nThemes\nThe mix combines a global equity ETF, a Swiss bond fund, vaulted gold bars, a private equity fund, a synthetic private company stake and self custodied Bitcoin and Ethereum. The apartment, watch collection and Porsche add direct and tangible exposures. This creates a growth and real asset tilt, with less in income oriented cash and bonds than the illustrative profile.\n\nRegions\nThe holdings are not evenly spread. Real estate is concentrated in Zurich, the bond fund is Swiss, and cash is held in CHF and EUR. The equity ETF is global, while the private equity fund and synthetic stake may carry wider or sector specific exposure. The result is a home market bias through real estate and Swiss bonds, offset by global equity and digital assets.\n\nThis is an illustrative draft, not advice.", "Growth": "Asset classes\nAn illustrative Growth profile typically holds equity as its largest asset class at 47 percent, with real estate at 16 percent, private markets at 14 percent, bonds at 12 percent, metals at 6 percent and cash at 5 percent. The current portfolio holds equity at 21.7 percent, below that reference, while real estate is 43.3 percent, well above it. Bonds are 5.0 percent, below the 12 percent reference. Cash is 5.7 percent, close to reference. Metals are 3.5 percent, slightly below. Private markets are 13.7 percent, close to reference. Crypto, collectibles and vehicles appear as satellites with no reference weight in any style.\n\nThemes\nThe Growth style is generally built around long term capital growth through listed equities and private markets, balanced by property, bonds, metals and cash. Current exposure leans more heavily toward direct property and includes satellite holdings such as Bitcoin, Ethereum, a watch collection and a car. These satellites are outside the reference framework and add different risk and liquidity characteristics. The mortgage is a liability outside the allocation weights. Net worth is CHF 2,637,200 against total assets of CHF 3,417,200.\n\nRegions\nThe reference profile does not specify regional weights. Current holdings suggest exposure through a global equity ETF, a Swiss bond fund, a Zurich apartment and CHF/EUR cash, with private markets and digital assets adding further spread. This is an illustrative draft, not advice.", "Aggressive": "Asset classes\nAn illustrative Aggressive profile typically holds equity and private markets as its largest blocks, with smaller cash, bonds, metals and real estate. Reference weights are cash 3, bonds 5, equity 55, metals 7, real estate 6 and private markets 24 percent. Your current allocation is above reference in cash at 5.7, real estate at 43.3, and satellites crypto, collectibles and vehicles, which have no reference weight. It is close to reference in bonds at 5.0, and below in equity at 21.7, metals at 3.5, and private markets at 13.7. The CHF 780,000 mortgage is a liability outside these weights, so net worth is CHF 2,637,200 against total assets of CHF 3,417,200.\n\nThemes\nThe portfolio is shaped by a direct Zurich apartment, a global equity ETF, a Swiss bond fund, vaulted gold, a private equity fund, a synthetic private company stake, self custodied Bitcoin and Ethereum, a vintage watch collection, a Porsche 911, and CHF and EUR cash. Direct property and selected private and satellite holdings create concentration relative to the illustrative style. The synthetic stake represents 3.0 percent ownership.\n\nRegions\nRegion exposure appears strongly Swiss through the apartment and Swiss bond fund. The global equity ETF adds broad international listed exposure. Cash is held in CHF and EUR. Private markets and crypto may add global or unlisted exposure, though their regional split is not shown here.\n\nThis is an illustrative draft for information only, not advice."};
-  var REPORT_PROMPT = "You are the report engine inside {brand}, a Swiss portfolio information tool. It is NOT an advisor and must never give personalised advice. You receive the client's current allocation by asset class and an illustrative reference profile for their chosen style. Write a drafted report of 180 to 240 words with three headed sections: Asset classes, Themes, Regions. Describe what an illustrative profile of this kind typically holds and where the current portfolio sits above or below it. Descriptive and educational only. End with one line that this is an illustrative draft, not advice. Never tell the client to buy or sell. English, plain text, no asterisks.";
-  var REPORT_META = "Report model: DeepSeek V4.1 Flash (Fireworks) via the {brand} gateway. Generated 24 Sep 2026 from the allocation shown. Prompt is fixed; it receives the figures only. Draft, pending human review before it reaches a client.";
+  var REPORT_PROMPT = "You are the report engine inside NetworthXray, a Swiss portfolio information tool. It is NOT an advisor and must never give personalised advice. You receive the client's current allocation by asset class and an illustrative reference profile for their chosen style. Write a drafted report of 180 to 240 words with three headed sections: Asset classes, Themes, Regions. Describe what an illustrative profile of this kind typically holds and where the current portfolio sits above or below it. Descriptive and educational only. End with one line that this is an illustrative draft, not advice. Never tell the client to buy or sell. English, plain text, no asterisks.";
+  var REPORT_META = "Report model: DeepSeek V4.1 Flash (Fireworks) via the NetworthXray gateway. Generated 24 Sep 2026 from the allocation shown. Prompt is fixed; it receives the figures only. Draft, pending human review before it reaches a client.";
   var style = {selected:"Balanced", via:"self"};
 
   function targets(st){return st.t;}
@@ -1233,6 +1289,30 @@
     style.selected=STYLES[pick].n; style.via="quiz";
   }
   function syncQuiz(){renderQuiz();}
+
+  // Server-computed drift + screened narrative for the selected style. The
+  // bars stay instant and local; this fetch is what the API route exists for,
+  // so the numbers the page cites and the numbers the API returns are one
+  // source. A missing/absent ledger hides the block rather than breaking it.
+  function loadAllocationDrift(){
+    var box=document.getElementById("driftScreen"); if(!box) return;
+    var st=style.selected;
+    fetch("api/allocation?style="+encodeURIComponent(st),{cache:"no-store"})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||d.ok!==true){ box.innerHTML=""; return; }
+        var scr=d.screen||{};
+        var head='<span class="src"><span class="dot"></span>'+
+          "Server drift: "+(d.style||st)+" reference, read "+(d.as_of||"")+
+          ". Tolerance "+(d.tolerance||5)+" points.</span>";
+        var body=scr.shown
+          ? (d.narrative||[]).map(function(n){return T(n.key, n.params||{});}).join(" ")
+          : "The reference narrative was withheld by the governance gate ("+
+            (scr.reason||"")+").";
+        box.innerHTML=head+'<p class="note" id="driftNarr">'+body+'</p>';
+      })
+      .catch(function(){ box.innerHTML=""; });
+  }
 
   function renderStyleGap(){
     var byClass={}, a=assets();
@@ -1308,27 +1388,61 @@
     });
     document.getElementById("repMeta").innerHTML='<span class="src"><span class="dot"></span>'+T(REPORT_META)+'</span>'+
       '<span class="src">style: '+style.selected+'</span>';
+    loadAllocationDrift();
   }
 
-  // market strip: levels from market.config.json (the same file the landing
-  // page reads), so one edit updates both and neither can drift. Each tile
-  // keeps its source and publish date.
+  // market strip: levels read /api/market (derived from the stored price table
+  // the scheduled worker keeps current), falling back to the bundled
+  // market.config.json when the API is unreachable, so a moved level needs no
+  // edit here. Each tile keeps its source and publish date.
   var MARKET={};
   function loadMarket(){
     return fetch("market.config.json",{cache:"no-store"}).then(function(r){return r.json();})
-      .then(function(d){ MARKET=d||{}; return MARKET; }).catch(function(){ MARKET={}; return MARKET; });
+      .then(function(d){ MARKET=d||{}; return MARKET; })
+      .catch(function(){ MARKET={}; return MARKET; })
+      .then(function(base){
+        return fetch("api/market",{cache:"no-store"}).then(function(r){return r.json();})
+          .then(function(live){
+            if(live&&live.ok){
+              if((live.levels||[]).length) MARKET.levels=live.levels;
+              if(live.sentiment) MARKET.sentiment=live.sentiment;
+              if((live.events||[]).length) MARKET.events=live.events;
+            }
+            return MARKET;
+          }).catch(function(){ return MARKET; });
+      });
   }
   function renderStrip(){
     var s=document.getElementById("strip"); if(!s) return; s.innerHTML="";
     (MARKET.levels||[]).forEach(function(t){
       var chg=t.change||"";
+      var cls = t.change_dir || (chg.indexOf("-")===0 ? "down" : (chg.indexOf("+")===0 ? "up" : ""));
       var d=document.createElement("div"); d.className="tick";
-      var cls = chg.indexOf("-")===0 ? "down" : (chg.indexOf("+")===0 ? "up" : "");
       d.innerHTML='<div class="nm">'+t.name+'</div><div class="vl num">'+t.value+'</div>'+
         '<div class="mt"><span class="chg '+cls+'" style="font-size:.72rem;">'+chg+'</span><span class="dt">'+t.date+'</span></div>'+
         '<div class="mt"><span>'+t.source+'</span></div>';
       s.appendChild(d);
     });
+  }
+  function renderMarketPanel(){
+    var sent=MARKET.sentiment;
+    var se=document.getElementById("sentiment");
+    if(se){ se.innerHTML="";
+      if(sent){
+        se.innerHTML='<div class="row"><div class="l"><span>'+T("market.sentiment.h")+
+          '</span><small>'+T("market.sentiment.method",{vix:sent.vix.toFixed(2),band:T(sent.note_key)})+
+          '</small></div><div class="r"><span class="tag">'+T(sent.note_key)+'</span></div></div>'+
+          '<p class="note">'+sent.source+', '+sent.date+'. '+T("market.sentiment.disclaimer")+'</p>';
+      }
+    }
+    var ev=document.getElementById("events"); if(ev){ ev.innerHTML="";
+      (MARKET.events||[]).forEach(function(e){
+        var d=document.createElement("div"); d.className="item";
+        d.innerHTML='<div class="t">'+loc(e.title)+'</div><div class="d">'+loc(e.what)+'</div>'+
+          '<span class="src">'+e.source+', '+e.date+'</span>';
+        ev.appendChild(d);
+      });
+    }
   }
 
   // mobile menu: collapsed nav that slides open under the header
@@ -2895,7 +3009,7 @@
           '<div class="l"><span style="font-weight:700;">'+T("evidence.seal")+': '+
           esc((d.seal&&d.seal.algo)||"")+'</span><small>'+T("evidence.seal_note")+'</small></div>'+
           '<div class="r"><code style="font-size:.7rem;word-break:break-all;">'+
-          esc(((d.seal&&d.seal.digest)||"").slice(0,16))+'…</code></div>';}
+          esc(((d.seal&&d.seal.digest)||"").slice(0,16))+'...'</code></div>';}
         var body=document.getElementById("evidenceBody");
         if(!body) return true;
         var rdy=(d.controls&&d.controls.readiness)||{};
@@ -2944,10 +3058,9 @@
       return loadWealth();
     });
   }
-  function enter(){
-    gate.classList.add("hidden");
-    document.getElementById("emailOut").textContent =
-      T("who.anonymous")+" ("+T("who.signed_in_as")+" "+document.getElementById("em").value+")";
+  // Everything a signed-in session needs to load. One call site, so the demo
+  // path and the real-login path show exactly the same cockpit.
+  function loadAll(){
     refresh();
     loadTax();
     loadScenario();
@@ -2955,15 +3068,103 @@
     loadEstate();
     loadEvidence();
   }
-  document.getElementById("signin").addEventListener("click",enter);
+  function whoLine(label){
+    var out=document.getElementById("emailOut");
+    if(out){ out.textContent=label; }
+  }
+  // The public synthetic demo: no session, the server returns the demo tenant.
+  function enterDemo(){
+    gate.classList.add("hidden");
+    whoLine(T("who.anonymous"));
+    loadAll();
+  }
+  // A real login. The server hashes and checks the password and returns a
+  // bearer token; a must_reset account is forced to set a new password first.
+  function signIn(){
+    var em=document.getElementById("em").value.trim();
+    var pw=document.getElementById("pw").value;
+    var err=document.getElementById("gateErr");
+    var btn=document.getElementById("signin");
+    err.textContent="";
+    if(!em||!pw){ err.textContent=T("gate.bad_credentials"); return; }
+    var old=btn.textContent;
+    btn.disabled=true; btn.textContent=T("gate.loading");
+    fetch("api/auth",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"login",email:em,password:pw})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        btn.disabled=false; btn.textContent=old;
+        if(!d||!d.ok){
+          err.textContent=(d&&d.reason==="invalid credentials")?T("gate.bad_credentials"):T("gate.offline");
+          return;
+        }
+        window.ownviewSetToken(d.token);
+        if(d.user&&d.user.must_reset){ showReset(); return; }
+        gate.classList.add("hidden");
+        whoLine((d.user&&d.user.email||"")+" ("+T("who.signed_in_as")+")");
+        loadAll();
+      })
+      .catch(function(){ btn.disabled=false; btn.textContent=old; err.textContent=T("gate.offline"); });
+  }
+  function showReset(){
+    document.getElementById("loginForm").style.display="none";
+    document.getElementById("resetForm").style.display="";
+    document.getElementById("pw1").focus();
+  }
+  function doReset(){
+    var p1=document.getElementById("pw1").value;
+    var p2=document.getElementById("pw2").value;
+    var err=document.getElementById("resetErr");
+    err.textContent="";
+    if(p1.length<8){ err.textContent=T("gate.reset_short"); return; }
+    if(p1!==p2){ err.textContent=T("gate.reset_mismatch"); return; }
+    fetch("api/auth",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({action:"reset",password:p1})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok){ err.textContent=T("gate.offline"); return; }
+        // The reset revokes every session, this one included: sign in again.
+        window.ownviewSetToken("");
+        document.getElementById("resetForm").style.display="none";
+        document.getElementById("loginForm").style.display="";
+        document.getElementById("pw").value="";
+        document.getElementById("gateErr").textContent=T("gate.reset_done");
+        document.getElementById("em").focus();
+      })
+      .catch(function(){ err.textContent=T("gate.offline"); });
+  }
+  // Resume a stored session on reload: validate it, then enter or force reset.
+  function resume(){
+    if(!window.ownviewToken()){ return false; }
+    fetch("api/auth",{cache:"no-store"}).then(function(r){return r.json();}).then(function(d){
+      if(d&&d.ok&&d.user){
+        if(d.user.must_reset){ showReset(); return; }
+        gate.classList.add("hidden");
+        whoLine(d.user.email+" ("+T("who.signed_in_as")+")");
+        loadAll();
+      } else {
+        window.ownviewSetToken("");
+      }
+    }).catch(function(){});
+    return true;
+  }
+  document.getElementById("signin").addEventListener("click",signIn);
+  document.getElementById("resetGo").addEventListener("click",doReset);
   // A landing-page "open the demo" link lands here with #demo and skips the
   // gate straight into the synthetic household.
-  if(location.hash==="#demo"||location.hash==="#signin") enter();
-  document.getElementById("pw").addEventListener("keydown",function(e){if(e.key==="Enter")enter();});
+  if(location.hash==="#demo"){ enterDemo(); }
+  else if(!resume()){ document.getElementById("em").focus(); }
+  document.getElementById("pw").addEventListener("keydown",function(e){if(e.key==="Enter")signIn();});
+  document.getElementById("pw2").addEventListener("keydown",function(e){if(e.key==="Enter")doReset();});
+  // Create account: no longer a prefilled fake identity. It clears the form so
+  // the visitor types their own email; the real account is provisioned by the
+  // owner (see the runbook), because this slice issues credentials by hand.
   document.getElementById("newacc").addEventListener("click",function(){
-    document.getElementById("em").value="new.client@example.ch";
+    document.getElementById("em").value="";
     document.getElementById("pw").value="";
-    document.getElementById("pw").placeholder="choose a password";
+    document.getElementById("gateErr").textContent="";
     document.getElementById("em").focus();
   });
   document.getElementById("delacc").addEventListener("click",function(){
@@ -2985,6 +3186,7 @@
     var am=document.querySelector('meta[name="apple-mobile-web-app-title"]');
     if(am) am.setAttribute("content", T("brand.name"));
     renderStrip();
+    renderMarketPanel();
     renderQuiz();
     renderStyles();
     render();
