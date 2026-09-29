@@ -373,6 +373,7 @@
     <a data-v="market" data-i18n="nav.market">Market today</a>
     <a data-v="style" data-i18n="nav.style">Investment style</a>
     <a data-v="insights" data-i18n="nav.insights">Insights</a>
+    <a data-v="education" data-i18n="nav.education">Education</a>
     <a data-v="scenario" data-i18n="nav.scenario">Scenarios</a>
     <a data-v="governance" data-i18n="nav.governance">Governed AI</a>
     <a data-v="estate" data-i18n="nav.estate">Estate</a>
@@ -577,6 +578,45 @@
         not a forecast.</p>
         <p style="margin:10px 0 0;"><a href="#scenario" id="toScenario" data-i18n="insights.scenario.open">Open the scenario engine</a></p>
       </section>
+      <section class="card" style="margin-top:18px;">
+        <h2 data-i18n="insights.education.title">Education</h2>
+        <p class="sub" data-i18n="insights.education.sub">Plain-language notes on what each asset
+        class is and does, and a descriptive read of today's levels. Sourced, dated, governance
+        screened, never advice.</p>
+        <p style="margin:10px 0 0;"><a href="#education" id="toEducation" data-i18n="insights.education.open">Open the education layer</a></p>
+      </section>
+    </section>
+
+    <!-- EDUCATION -->
+    <section class="view" id="v-education">
+      <span class="eyebrow" data-i18n="edu.eyebrow">Education</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;"><span data-i18n="edu.title">What each asset class is and does</span>
+        <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="eduTag" data-i18n="edu.tag.loading">loading</span></h2>
+      <p class="sub" data-i18n="edu.sub">Plain-language notes about asset classes and the ideas
+      behind them. General information about a class, not about your holding, and never advice.</p>
+      <p class="note" id="eduRef" style="margin:2px 0 16px;"></p>
+
+      <section class="card">
+        <h2 data-i18n="edu.class.h">Asset classes in your portfolio</h2>
+        <div id="eduClasses"></div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <h2 data-i18n="edu.concepts.h">The ideas behind the notes</h2>
+        <div id="eduConcepts"></div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <h2 data-i18n="edu.context.h">Market context today</h2>
+        <p class="sub" data-i18n="edu.context.lead">A descriptive read of the levels shown on the
+        Market page, phrased as education. It says what a level is and has done, never what it does
+        next.</p>
+        <div id="eduContext"></div>
+      </section>
+
+      <div class="nocall">
+        <b data-i18n="edu.note.notadvice">General information about asset classes, not investment advice.</b>
+      </div>
     </section>
 
     <!-- SCENARIOS -->
@@ -968,6 +1008,7 @@
       // Re-render the data-driven views so their strings follow the language.
       try { render(); } catch(e){}
       try { if(document.getElementById("taxBody")) loadTax(); } catch(e){}
+      try { if(document.getElementById("eduClasses")) loadEducation(); } catch(e){}
       try { if(document.getElementById("scenarioBody")) loadScenario(); } catch(e){}
       try { if(document.getElementById("govAttacks")) loadGovernance(); } catch(e){}
       try { if(document.getElementById("estateTotal")) loadEstate(); } catch(e){}
@@ -1548,6 +1589,7 @@
     document.querySelectorAll(".nav a").forEach(function(a){a.classList.toggle("on",a.dataset.v===v);});
     document.querySelectorAll(".view").forEach(function(s){s.classList.toggle("on",s.id==="v-"+v);});
     if(v==="documents") loadDocuments();
+    if(v==="education") loadEducation();
     if(v==="scenario") loadScenario();
     if(v==="governance") loadGovernance();
     if(v==="estate") loadEstate();
@@ -2010,6 +2052,10 @@
   var toScenario=document.getElementById("toScenario");
   if(toScenario){
     toScenario.addEventListener("click",function(e){e.preventDefault();route("scenario");});
+  }
+  var toEducation=document.getElementById("toEducation");
+  if(toEducation){
+    toEducation.addEventListener("click",function(e){e.preventDefault();route("education");});
   }
 
   // add form
@@ -2886,6 +2932,48 @@
   // valuation function on one input and the engine returns the diff over the
   // live positions plus the shocked series' reconciliation. Renders nothing if
   // the endpoint is offline, so the view stays empty rather than broken.
+  // Education layer (#228, workstream B). Plain-language notes on what each
+  // asset class is and does, the concepts behind them, and a descriptive read of
+  // today's stored levels. Every note is screened server-side by the governance
+  // layer; a note whose gate refuses it is dropped rather than shown. General
+  // information, never advice.
+  function loadEducation(){
+    var tag=document.getElementById("eduTag");
+    return fetch("api/education",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok) { if(tag){tag.textContent=T("edu.tag.offline");tag.style.color="var(--muted)";} return false; }
+        if(tag){tag.textContent=T("edu.tag.ok");tag.style.color="var(--pine)";}
+        var ref=d.reference||{};
+        var rf=document.getElementById("eduRef");
+        if(rf){rf.textContent=T("edu.reference.line",{source:ref.source||"",as_of:ref.as_of||""});}
+        // The screen decides what shows: keep only notes the gate+guard passed.
+        var keep=function(n){return n && n.screen && n.screen.shown;};
+        var cl=document.getElementById("eduClasses");
+        if(cl){
+          var cls=(d.class_notes||[]).filter(keep);
+          cl.innerHTML=cls.length?cls.map(function(n){
+            return '<div class="row"><div class="l"><span style="font-weight:600;">'+esc(T("class."+n.key))+'</span>'+
+              '<small>'+esc(T(n.note_key,n.params||{}))+'</small></div></div>';}).join("")
+            :'<p class="note">'+T("edu.context.empty")+'</p>';
+        }
+        var co=document.getElementById("eduConcepts");
+        if(co){
+          var cps=(d.concepts||[]);
+          co.innerHTML=cps.map(function(c){
+            return '<div class="row"><div class="l"><span style="font-weight:600;">'+esc(T(c.name_key))+'</span>'+
+              '<small>'+esc(T(c.note_key))+'</small></div></div>';}).join("");
+        }
+        var cx=document.getElementById("eduContext");
+        if(cx){
+          var ctx=(d.context||[]).filter(keep);
+          cx.innerHTML=ctx.length?ctx.map(function(n){
+            return '<div class="row"><div class="l"><span>'+esc(n.key)+'</span>'+
+              '<small>'+esc(T(n.note_key,n.params||{}))+'</small></div></div>';}).join("")
+            :'<p class="note">'+T("edu.context.empty")+'</p>';
+        }
+        return true;
+      }).catch(function(){if(tag){tag.textContent=T("edu.tag.offline");}return false;});
+  }
   function loadScenario(){
     var tag=document.getElementById("scenarioTag");
     return fetch("api/scenario",{cache:"no-store"}).then(function(r){return r.json();})
@@ -3009,7 +3097,7 @@
           '<div class="l"><span style="font-weight:700;">'+T("evidence.seal")+': '+
           esc((d.seal&&d.seal.algo)||"")+'</span><small>'+T("evidence.seal_note")+'</small></div>'+
           '<div class="r"><code style="font-size:.7rem;word-break:break-all;">'+
-          esc(((d.seal&&d.seal.digest)||"").slice(0,16))+'...'</code></div>';}
+          esc(((d.seal&&d.seal.digest)||"").slice(0,16))+'...</code></div>';}
         var body=document.getElementById("evidenceBody");
         if(!body) return true;
         var rdy=(d.controls&&d.controls.readiness)||{};
@@ -3063,6 +3151,7 @@
   function loadAll(){
     refresh();
     loadTax();
+    loadEducation();
     loadScenario();
     loadGovernance();
     loadEstate();
