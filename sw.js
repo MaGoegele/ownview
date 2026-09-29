@@ -1,15 +1,17 @@
 /* NetworthXray offline app shell.
  *
- * Cache-first for the shell (the page, its i18n/config data and the icon), so a
- * cold reload works offline; network-first for everything else, so live data
- * (/api/*) and any asset this list forgot still reach the network rather than
- * serving a stale copy. A failed network fetch falls back to the cache, then to
- * the cached app shell, so the app opens (empty) rather than erroring.
+ * Network-first for same-origin GETs: a connected client always gets the fresh
+ * bytes, and a failed fetch falls back to the cache (then to the cached app
+ * shell), so the app still opens offline. Cache-first was tried first and bit
+ * us: a cache-first shell serves its cached copy *forever*, so a publish that
+ * changed i18n/en.json (issue #234's profile keys) never reached an installed
+ * client - the page painted raw keys until the cache name changed. Freshness
+ * beats a marginal speed win for a site that publishes often.
  *
- * Bump CACHE when the shell bytes change: install() only re-fetches the
- * precache list under a new cache name, and activate() deletes every older one.
+ * Bump CACHE when this list changes: activate() deletes every older cache, so
+ * an installed client drops a stale one on the next load.
  */
-var CACHE = "nx-shell-v1";
+var CACHE = "nx-shell-v2";
 var SHELL = [
   "./",
   "./index.html",
@@ -29,6 +31,22 @@ var SHELL = [
 var SHELL_PATHS = SHELL.map(function (u) {
   return new URL(u, self.location).pathname;
 });
+
+// Network-first with a cache fallback. `fallback` is what to serve when both
+// the network and the cache miss (the app shell, so a navigation still opens).
+function netFirst(req, fallback) {
+  return fetch(req).then(function (res) {
+    if (res && res.status === 200 && res.type === "basic") {
+      var copy = res.clone();
+      caches.open(CACHE).then(function (c) { c.put(req, copy); });
+    }
+    return res;
+  }).catch(function () {
+    return caches.match(req).then(function (hit) {
+      return hit || (fallback ? caches.match(fallback) : undefined);
+    });
+  });
+}
 
 self.addEventListener("install", function (e) {
   e.waitUntil(
@@ -58,32 +76,9 @@ self.addEventListener("fetch", function (e) {
   var url = new URL(req.url);
   if (url.origin !== self.location.origin) return; // let cross-origin pass through
 
-  if (SHELL_PATHS.indexOf(url.pathname) !== -1) {
-    // Cache-first: the shell must be instant and available offline.
-    e.respondWith(
-      caches.match(req).then(function (hit) {
-        return hit || fetch(req).then(function (res) {
-          var copy = res.clone();
-          caches.open(CACHE).then(function (c) { c.put(req, copy); });
-          return res;
-        }).catch(function () { return caches.match("./app.html"); });
-      })
-    );
-    return;
-  }
-
-  // Network-first for live data and the rest, falling back to cache.
-  e.respondWith(
-    fetch(req).then(function (res) {
-      if (res && res.status === 200 && res.type === "basic") {
-        var copy = res.clone();
-        caches.open(CACHE).then(function (c) { c.put(req, copy); });
-      }
-      return res;
-    }).catch(function () {
-      return caches.match(req).then(function (hit) {
-        return hit || caches.match("./app.html");
-      });
-    })
-  );
+  // Same strategy for the shell and everything else: fresh when online, cached
+  // when offline. A navigation that misses both opens the cached app shell so
+  // an install still launches (empty) rather than erroring.
+  var fallback = (url.pathname.indexOf(".html") !== -1) ? undefined : "./app.html";
+  e.respondWith(netFirst(req, fallback));
 });
