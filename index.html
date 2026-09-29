@@ -616,5 +616,15 @@
   });
 })();
 </script>
+<script>
+/* Register the offline shell worker: required for installability and so a
+   cold reload renders the shell without a network. Fails silently where a
+   worker or a secure context is unavailable (the page still works online). */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
 </body>
 </html>
