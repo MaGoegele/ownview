@@ -3031,28 +3031,46 @@
       return '<div class="row"><div class="l"><small>'+esc(T("checkin.history.flagged",
         {event:T("checkin.event."+a.event_code), date:a.answered_on||""}))+'</small></div></div>';}).join("");
   }
+  // Paint the catalogue + (optional) stored answers. Shared by the live API
+  // response and the bundled offline fallback, so the view renders the same.
+  function ckPaint(d){
+    var box=document.getElementById("ckEvents");
+    if(box){
+      box.innerHTML=(d.events||[]).map(function(ev){
+        return '<div class="row"><div class="l"><button class="chip" data-event="'+esc(ev.code)+'">'+
+          esc(T(ev.name_key))+'</button></div></div>';}).join("");
+      box.querySelectorAll("button[data-event]").forEach(function(b){
+        b.addEventListener("click",function(){
+          // Offline: the bundled config already carries the consequences, so
+          // render them straight away; online the POST also records the answer.
+          var ev=(d.events||[]).filter(function(e){return e.code===b.getAttribute("data-event");})[0];
+          if(ev) ckRenderMapped({code:ev.code,name_key:ev.name_key,consequences:ev.consequences||[]});
+          ckAnswer(b.getAttribute("data-event"));
+        });
+      });
+    }
+    var ref=d.reference||{};
+    var rf=document.getElementById("ckRef");
+    if(rf){rf.textContent=T("checkin.reference.line",{source:ref.source||"",as_of:ref.as_of||""});}
+    ckRenderMapped(null);
+    ckRenderHistory(d.answers||[]);
+  }
   function loadCheckin(){
     var tag=document.getElementById("ckTag");
     return fetch("api/checkins",{cache:"no-store"}).then(function(r){return r.json();})
       .then(function(d){
-        if(!d || !d.ok) { if(tag){tag.textContent=T("checkin.tag.offline");tag.style.color="var(--muted)";} return false; }
+        if(!d || !d.ok) { throw new Error("offline"); }
         if(tag){tag.textContent=T("checkin.tag.ok");tag.style.color="var(--pine)";}
-        var ref=d.reference||{};
-        var rf=document.getElementById("ckRef");
-        if(rf){rf.textContent=T("checkin.reference.line",{source:ref.source||"",as_of:ref.as_of||""});}
-        var box=document.getElementById("ckEvents");
-        if(box){
-          box.innerHTML=(d.events||[]).map(function(ev){
-            return '<div class="row"><div class="l"><button class="chip" data-event="'+esc(ev.code)+'">'+
-              esc(T(ev.name_key))+'</button></div></div>';}).join("");
-          box.querySelectorAll("button[data-event]").forEach(function(b){
-            b.addEventListener("click",function(){ ckAnswer(b.getAttribute("data-event")); });
-          });
-        }
-        ckRenderMapped(null);
-        ckRenderHistory(d.answers||[]);
+        ckPaint(d);
         return true;
-      }).catch(function(){if(tag){tag.textContent=T("checkin.tag.offline");}return false;});
+      }).catch(function(){
+        // No live backend: fall back to the bundled catalogue so the view still
+        // renders (the events + consequences live in checkins.config.json).
+        if(tag){tag.textContent=T("checkin.tag.offline");tag.style.color="var(--muted)";}
+        return fetch("checkins.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+          .then(function(d){ ckPaint(d||{}); return true; })
+          .catch(function(){ return false; });
+      });
   }
   function ckAnswer(code){
     if(!code) return;

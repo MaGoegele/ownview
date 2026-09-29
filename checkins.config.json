@@ -1,0 +1,449 @@
+{
+  "reference": {
+    "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+    "as_of": "2026-09-29"
+  },
+  "events": [
+    {
+      "code": "new_baby",
+      "name_key": "checkin.event.new_baby",
+      "dimensions": [
+        "liquidity",
+        "horizon",
+        "risk"
+      ],
+      "consequences": [
+        {
+          "dimension": "liquidity",
+          "note_key": "checkin.new_baby.liquidity",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "horizon",
+          "note_key": "checkin.new_baby.horizon",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "risk",
+          "note_key": "checkin.new_baby.risk",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        }
+      ]
+    },
+    {
+      "code": "house_purchase",
+      "name_key": "checkin.event.house_purchase",
+      "dimensions": [
+        "liquidity",
+        "horizon",
+        "risk"
+      ],
+      "consequences": [
+        {
+          "dimension": "liquidity",
+          "note_key": "checkin.house_purchase.liquidity",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "horizon",
+          "note_key": "checkin.house_purchase.horizon",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "risk",
+          "note_key": "checkin.house_purchase.risk",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        }
+      ]
+    },
+    {
+      "code": "divorce",
+      "name_key": "checkin.event.divorce",
+      "dimensions": [
+        "liquidity",
+        "horizon",
+        "risk"
+      ],
+      "consequences": [
+        {
+          "dimension": "liquidity",
+          "note_key": "checkin.divorce.liquidity",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "horizon",
+          "note_key": "checkin.divorce.horizon",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "risk",
+          "note_key": "checkin.divorce.risk",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        }
+      ]
+    },
+    {
+      "code": "unemployment",
+      "name_key": "checkin.event.unemployment",
+      "dimensions": [
+        "liquidity",
+        "horizon",
+        "risk"
+      ],
+      "consequences": [
+        {
+          "dimension": "liquidity",
+          "note_key": "checkin.unemployment.liquidity",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "horizon",
+          "note_key": "checkin.unemployment.horizon",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "risk",
+          "note_key": "checkin.unemployment.risk",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        }
+      ]
+    },
+    {
+      "code": "inheritance",
+      "name_key": "checkin.event.inheritance",
+      "dimensions": [
+        "liquidity",
+        "horizon",
+        "risk"
+      ],
+      "consequences": [
+        {
+          "dimension": "liquidity",
+          "note_key": "checkin.inheritance.liquidity",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "horizon",
+          "note_key": "checkin.inheritance.horizon",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "risk",
+          "note_key": "checkin.inheritance.risk",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        }
+      ]
+    },
+    {
+      "code": "health",
+      "name_key": "checkin.event.health",
+      "dimensions": [
+        "liquidity",
+        "horizon",
+        "risk"
+      ],
+      "consequences": [
+        {
+          "dimension": "liquidity",
+          "note_key": "checkin.health.liquidity",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "horizon",
+          "note_key": "checkin.health.horizon",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        },
+        {
+          "dimension": "risk",
+          "note_key": "checkin.health.risk",
+          "screen": {
+            "shown": true,
+            "reason": "",
+            "fallback_key": "",
+            "citations": [
+              {
+                "asset_id": "checkin.reference.v0.1",
+                "name": "Life-change reference",
+                "source": "OwnView life-change reference v0.1, drafted 29 Sep 2026. General information about how life events usually affect liquidity, horizon and risk, not advice.",
+                "as_of": "2026-09-29",
+                "field_used": "",
+                "value": null
+              }
+            ],
+            "guard": []
+          }
+        }
+      ]
+    }
+  ],
+  "dimensions": [
+    {
+      "code": "liquidity",
+      "name_key": "checkin.dim.liquidity"
+    },
+    {
+      "code": "horizon",
+      "name_key": "checkin.dim.horizon"
+    },
+    {
+      "code": "risk",
+      "name_key": "checkin.dim.risk"
+    }
+  ],
+  "note_key": "checkin.note.notadvice"
+}
