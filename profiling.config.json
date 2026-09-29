@@ -1,0 +1,178 @@
+{
+  "reference": {
+    "source": "OwnView profiling reference v0.1, drafted 29 Sep 2026. General information about how a short profile usually maps answers to an illustrative style, not advice.",
+    "as_of": "2026-09-29"
+  },
+  "rule_key": "profile.rule",
+  "note_key": "profile.note.notadvice",
+  "questions": [
+    {
+      "id": "horizon",
+      "group": "capacity",
+      "prompt_key": "profile.q.horizon",
+      "options": [
+        {
+          "v": 0,
+          "label_key": "profile.o.horizon.0"
+        },
+        {
+          "v": 1,
+          "label_key": "profile.o.horizon.1"
+        },
+        {
+          "v": 2,
+          "label_key": "profile.o.horizon.2"
+        },
+        {
+          "v": 3,
+          "label_key": "profile.o.horizon.3"
+        }
+      ]
+    },
+    {
+      "id": "income_stability",
+      "group": "capacity",
+      "prompt_key": "profile.q.income",
+      "options": [
+        {
+          "v": 0,
+          "label_key": "profile.o.income.0"
+        },
+        {
+          "v": 1,
+          "label_key": "profile.o.income.1"
+        },
+        {
+          "v": 2,
+          "label_key": "profile.o.income.2"
+        },
+        {
+          "v": 3,
+          "label_key": "profile.o.income.3"
+        }
+      ]
+    },
+    {
+      "id": "life_stage",
+      "group": "capacity",
+      "prompt_key": "profile.q.stage",
+      "options": [
+        {
+          "v": 0,
+          "label_key": "profile.o.stage.0"
+        },
+        {
+          "v": 1,
+          "label_key": "profile.o.stage.1"
+        },
+        {
+          "v": 2,
+          "label_key": "profile.o.stage.2"
+        },
+        {
+          "v": 3,
+          "label_key": "profile.o.stage.3"
+        }
+      ]
+    },
+    {
+      "id": "dependents",
+      "group": "capacity",
+      "prompt_key": "profile.q.dependents",
+      "options": [
+        {
+          "v": 0,
+          "label_key": "profile.o.dependents.0"
+        },
+        {
+          "v": 1,
+          "label_key": "profile.o.dependents.1"
+        },
+        {
+          "v": 2,
+          "label_key": "profile.o.dependents.2"
+        },
+        {
+          "v": 3,
+          "label_key": "profile.o.dependents.3"
+        }
+      ]
+    },
+    {
+      "id": "emergency_months",
+      "group": "liquidity",
+      "prompt_key": "profile.q.emergency",
+      "options": [
+        {
+          "v": 0,
+          "label_key": "profile.o.emergency.0"
+        },
+        {
+          "v": 1,
+          "label_key": "profile.o.emergency.1"
+        },
+        {
+          "v": 2,
+          "label_key": "profile.o.emergency.2"
+        },
+        {
+          "v": 3,
+          "label_key": "profile.o.emergency.3"
+        }
+      ]
+    },
+    {
+      "id": "property_plans",
+      "group": "liquidity",
+      "prompt_key": "profile.q.property",
+      "options": [
+        {
+          "v": 0,
+          "label_key": "profile.o.property.0"
+        },
+        {
+          "v": 1,
+          "label_key": "profile.o.property.1"
+        },
+        {
+          "v": 2,
+          "label_key": "profile.o.property.2"
+        },
+        {
+          "v": 3,
+          "label_key": "profile.o.property.3"
+        }
+      ]
+    },
+    {
+      "id": "drop",
+      "group": "willingness",
+      "prompt_key": "profile.q.drop",
+      "options": [
+        {
+          "v": 0,
+          "label_key": "profile.o.drop.0"
+        },
+        {
+          "v": 1,
+          "label_key": "profile.o.drop.1"
+        },
+        {
+          "v": 2,
+          "label_key": "profile.o.drop.2"
+        },
+        {
+          "v": 3,
+          "label_key": "profile.o.drop.3"
+        }
+      ]
+    }
+  ],
+  "styles": [
+    "Capital preservation",
+    "Income",
+    "Balanced",
+    "Growth",
+    "Aggressive"
+  ]
+}

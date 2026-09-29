@@ -536,10 +536,18 @@
           <div id="styleMeta" class="note" style="margin-top:14px;"></div>
         </section>
         <section class="card">
-          <h2>2. Questionnaire</h2>
-          <p class="sub" style="margin:-6px 0 4px;">Two questions. The fit is a rule on your answers,
-          shown openly. Clear the answers to choose a style by hand.</p>
+          <h2><span data-i18n="profile.quiz.h">2. Questionnaire</span>
+            <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="profTag" data-i18n="profile.tag.loading">loading</span></h2>
+          <p class="sub" data-i18n="profile.quiz.lead" style="margin:-6px 0 4px;">Seven short questions.
+          Your answers map to a suggested style by an open rule, shown below. Clear the answers to
+          choose a style by hand.</p>
           <div class="q" id="quiz"></div>
+          <button type="button" class="btn gh" id="profClear" data-i18n="profile.clear" style="margin-top:10px;">Clear answers</button>
+          <div style="margin-top:14px;">
+            <h2 style="font-size:1rem;margin:0 0 4px;"><span data-i18n="profile.result.h">Suggested style</span></h2>
+            <div class="sub" id="profResult"></div>
+            <div id="profReason" class="note" style="margin-top:8px;"></div>
+          </div>
         </section>
       </div>
 
@@ -1061,7 +1069,7 @@
       try { if(document.getElementById("evidenceSeal")) loadEvidence(); } catch(e){}
       try { if(document.getElementById("strip")) { renderStrip(); renderMarketPanel(); } } catch(e){}
       try { if(document.getElementById("styleChips")) renderStyles(); } catch(e){}
-      try { if(document.getElementById("quizList")) renderQuiz(); } catch(e){}
+      try { if(document.getElementById("profResult")) renderProfResult(); } catch(e){}
     });
   }
   function loadCatalogue(l){
@@ -1329,53 +1337,129 @@
       var b=document.createElement("button");
       b.type="button"; b.className="chip"+(style.selected===st.n?" on":"");
       b.textContent=st.n;
-      b.addEventListener("click",function(){style.selected=st.n;style.via="self";quizAns.horizon=null;quizAns.drop=null;syncQuiz();renderStyles();renderStyleGap();});
+      b.addEventListener("click",function(){style.selected=st.n;style.via="self";quizAns={};syncQuiz();renderProfResult();renderStyles();renderStyleGap();});
       chips.appendChild(b);
     });
     var st=styleByName(style.selected);
-    document.getElementById("styleQn").innerHTML="<span>Selected: <b>"+st.n+"</b></span>"+
-      "<span>Source: "+(style.via==="quiz"?"matched from your questionnaire answers":"chosen by you")+"</span>";
+    document.getElementById("styleQn").innerHTML="<span>"+esc(T("profile.selected"))+" <b>"+st.n+"</b></span>"+
+      "<span>"+esc(T(style.via==="quiz"?"profile.source.quiz":"profile.source.self"))+"</span>";
     document.getElementById("styleSrc").innerHTML='<span class="src"><span class="dot"></span>'+T(st.src)+'</span>';
     document.getElementById("styleMeta").innerHTML="<b>Illustrative profile.</b> "+st.d+
       " These weights are a reference designed by us, in the open, so you can see what the gap is measured against. They are not a recommended allocation and not a product.";
   }
 
-  var QUESTIONS=[
-    {id:"horizon", q:"How long before you would need a large part of this money?", opts:[
-      {v:0,label:"Under 3 years"},{v:1,label:"3 to 7 years"},{v:2,label:"8 to 15 years"},{v:3,label:"Over 15 years"}]},
-    {id:"drop", q:"If your portfolio fell 25% in a year, what would you do?", opts:[
-      {v:0,label:"Sell to stop further falls"},{v:1,label:"Sell some"},{v:2,label:"Hold"},{v:3,label:"Add to it"}]}
-  ];
-  var quizAns={horizon:null, drop:null};
+  // The setup questionnaire (#228 workstream C). The questions are data, so
+  // the registry and the view cannot drift, and the rule is stated openly: a
+  // base score (horizon + reaction to a fall) is capped by capacity and by
+  // liquidity, and the fit is the lower figure. A high willingness to take risk
+  // never lifts a portfolio whose money is needed soon or whose buffer is thin.
+  var profCfg=null;      // catalogue from api/profile, or the bundled config
+  var profOnce=false;    // bind the static handlers once
+  var quizAns={};        // question id -> 0..3 score (absent = unanswered)
+  function profVal(v){ return (v===null||v===undefined||v==="")?null:Math.max(0,Math.min(3,parseInt(v,10)||0)); }
+  function profScore(ans){
+    var h=profVal(ans.horizon), d=profVal(ans.drop);
+    var base=(h||0)+(d||0);
+    var cap=[];
+    ["income_stability","life_stage","dependents"].forEach(function(id){var s=profVal(ans[id]);if(s!==null)cap.push(s);});
+    if(h!==null) cap.push(h);
+    var capacity=cap.length?Math.round(cap.reduce(function(a,b){return a+b;},0)/cap.length):0;
+    var liq=[];["emergency_months","property_plans"].forEach(function(id){var s=profVal(ans[id]);if(s!==null)liq.push(s);});
+    var liquidity=liq.length?Math.min.apply(null,liq):3;
+    var ceiling=2*Math.min(capacity,liquidity);
+    var fit=Math.min(base,ceiling);
+    return {base:base,capacity:capacity,liquidity:liquidity,ceiling:ceiling,fit:fit,
+            pick:[0,0,1,2,3,4,4][fit],override:ceiling<base,
+            binding:(capacity<=liquidity?"capacity":"liquidity")};
+  }
+  function profAnswered(){ return Object.keys(quizAns).some(function(k){return profVal(quizAns[k])!==null;}); }
   function renderQuiz(){
-    var el=document.getElementById("quiz"); if(!el) return;
+    var el=document.getElementById("quiz"); if(!el||!profCfg) return;
     el.innerHTML="";
-    QUESTIONS.forEach(function(Q){
+    (profCfg.questions||[]).forEach(function(Q){
       var d=document.createElement("div"); d.className="qi";
-      var h='<p class="qt">'+Q.q+'</p><div class="qo">';
-      Q.opts.forEach(function(o){
-        var on=quizAns[Q.id]===o.v;
-        h+='<label class="'+(on?"sel":"")+'" data-q="'+Q.id+'" data-v="'+o.v+'"><input type="radio" name="'+Q.id+'" '+(on?"checked":"")+'>'+o.label+'</label>';
+      var h='<p class="qt">'+esc(T(Q.prompt_key))+'</p><div class="qo">';
+      (Q.options||[]).forEach(function(o){
+        var on=profVal(quizAns[Q.id])===o.v;
+        h+='<label class="'+(on?"sel":"")+'" data-q="'+Q.id+'" data-v="'+o.v+'"><input type="radio" name="'+Q.id+'" '+(on?"checked":"")+'>'+esc(T(o.label_key))+'</label>';
       });
       h+='</div>'; d.innerHTML=h; el.appendChild(d);
     });
     el.querySelectorAll("label[data-q]").forEach(function(l){
       l.addEventListener("click",function(){
         quizAns[l.dataset.q]=parseInt(l.dataset.v,10);
-        guessStyle(); renderQuiz(); renderStyles(); renderStyleGap();
+        guessStyle(); renderQuiz(); renderProfResult(); renderStyles(); renderStyleGap();
       });
     });
-    var c=document.createElement("p"); c.className="note";
-    c.textContent="Rule: score 0 to 6 across the two answers maps to Capital preservation, Income, Balanced, Growth, Aggressive at 0-1, 2, 3, 4, 5-6. An open rule, not a black box.";
+    var c=document.createElement("p"); c.className="note"; c.textContent=T("profile.rule");
     el.appendChild(c);
   }
-  function guessStyle(){
-    if(quizAns.horizon===null||quizAns.drop===null) return;
-    var s=quizAns.horizon+quizAns.drop;
-    var pick=[0,0,1,2,3,4,4][s];
-    style.selected=STYLES[pick].n; style.via="quiz";
+  function renderProfResult(){
+    var box=document.getElementById("profResult"), r=document.getElementById("profReason");
+    if(!box||!profCfg) return;
+    if(!profAnswered()){
+      box.innerHTML='<span class="sub">'+esc(T("profile.quiz.lead"))+'</span>';
+      if(r) r.innerHTML="";
+      return;
+    }
+    var s=profScore(quizAns);
+    box.innerHTML='<span>'+esc(T("profile.suggested",{style:STYLES[s.pick].n}))+'</span>';
+    if(r){
+      // The reasoning lines are educational and screened server-side; the
+      // offline path renders the same keys so the fit is explained either way.
+      var lines=[T("profile.reason.base",{base:s.base}),
+                 T("profile.reason.capacity",{capacity:s.capacity}),
+                 T("profile.reason.liquidity",{liquidity:s.liquidity})];
+      if(s.override) lines.push(T("profile.reason.override."+s.binding));
+      var ref=profCfg.reference||{};
+      r.innerHTML=lines.map(function(x){return '<p style="margin:.3rem 0;">'+esc(x)+'</p>';}).join("")+
+        '<p class="src" style="margin:.3rem 0;"><span class="dot"></span>'+
+        esc(T("profile.reference.line",{source:ref.source||"",as_of:ref.as_of||""}))+'</p>';
+    }
   }
-  function syncQuiz(){renderQuiz();}
+  function guessStyle(){
+    if(!profAnswered()) return;
+    var s=profScore(quizAns);
+    style.selected=STYLES[s.pick].n; style.via="quiz";
+  }
+  // Paint the catalogue (from the live API or the bundled config) and, when the
+  // tenant has stored answers, seed the questionnaire with them. Shared by both
+  // paths so the view renders the same online and offline.
+  function profPaint(cfg){
+    if(!cfg||!cfg.questions) return;
+    profCfg=cfg;
+    if(!profOnce){
+      var clr=document.getElementById("profClear");
+      if(clr){clr.addEventListener("click",function(){quizAns={};syncQuiz();renderProfResult();renderStyles();renderStyleGap();});}
+      profOnce=true;
+    }
+    renderQuiz(); renderProfResult();
+  }
+  function loadProfile(){
+    var tag=document.getElementById("profTag");
+    if(tag){tag.textContent=T("profile.tag.loading");}
+    return fetch("api/profile",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d||!d.ok){ throw new Error("offline"); }
+        if(tag){tag.textContent=T("profile.tag.ok");tag.style.color="var(--pine)";}
+        // Seed with the tenant's latest stored answer per question.
+        (d.answers||[]).forEach(function(a){
+          if(quizAns[a.question_id]===undefined && a.answer_value!==null){
+            quizAns[a.question_id]=a.answer_value;
+          }
+        });
+        guessStyle();
+        profPaint(d);
+        renderStyles(); renderStyleGap();
+        return true;
+      }).catch(function(){
+        if(tag){tag.textContent=T("profile.tag.offline");tag.style.color="var(--muted)";}
+        return fetch("profiling.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+          .then(function(d){ profPaint(d||{}); return true; })
+          .catch(function(){ return false; });
+      });
+  }
+  function syncQuiz(){ renderQuiz(); }
 
   // Server-computed drift + screened narrative for the selected style. The
   // bars stay instant and local; this fetch is what the API route exists for,
@@ -3400,8 +3484,8 @@
     if(am) am.setAttribute("content", T("brand.name"));
     renderStrip();
     renderMarketPanel();
-    renderQuiz();
     renderStyles();
+    loadProfile();
     render();
     // Enter the app (demo or resumed session) only now that I18N is loaded, so
     // every JS-painted view resolves its strings on the first paint.
