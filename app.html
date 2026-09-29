@@ -3094,10 +3094,12 @@
     if(!box) return;
     var keep=function(n){return n && n.screen && n.screen.shown;};
     var notes=(d.valuation||[]).filter(keep);
-    // A backend older than #235 returns no valuation key at all; the bundled
-    // rows carry the same sourced/dated shape, so band them here and describe
-    // them the same way rather than showing an empty panel.
-    if(!notes.length && !(d.valuation && d.valuation.length) && d._rows && d._rows.length){
+    // A backend older than #235 returns no valuation key at all, and the bundled
+    // offline catalogue carries raw rows (no server screen); in both cases the
+    // bundled rows are the fallback. When the API *did* answer with a valuation
+    // key, respect its screen: an all-refused list stays empty rather than being
+    // backfilled here.
+    if(!notes.length && d.valuation==null && d._rows && d._rows.length){
       notes=d._rows.map(eduBandRow);
     }
     box.innerHTML=notes.length?notes.map(function(n){
@@ -3157,7 +3159,7 @@
         // renders (reference + valuation rows live in education.config.json).
         if(tag){tag.textContent=T("edu.tag.offline");tag.style.color="var(--muted)";}
         return fetch("education.config.json",{cache:"no-store"}).then(function(r){return r.json();})
-          .then(function(d){ d=d||{}; d._rows=d.valuation||[]; eduPaint(d); return true; })
+          .then(function(d){ d=d||{}; d._rows=d.valuation||[]; d.valuation=null; eduPaint(d); return true; })
           .catch(function(){ return false; });
       });
   }
