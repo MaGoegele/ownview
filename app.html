@@ -3083,18 +3083,22 @@
     if(r<1.30) return "elevated";
     return "expensive";
   }
+  // Band a raw valuation row the way the server does, giving a note the same
+  // shape the API returns so one renderer serves both.
+  function eduBandRow(e){
+    return {key:e.symbol, note_key:"edu.context.valuation."+eduValBand(e.pe,e.reference_pe),
+            params:{symbol:e.symbol,pe:Number(e.pe).toFixed(1),reference_pe:Number(e.reference_pe).toFixed(1)}};
+  }
   function eduRenderValuation(d){
     var box=document.getElementById("eduValuation");
     if(!box) return;
     var keep=function(n){return n && n.screen && n.screen.shown;};
     var notes=(d.valuation||[]).filter(keep);
-    // Offline the server screen is absent; the bundled rows carry the same
-    // sourced/dated shape, so band them here and describe them the same way.
-    if(!notes.length && d.valuation && d.valuation.length===0 && d._rows){
-      notes=d._rows.map(function(e){
-        return {key:e.symbol, note_key:"edu.context.valuation."+eduValBand(e.pe,e.reference_pe),
-                params:{symbol:e.symbol,pe:e.pe.toFixed(1),reference_pe:e.reference_pe.toFixed(1)}};
-      });
+    // A backend older than #235 returns no valuation key at all; the bundled
+    // rows carry the same sourced/dated shape, so band them here and describe
+    // them the same way rather than showing an empty panel.
+    if(!notes.length && !(d.valuation && d.valuation.length) && d._rows && d._rows.length){
+      notes=d._rows.map(eduBandRow);
     }
     box.innerHTML=notes.length?notes.map(function(n){
       return '<div class="row"><div class="l"><span>'+esc(n.key)+'</span>'+
@@ -3138,6 +3142,14 @@
       .then(function(d){
         if(!d || !d.ok) { throw new Error("offline"); }
         if(tag){tag.textContent=T("edu.tag.ok");tag.style.color="var(--pine)";}
+        // The bundled valuation rows travel alongside the live API response:
+        // the API is the source of truth for the screened notes, but a backend
+        // that predates #235 carries none, so hand the renderer the bundled
+        // rows as the fallback and band them the same way.
+        return fetch("education.config.json",{cache:"no-store"}).then(function(r){return r.json();})
+          .then(function(cfg){ d._rows=(cfg||{}).valuation||[]; return d; })
+          .catch(function(){ d._rows=[]; return d; });
+      }).then(function(d){
         eduPaint(d);
         return true;
       }).catch(function(){
