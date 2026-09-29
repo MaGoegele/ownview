@@ -374,6 +374,7 @@
     <a data-v="style" data-i18n="nav.style">Investment style</a>
     <a data-v="insights" data-i18n="nav.insights">Insights</a>
     <a data-v="education" data-i18n="nav.education">Education</a>
+    <a data-v="checkin" data-i18n="nav.checkin">Life check-in</a>
     <a data-v="scenario" data-i18n="nav.scenario">Scenarios</a>
     <a data-v="governance" data-i18n="nav.governance">Governed AI</a>
     <a data-v="estate" data-i18n="nav.estate">Estate</a>
@@ -616,6 +617,38 @@
 
       <div class="nocall">
         <b data-i18n="edu.note.notadvice">General information about asset classes, not investment advice.</b>
+      </div>
+    </section>
+
+    <!-- LIFE CHECK-IN -->
+    <section class="view" id="v-checkin">
+      <span class="eyebrow" data-i18n="checkin.eyebrow">Life check-in</span>
+      <h2 style="font-size:1.4rem;margin:.3rem 0 4px;"><span data-i18n="checkin.title">Did your life circumstance change?</span>
+        <span style="font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;" id="ckTag" data-i18n="checkin.tag.loading">loading</span></h2>
+      <p class="sub" data-i18n="checkin.sub">A life event usually changes what your money needs to do: how much
+      cash you can reach, how long it can stay invested, and how much a fall can be carried. Mark any that apply
+      and see the general consequences. Information about the event, not advice about your holdings.</p>
+      <p class="note" id="ckRef" style="margin:2px 0 16px;"></p>
+
+      <section class="card">
+        <h2 data-i18n="checkin.pick.h">Mark any change</h2>
+        <p class="sub" data-i18n="checkin.pick.lead">Choose the event that happened. The consequences are general
+        and sourced; the answer is dated and kept with your account so a later session can come back to it.</p>
+        <div id="ckEvents"></div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <h2 data-i18n="checkin.result.h">What this usually means</h2>
+        <div id="ckResult"></div>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <h2 data-i18n="checkin.history.h">Your check-ins</h2>
+        <div id="ckHistory"></div>
+      </section>
+
+      <div class="nocall">
+        <b data-i18n="checkin.note.notadvice">General information about a life event, not investment advice.</b>
       </div>
     </section>
 
@@ -1010,6 +1043,7 @@
       try { render(); } catch(e){}
       try { if(document.getElementById("taxBody")) loadTax(); } catch(e){}
       try { if(document.getElementById("eduClasses")) loadEducation(); } catch(e){}
+      try { if(document.getElementById("ckEvents")) loadCheckin(); } catch(e){}
       try { if(document.getElementById("scenarioBody")) loadScenario(); } catch(e){}
       try { if(document.getElementById("govAttacks")) loadGovernance(); } catch(e){}
       try { if(document.getElementById("estateTotal")) loadEstate(); } catch(e){}
@@ -1591,6 +1625,7 @@
     document.querySelectorAll(".view").forEach(function(s){s.classList.toggle("on",s.id==="v-"+v);});
     if(v==="documents") loadDocuments();
     if(v==="education") loadEducation();
+    if(v==="checkin") loadCheckin();
     if(v==="scenario") loadScenario();
     if(v==="governance") loadGovernance();
     if(v==="estate") loadEstate();
@@ -2975,6 +3010,60 @@
         return true;
       }).catch(function(){if(tag){tag.textContent=T("edu.tag.offline");}return false;});
   }
+  // Life-change check-in (#228 workstream D): the events + their screened
+  // consequences. The screen decides what shows; an answer is posted back and
+  // recorded, never held in the client.
+  function ckRenderMapped(ev){
+    var box=document.getElementById("ckResult");
+    if(!box) return;
+    if(!ev){ box.innerHTML='<p class="note">'+T("checkin.result.empty")+'</p>'; return; }
+    var keep=function(n){return n && n.screen && n.screen.shown;};
+    box.innerHTML='<div class="row"><div class="l"><span style="font-weight:700;">'+esc(T(ev.name_key))+'</span></div></div>'+
+      (ev.consequences||[]).filter(keep).map(function(c){
+        return '<div class="row"><div class="l"><span style="font-weight:600;">'+esc(T("checkin.dim."+c.dimension))+'</span>'+
+          '<small>'+esc(T(c.note_key))+'</small></div></div>';}).join("");
+  }
+  function ckRenderHistory(answers){
+    var box=document.getElementById("ckHistory");
+    if(!box) return;
+    if(!answers || !answers.length){ box.innerHTML='<p class="note">'+T("checkin.history.empty")+'</p>'; return; }
+    box.innerHTML=answers.map(function(a){
+      return '<div class="row"><div class="l"><small>'+esc(T("checkin.history.flagged",
+        {event:T("checkin.event."+a.event_code), date:a.answered_on||""}))+'</small></div></div>';}).join("");
+  }
+  function loadCheckin(){
+    var tag=document.getElementById("ckTag");
+    return fetch("api/checkins",{cache:"no-store"}).then(function(r){return r.json();})
+      .then(function(d){
+        if(!d || !d.ok) { if(tag){tag.textContent=T("checkin.tag.offline");tag.style.color="var(--muted)";} return false; }
+        if(tag){tag.textContent=T("checkin.tag.ok");tag.style.color="var(--pine)";}
+        var ref=d.reference||{};
+        var rf=document.getElementById("ckRef");
+        if(rf){rf.textContent=T("checkin.reference.line",{source:ref.source||"",as_of:ref.as_of||""});}
+        var box=document.getElementById("ckEvents");
+        if(box){
+          box.innerHTML=(d.events||[]).map(function(ev){
+            return '<div class="row"><div class="l"><button class="chip" data-event="'+esc(ev.code)+'">'+
+              esc(T(ev.name_key))+'</button></div></div>';}).join("");
+          box.querySelectorAll("button[data-event]").forEach(function(b){
+            b.addEventListener("click",function(){ ckAnswer(b.getAttribute("data-event")); });
+          });
+        }
+        ckRenderMapped(null);
+        ckRenderHistory(d.answers||[]);
+        return true;
+      }).catch(function(){if(tag){tag.textContent=T("checkin.tag.offline");}return false;});
+  }
+  function ckAnswer(code){
+    if(!code) return;
+    return fetch("api/checkins/answer",{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify({event:code})})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d && d.ok){ ckRenderMapped(d.event); ckRenderHistory(d.answers||[]); }
+        return d;
+      }).catch(function(){ return false; });
+  }
   function loadScenario(){
     var tag=document.getElementById("scenarioTag");
     return fetch("api/scenario",{cache:"no-store"}).then(function(r){return r.json();})
@@ -3153,6 +3242,7 @@
     refresh();
     loadTax();
     loadEducation();
+    loadCheckin();
     loadScenario();
     loadGovernance();
     loadEstate();
@@ -3243,9 +3333,13 @@
   document.getElementById("signin").addEventListener("click",signIn);
   document.getElementById("resetGo").addEventListener("click",doReset);
   // A landing-page "open the demo" link lands here with #demo and skips the
-  // gate straight into the synthetic household.
-  if(location.hash==="#demo"){ enterDemo(); }
-  else if(!resume()){ document.getElementById("em").focus(); }
+  // gate straight into the synthetic household. Entry is deferred until the
+  // catalogue has loaded (see below): enterDemo/resume paint i18n text through
+  // T(), and running them before loadCatalogue() resolves paints raw keys.
+  function bootGate(){
+    if(location.hash==="#demo"){ enterDemo(); }
+    else if(!resume()){ document.getElementById("em").focus(); }
+  }
   document.getElementById("pw").addEventListener("keydown",function(e){if(e.key==="Enter")signIn();});
   document.getElementById("pw2").addEventListener("keydown",function(e){if(e.key==="Enter")doReset();});
   // Create account: no longer a prefilled fake identity. It clears the form so
@@ -3280,6 +3374,9 @@
     renderQuiz();
     renderStyles();
     render();
+    // Enter the app (demo or resumed session) only now that I18N is loaded, so
+    // every JS-painted view resolves its strings on the first paint.
+    bootGate();
     // Deep-link into the tour: #tour, or #tour=3 for a step.
     var m=/^#tour(?:=(\d+))?$/.exec(location.hash||"");
     if(m) openTour(m[1]?parseInt(m[1],10)-1:0);
