@@ -15,15 +15,26 @@
 <meta name="description" content="NetworthXray app: the personal wealth cockpit behind the sign-in. Net worth, allocation, valuations across currencies, a Swiss tax pack, all with method, source and date.">
 <style>
   :root{
-    --pine:#1F5E4C; --pine-soft:#E7F0EA; --paper:#F6F4EE; --card:#FFFFFF;
-    --ink:#17201C; --muted:#5C6A62; --line:#E4E0D4;
+    /* NetworthXray palette: gold + blue, matching the mark (navy ground, gold
+       ring, gold/blue chart). --pine is the ACCENT token; loadBrand() overrides
+       it from brand.config.json's b2c accent, so the default here is the same
+       gold the config carries, not the old green. --blue is the fixed second
+       brand colour, borrowed from the mark's chart line. */
+    --pine:#8A6A1E; --pine-soft:#F5EDD8; --blue:#2F5FA8; --blue-soft:#E7EDF8;
+    --navy:#0B1220;
+    --paper:#F7F4EC; --card:#FFFFFF;
+    --ink:#141A22; --muted:#5C6A72; --line:#E5E0D2;
     --est:#B98A2E; --est-soft:#F5EDD8; --pos:#2E6B3E; --neg:#B23A2E;
+    --shadow:0 1px 2px rgba(11,18,32,.05),0 10px 28px -14px rgba(11,18,32,.20);
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5;}
   .num{font-variant-numeric:tabular-nums;}
   header{border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:20;}
+  /* The mark's two-tone chart, as a hairline: gold to blue. */
+  header::before{content:"";display:block;height:3px;
+    background:linear-gradient(90deg,var(--pine),var(--blue));}
   .bar{max-width:1160px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;gap:16px;}
   .brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;letter-spacing:-.01em;font-size:1.05rem;}
   .brand .mk{width:24px;height:24px;border-radius:6px;display:block;}
@@ -112,7 +123,7 @@
   input:focus,select:focus{outline:2px solid var(--pine-soft);border-color:var(--pine);}
   .btn{margin-top:16px;padding:11px 18px;border:0;border-radius:10px;background:var(--pine);
     color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;}
-  .btn:hover{background:#194b3d;}
+  .btn:hover{background:#6E5415;}
   .btn.ghost{background:#fff;color:var(--muted);border:1px solid var(--line);}
   .tag{font-size:.68rem;font-family:ui-monospace,monospace;background:var(--pine-soft);
     color:var(--pine);padding:2px 7px;border-radius:6px;}
@@ -140,13 +151,13 @@
   .gapbar .gl:last-child{border-bottom:0;}
   @media(max-width:820px){.gapbar .gl{grid-template-columns:1fr;gap:4px;}}
   .gapbar .track{position:relative;height:22px;background:#EFEAD9;border-radius:6px;overflow:hidden;}
-  .gapbar .cur{position:absolute;top:0;bottom:0;background:rgba(31,94,76,.22);}
+  .gapbar .cur{position:absolute;top:0;bottom:0;background:rgba(138,106,30,.22);}
   .gapbar .tgt{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--pine);border-radius:2px;}
   .gapbar .delta{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;}
   .gapbar .delta.over{color:var(--est);} .gapbar .delta.under{color:var(--neg);}
   .gapbar .delta.matched{color:var(--pos);}
   .rep{margin-top:8px;border:1px solid var(--line);border-radius:12px;padding:18px 20px;
-    background:#FCFBF7;font-size:.87rem;line-height:1.6;}
+    background:#FBF8F0;font-size:.87rem;line-height:1.6;}
   .rep h3{margin:14px 0 6px;font-size:.82rem;font-family:ui-monospace,monospace;letter-spacing:.08em;
     text-transform:uppercase;color:var(--pine);}
   .rep h3:first-child{margin-top:0;}
@@ -164,7 +175,7 @@
   .gate p{color:var(--muted);font-size:.86rem;margin:.2rem 0 18px;}
   .gate .go{margin-top:20px;width:100%;padding:12px;border:0;border-radius:10px;
     background:var(--pine);color:#fff;font-size:.92rem;font-weight:600;cursor:pointer;font-family:inherit;}
-  .gate .go:hover{background:#194b3d;}
+  .gate .go:hover{background:#6E5415;}
   .gate .hint{margin-top:16px;font-size:.76rem;color:var(--muted);
     background:var(--est-soft);border-radius:10px;padding:11px 13px;}
   .gate .hint code{font-family:ui-monospace,monospace;background:#fff;padding:1px 5px;border-radius:4px;}
@@ -986,15 +997,15 @@
   // balance sheet rather than four broad buckets. `liability` is not an asset
   // class and is excluded from every share computation.
   var CLASSES = {
-    equity:{k:"class.equity", color:"#2E6B3E"},
-    bonds:{k:"class.bonds", color:"#5C8A6A"},
-    realestate:{k:"class.realestate", color:"#1F5E4C"},
-    private:{k:"class.private", color:"#B98A2E"},
-    crypto:{k:"class.crypto", color:"#8A6FB0"},
-    metals:{k:"class.metals", color:"#A78B4B"},
-    collectibles:{k:"class.collectibles", color:"#9A6B4F"},
-    vehicles:{k:"class.vehicles", color:"#4E6E8E"},
-    cash:{k:"class.cash", color:"#6C8F86"},
+    equity:{k:"class.equity", color:"#2F5FA8"},
+    bonds:{k:"class.bonds", color:"#6E93CC"},
+    realestate:{k:"class.realestate", color:"#B98A2E"},
+    private:{k:"class.private", color:"#7A5CA8"},
+    crypto:{k:"class.crypto", color:"#C77F3A"},
+    metals:{k:"class.metals", color:"#D4B25A"},
+    collectibles:{k:"class.collectibles", color:"#A8705A"},
+    vehicles:{k:"class.vehicles", color:"#55688A"},
+    cash:{k:"class.cash", color:"#9BB0C9"},
     liability:{k:"class.liability", color:"#B23A2E"}
   };
   // Min/max share of total assets used to sanity-check a new position, not a rule.
@@ -2823,9 +2834,9 @@
   // sums to the total the net-worth line already shows, so a band rests on the
   // same sourced, dated basis the point carries; there is no separate figure.
   var CLASS_COLORS=[
-    ["equity","#2f6f5e"],["bonds","#5b8ea8"],["realestate","#c8a15a"],
-    ["private","#8a6db0"],["crypto","#d08a3e"],["metals","#b8a04a"],
-    ["collectibles","#a8705a"],["vehicles","#7d8a92"],["cash","#6f8a6a"]
+    ["equity","#2F5FA8"],["bonds","#6E93CC"],["realestate","#B98A2E"],
+    ["private","#7A5CA8"],["crypto","#C77F3A"],["metals","#D4B25A"],
+    ["collectibles","#A8705A"],["vehicles","#55688A"],["cash","#9BB0C9"]
   ];
   function colorFor(code){
     for(var i=0;i<CLASS_COLORS.length;i++){if(CLASS_COLORS[i][0]===code){return CLASS_COLORS[i][1];}}
