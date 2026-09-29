@@ -82,6 +82,7 @@
   ],
   "sentiment": {
     "band": "calm",
+    "note_key": "market.sentiment.calm",
     "vix": 14.87,
     "method": "Cboe VIX level mapped to a descriptive band (<15 calm, 15-20 normal, 20-30 cautious, >30 stressed)",
     "source": "Cboe",

@@ -22,6 +22,10 @@ window.OwnViewI18n = (function () {
   function T(key, params) {
     var cat = I18N[LANG] || I18N.en || {};
     var s = cat[key] != null ? cat[key] : ((I18N.en || {})[key] != null ? I18N.en[key] : key);
+    // A missing key falls back to the key name. Key it as a string so a caller
+    // passing an undefined/invalid key degrades to that name, never a throw
+    // that aborts the whole render pass.
+    if (typeof s !== "string") s = (key == null ? "" : String(key));
     if (params) {
       Object.keys(params).forEach(function (k) { s = s.split("{" + k + "}").join(params[k]); });
     }
